@@ -1,7 +1,5 @@
-use std::env;
-use std::fs::{create_dir, create_dir_all};
+use std::fs::{create_dir_all};
 use std::io::Write;
-use std::ops::Index;
 use std::path::Path;
 use std::time::SystemTime;
 use crate::core::install::install;
@@ -28,7 +26,6 @@ fn main() {
 }
 
 fn handle_command(command: &str) {
-    // TODO: match?
     if command == "" {
         // Check if the command is empty
         return;
@@ -42,7 +39,7 @@ fn handle_command(command: &str) {
         let head = args[0];
 
         // Game directory
-        if head == "DIR" {
+        if head == "dir" {
             if args.len() >= 2 {
                 if args[1] == "new" {
                     // Create directory
@@ -117,7 +114,7 @@ fn handle_command(command: &str) {
             let sources = get_version_sources(true, true, true, true).unwrap();
             let source = sources.get(index).unwrap();
 
-            println!("Minecraft installing start!\nIndex: {}\nId: {}\nTime out: {}\nPool size: {}",
+            println!("Minecraft is installing..\nIndex: {}\nId: {}\nTime out: {}\nPool size: {}",
                      index,
                      source.version_id,
                      time_out,
