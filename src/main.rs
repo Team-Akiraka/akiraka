@@ -105,6 +105,10 @@ fn handle_command(command: &str) {
                 }
             }
         } else if head == "install" {
+            if args.len() != 4 {
+                println!("Unknown arguments!");
+                return;
+            }
             let start_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis();
 
             let index = args[1].parse::<usize>().unwrap();

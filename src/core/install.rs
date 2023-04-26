@@ -42,7 +42,7 @@ fn download(url: &str, mut file: File, client: Client) {
     file.write_all(&client.get(url).send().unwrap().bytes().unwrap()).expect("Could not write library file!");
 }
 
-pub unsafe fn install(
+pub fn install(
     source: &VersionSource,
     dir: String,
     time_out: usize,
@@ -77,6 +77,7 @@ pub unsafe fn install(
 
     // Thread pool
     let pool = rayon::ThreadPoolBuilder::new().num_threads(pool_size).build().expect("Could not create a Thread pool!");
+    pool.install(|| println!("Thread pool created!"));
 
     // Downloads
     // Main file
@@ -134,6 +135,10 @@ pub unsafe fn install(
             if natives.get(os).is_some() {
                 create_dir_all(natives_path).expect("Could not create natives directory!");
                 let natives = &library["downloads"]["classifiers"][&library["natives"][os].as_str().unwrap()];
+                if natives.is_null() {
+                    continue
+                }
+                println!("{}", serde_json::to_string(natives).unwrap());
                 let url = natives["url"].as_str().unwrap();
                 create_dir_all(library_path.clone().join(natives["path"].as_str().unwrap()).as_path().parent().unwrap()).expect("Could not create native directory!");
                 let file = File::create(library_path.clone().join(natives["path"].as_str().unwrap()).as_path()).expect("Could not create native library!");
