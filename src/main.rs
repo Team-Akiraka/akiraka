@@ -109,7 +109,7 @@ fn handle_command(command: &str) {
 
             let index = args[1].parse::<usize>().unwrap();
             let time_out = args[2].parse::<usize>().unwrap();
-            let pool_size = args[2].parse::<usize>().unwrap();
+            let pool_size = args[3].parse::<usize>().unwrap();
 
             let sources = get_version_sources(true, true, true, true).unwrap();
             let source = sources.get(index).unwrap();
