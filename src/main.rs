@@ -2,6 +2,7 @@ use std::fs::{create_dir_all};
 use std::io::Write;
 use std::path::Path;
 use std::time::SystemTime;
+use rust_embed::RustEmbed;
 use crate::core::install::install;
 use crate::core::network::get_version_sources;
 use crate::core::util;
@@ -10,7 +11,13 @@ mod core;
 
 static mut DIR: String = String::new();
 
+#[derive(RustEmbed)]
+#[folder = "assets"]
+struct Asset;
+
 fn main() {
+    // let test = Asset::get("icon.txt").unwrap();
+    // println!("{:?}", std::str::from_utf8(test.data.as_ref()).unwrap());
     unsafe { DIR = String::from(Path::new(util::current_dir().as_str()).join(".minecraft").as_path().to_str().unwrap()); }
     println!("Akiraka Command Tool [Version 0.1.0-dev.20230420]\n(c) Arrokoth233. All rights reserved\n");
     loop {
