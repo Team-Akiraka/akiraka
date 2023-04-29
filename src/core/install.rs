@@ -1,9 +1,7 @@
-use std::env;
 use std::env::consts::OS;
 use std::fs::{create_dir_all, File};
-use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
-use std::ptr::null;
+use std::io::{Write};
+use std::path::{Path};
 use std::time::Duration;
 use reqwest::blocking::Client;
 use serde_json::Value;
@@ -41,6 +39,8 @@ fn check_rule(rules: &Vec<Value>) -> bool {
 fn download(url: &str, mut file: File, client: Client) {
     file.write_all(&client.get(url).send().unwrap().bytes().unwrap()).expect("Could not write library file!");
 }
+
+const ASSETS_URL: &str = "https://resources.download.minecraft.net/";
 
 pub fn install(
     source: &VersionSource,
@@ -131,7 +131,6 @@ pub fn install(
             } else {
                 OS
             };
-            // TODO: Assets
             if natives.get(os).is_some() {
                 create_dir_all(natives_path).expect("Could not create natives directory!");
                 let natives = &library["downloads"]["classifiers"][&library["natives"][os].as_str().unwrap()];
@@ -148,9 +147,21 @@ pub fn install(
         }
     }
 
+    // TODO: Download Sources and Multithreading
     // Assets
     for i in asset_index["objects"].as_object().unwrap().keys() {
-        println!("{}: {}", i, &asset_index["objects"][i]["hash"].as_str().unwrap());
+        let hash = asset_index["objects"][i]["hash"].as_str().unwrap();
+        let hash_short = &hash[0..2];
+        let temp = assets_path.clone().join(format!("objects/{}", hash_short));
+        let path = temp.as_path();
+        let temp = format!("{}{}/{}", ASSETS_URL, hash_short, hash);
+        let url = temp.as_str();
+        create_dir_all(path.clone()).expect("Could not create parent directories for Asset!");
+        let file = File::create(path.join(hash)).expect("Could not create Asset file!");
+        // println!("{}: {}", i, &asset_index["objects"][i]["hash"].as_str().unwrap());
+        // println!(".minecraft/assets/objects/{}/{}", hash_short, hash);
+        println!("Downloading Asset: {}", url);
+        download(url, file, client.clone());
     }
 
     Ok(())
