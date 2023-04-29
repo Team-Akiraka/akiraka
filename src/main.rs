@@ -27,31 +27,30 @@ fn main() {
 
 fn handle_command(command: &str) {
     if command == "" {
-        // Check if the command is empty
+        // 检查命令是否为空
         return;
     } else if command == "exit" {
-        // Exit command
+        // 退出程序
         std::process::exit(0);
     } else {
-        // Functional commands
-        // Command parsing
+        // 真正有用的命令（迫真
+        // 解析命令
         let args: Vec<&str> = command.split(" ").collect();
         let head = args[0];
 
-        // Game directory
+        // 游戏目录
         if head == "dir" {
             if args.len() >= 2 {
                 if args[1] == "new" {
-                    // Create directory
+                    // 创建
                     create_dir_all(args[2]).expect("Could not create directories!");
                     if args[2].replace("\\", "/").contains("/") {
                         if &(args[2].replace("\\", "/"))[args[2].replace("\\", "/").rfind("/").unwrap()..] != "/.minecraft" {
                             create_dir_all(String::from(args[2]) + "/.minecraft").expect("Could not create directories!");
-                            // println!("{}", &(args[2].replace("\\", "/"))[args[2].replace("\\", "/").rfind("/").unwrap()..] == "/.minecraft");
                         }
                     }
                 } else if args[1] == "change" {
-                    // Change current directory
+                    // 更改
                     unsafe {
                         let path = Path::new(args[2]);
                         if path.exists() {
