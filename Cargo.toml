@@ -2,7 +2,6 @@
 name = "akiraka"
 version = "0.1.0"
 edition = "2021"
-[target.'cfg(windows)'.build-dependencies]
 build = "build.rs"
 
 [dependencies]
