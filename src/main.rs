@@ -18,6 +18,7 @@ struct Asset;
 fn main() {
     // let test = Asset::get("icon.txt").unwrap();
     // println!("{:?}", std::str::from_utf8(test.data.as_ref()).unwrap());
+    // Minecraft购买链接：https://www.xbox.com/zh-cn/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj
     unsafe { DIR = String::from(Path::new(util::current_dir().as_str()).join(".minecraft").as_path().to_str().unwrap()); }
     println!("Akiraka Command Tool [Version 0.1.0-dev.20230420]\n(c) Arrokoth233. All rights reserved\n");
     loop {
