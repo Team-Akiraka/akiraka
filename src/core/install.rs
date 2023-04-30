@@ -16,7 +16,7 @@ pub fn install(
     // TODO: 多线程
     pool_size: usize) -> Result<(), std::io::Error> {
 
-    // 检查龟则
+    // 龟则检查函数
     fn check_rule(rules: &Vec<Value>) -> bool {
         let mut allow = false;
         for rule in rules {
