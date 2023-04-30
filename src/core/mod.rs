@@ -1,4 +1,5 @@
 pub mod install;
+pub mod launcher;
 pub mod network;
 pub mod util;
 

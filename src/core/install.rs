@@ -7,39 +7,6 @@ use reqwest::blocking::Client;
 use serde_json::Value;
 use crate::core::VersionSource;
 
-fn check_rule(rules: &Vec<Value>) -> bool {
-    let mut allow = false;
-    for rule in rules {
-        // TODO: 跨平台以及更多的规则
-        // https://doc.rust-lang.org/std/env/consts/constant.OS.html
-        // println!("{}", env::consts::ARCH);
-        let allow_ = rule["action"].as_str().unwrap() == "allow";
-        if rule.get("os").is_some() {
-            let os = OS;
-            let os_ = rule["os"]["name"].as_str().unwrap();
-
-            if os == "windows" && os_ == "windows" {
-                allow |= allow_;
-            } else if os == "linux" && os_ == "linux" {
-                allow |= allow_;
-            } else if os == "macos" && os_ == "osx" {
-                allow |= allow_;
-            } else {
-                allow |= false;
-            }
-        } else {
-            allow |= allow_;
-        }
-        // println!("{}", serde_json::to_string(rule).unwrap());
-    }
-    // println!("{}", allow);
-    return allow;
-}
-
-fn download(url: &str, mut file: File, client: Client) {
-    file.write_all(&client.get(url).send().unwrap().bytes().unwrap()).expect("Could not write library file!");
-}
-
 const ASSETS_URL: &str = "https://resources.download.minecraft.net/";
 
 pub fn install(
@@ -48,6 +15,42 @@ pub fn install(
     time_out: usize,
     // TODO: 多线程
     pool_size: usize) -> Result<(), std::io::Error> {
+
+    // 检查龟则
+    fn check_rule(rules: &Vec<Value>) -> bool {
+        let mut allow = false;
+        for rule in rules {
+            // TODO: 跨平台以及更多的规则
+            // https://doc.rust-lang.org/std/env/consts/constant.OS.html
+            // println!("{}", env::consts::ARCH);
+            let allow_ = rule["action"].as_str().unwrap() == "allow";
+            if rule.get("os").is_some() {
+                let os = OS;
+                let os_ = rule["os"]["name"].as_str().unwrap();
+
+                if os == "windows" && os_ == "windows" {
+                    allow |= allow_;
+                } else if os == "linux" && os_ == "linux" {
+                    allow |= allow_;
+                } else if os == "macos" && os_ == "osx" {
+                    allow |= allow_;
+                } else {
+                    allow |= false;
+                }
+            } else {
+                allow |= allow_;
+            }
+            // println!("{}", serde_json::to_string(rule).unwrap());
+        }
+        // println!("{}", allow);
+        return allow;
+    }
+
+    // 下崽函数
+    fn download(url: &str, mut file: File, client: Client) {
+        file.write_all(&client.get(url).send().unwrap().bytes().unwrap()).expect("Could not write library file!");
+    }
+
     // Http客户端
     let client = reqwest::blocking::ClientBuilder::new().timeout(Duration::from_millis(time_out as u64)).build().expect("Could not create a Http Client!");
 
