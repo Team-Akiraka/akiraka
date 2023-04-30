@@ -1,6 +1,7 @@
 #[cfg(target_os="windows")]
 extern crate windres;
 
+#[cfg(target_os="windows")]
 use windres::Build;
 
 fn main() {
