@@ -5,6 +5,6 @@
  */
 public class VersionChecker {
     public static void main(String[] args) {
-        System.out.println("{\"java_home\":\"" + System.getProperty("java.home") + "\",\"java_class_version\":\"" + (Double.parseDouble(System.getProperty("java.class.version")) - 44) + "\"}");
+        System.out.println("{\"java_home\":\"" + System.getProperty("java.home") + "\",\"java_class_version\":" + (Double.parseDouble(System.getProperty("java.class.version")) - 44) + "}");
     }
 }

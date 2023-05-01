@@ -1,25 +1,29 @@
-use std::fs::{create_dir_all};
+use std::fs::{create_dir_all, read_dir};
 use std::io::Write;
 use std::path::Path;
 use std::time::SystemTime;
-use rust_embed::RustEmbed;
 use crate::core::install::install;
 use crate::core::launcher::launch;
 use crate::core::network::get_version_sources;
-use crate::core::util;
+use crate::core::{check_java, util};
 
 mod core;
 
+const HELP: &str = r#"
+Available commands are:
+-help
+-exit
+-dir        new         [path]
+            change      [path]
+            []
+-index      (+s, -s, +r, -r, +ob, -ob, +oa, -oa)
+ install    [index]     [timeout]   [thread_pool_size]
+-local
+-java       [path_to_java]
+-run        [name]      [path_to_java]"#;
 static mut DIR: String = String::new();
 
-#[derive(RustEmbed)]
-#[folder = "assets"]
-struct Asset;
-
 fn main() {
-    // let test = Asset::get("icon.txt").unwrap();
-    // println!("{:?}", std::str::from_utf8(test.data.as_ref()).unwrap());
-
     fn handle_command(command: &str) {
         if command == "" {
             // 检查命令是否为空
@@ -122,18 +126,39 @@ fn main() {
 
                 let end_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis();
                 println!("Install process end! Time used: {}ms.", (end_time - start_time));
+            } else if head == "local" {
+                unsafe {
+                    for i in read_dir(Path::new(&DIR).join("versions")).unwrap() {
+                        let dir = i.unwrap();
+                        let json = dir.path().clone().join(format!("{}.json", dir.file_name().to_str().unwrap()));
+                        if json.exists() && json.is_file() {
+                            println!("Found Version: {}", dir.file_name().to_str().unwrap());
+                        }
+                    }
+                }
+            } else if head == "java" {
+                let res = check_java(args[1]);
+                match res {
+                    Ok(..) => {
+                        let temp = res.unwrap().clone();
+                        println!("Java Home: {}\nJava Version: {}\nJava Class Version: {}", temp["java_home"].as_str().unwrap(), temp["java_class_version"].as_f64().unwrap(), temp["java_class_version"].as_f64().unwrap() + 44.0)
+                    },
+                    Err(..) => println!("Error while checking Java: {}", res.err().unwrap())
+                }
             } else if head == "run" {
                 if args.len() == 3 {
                     unsafe {
                         let x = launch(args[1], Path::new(&DIR), Path::new(args[2]));
                         match x {
                             Ok(..) => {},
-                            Err(..) => println!("{}", format!("Errors while launching game: {}", x.err().unwrap()))
+                            Err(..) => println!("{}", format!("Error while launching game: {}", x.err().unwrap()))
                         }
                     }
                 } else {
                     unknown_arguments();
                 }
+            } else if head == "help" {
+                println!("{}", HELP);
             } else {
                 unknown_command(command);
             }
@@ -150,7 +175,7 @@ fn main() {
     }
     // Minecraft购买链接：https://www.xbox.com/zh-cn/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj
     unsafe { DIR = String::from(Path::new(util::current_dir().as_str()).join(".minecraft").as_path().to_str().unwrap()); }
-    println!("Akiraka Command Tool [Version 0.1.0-dev.20230420]\n(c) Arrokoth233. All rights reserved\n");
+    println!("Akiraka Command Tool [Version 0.1.0-dev.20230501]\n(c) Arrokoth233. All rights reserved\n");
     loop {
         print!(">>");
         std::io::stdout().flush().expect("Flush Error!");

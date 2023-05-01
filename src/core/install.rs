@@ -1,11 +1,12 @@
 use std::env::consts::OS;
 use std::fs::{create_dir_all, File};
-use std::io::{Write};
+use std::io::{Read, Write};
 use std::path::{Path};
 use std::time::Duration;
 use reqwest::blocking::Client;
 use serde_json::Value;
-use crate::core::VersionSource;
+use zip::ZipArchive;
+use crate::core::{check_rule, VersionSource};
 
 const ASSETS_URL: &str = "https://resources.download.minecraft.net/";
 
@@ -16,39 +17,33 @@ pub fn install(
     // TODO: 多线程
     pool_size: usize) -> Result<(), std::io::Error> {
 
-    // 龟则检查函数
-    fn check_rule(rules: &Vec<Value>) -> bool {
-        let mut allow = false;
-        for rule in rules {
-            // TODO: 跨平台以及更多的规则
-            // https://doc.rust-lang.org/std/env/consts/constant.OS.html
-            // println!("{}", env::consts::ARCH);
-            let allow_ = rule["action"].as_str().unwrap() == "allow";
-            if rule.get("os").is_some() {
-                let os = OS;
-                let os_ = rule["os"]["name"].as_str().unwrap();
-
-                if os == "windows" && os_ == "windows" {
-                    allow |= allow_;
-                } else if os == "linux" && os_ == "linux" {
-                    allow |= allow_;
-                } else if os == "macos" && os_ == "osx" {
-                    allow |= allow_;
-                } else {
-                    allow |= false;
-                }
-            } else {
-                allow |= allow_;
-            }
-            // println!("{}", serde_json::to_string(rule).unwrap());
-        }
-        // println!("{}", allow);
-        return allow;
-    }
-
     // 下崽函数
     fn download(url: &str, mut file: File, client: Client) {
         file.write_all(&client.get(url).send().unwrap().bytes().unwrap()).expect("Could not write library file!");
+        file.flush().expect("Could not flush file!");
+    }
+    // 下崽并解鸭函数
+    fn download_and_extract(url: &str, mut file: File, extract_path: &Path, client: Client) {
+        create_dir_all(extract_path).expect("Could not crate natives directory!");
+        let buf = &client.get(url).send().unwrap().bytes().unwrap();
+        file.write_all(buf).expect("Could not write library file!");
+        file.flush().expect("Could not flush file!");
+
+        let contents = buf.to_vec();
+        let mut zip_archive = ZipArchive::new(std::io::Cursor::new(&contents[..])).expect("Could not open Native library as Zip file!");
+        for i in 0..zip_archive.len() {
+            let mut buf = zip_archive.by_index(i).expect("Could not extract Native library!");
+            if buf.is_dir() {
+                create_dir_all(extract_path.clone().join(buf.name())).expect("Could not crate directory!");
+            } else if buf.is_file() {
+                let mut file = File::create(extract_path.clone().join(buf.name())).expect("Could not create extracted file!");
+                let mut extracted = Vec::new();
+                buf.read_to_end(&mut extracted).expect("Could not read zip file!");
+                file.write_all(&extracted[..]).expect("Could not write to extracted file!");
+                file.flush().expect("Could not flush extracted file!");
+            }
+        }
+        // natives_path
     }
 
     // Http客户端
@@ -139,12 +134,11 @@ pub fn install(
                 if natives.is_null() {
                     continue
                 }
-                println!("{}", serde_json::to_string(natives).unwrap());
                 let url = natives["url"].as_str().unwrap();
                 create_dir_all(library_path.clone().join(natives["path"].as_str().unwrap()).as_path().parent().unwrap()).expect("Could not create native directory!");
                 let file = File::create(library_path.clone().join(natives["path"].as_str().unwrap()).as_path()).expect("Could not create native library!");
                 println!("Downloading Natives: {}", url);
-                download(url, file, client.clone());
+                download_and_extract(url, file.try_clone().unwrap(), natives_path, client.clone());
             }
         }
     }
