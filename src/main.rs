@@ -1,7 +1,6 @@
 use std::fs::{create_dir_all};
 use std::io::Write;
 use std::path::Path;
-use std::ptr::null;
 use std::time::SystemTime;
 use rust_embed::RustEmbed;
 use crate::core::install::install;

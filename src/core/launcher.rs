@@ -1,8 +1,7 @@
 use std::env::consts::OS;
-use std::fmt::format;
-use std::{env, fs};
+use std::{env};
 use std::fs::File;
-use std::io::{Error, ErrorKind, Read};
+use std::io::{Read};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use serde_json::Value;
@@ -82,7 +81,44 @@ pub fn launch(
     json.read_to_string(temp).expect("Could not read JSON!");
     let json: Value = serde_json::from_str(temp.as_str()).expect("JSON format error!");
 
+    // 替换游戏参数的函数
+    let replace_game_argument = |arg: String| -> String {
+        let arg = arg;
+        // TODO: 替换游戏参数
+        // --username
+        // ${auth_player_name}
+        // --version
+        // ${version_name}
+        // --gameDir
+        // ${game_directory}
+        // --assetsDir
+        // ${assets_root}
+        // --assetIndex
+        // ${assets_index_name}
+        // --uuid
+        // ${auth_uuid}
+        // --accessToken
+        // ${auth_access_token}
+        // --userType
+        // ${user_type}
+        // --versionType
+        // ${version_type}
+
+        // 必要参数（迫真
+        let arg = arg.replace("${game_directory}", to_absolute(dir).to_str().unwrap());
+        let arg = arg.replace("${assets_root}", to_absolute(dir.clone().join("assets").as_path()).to_str().unwrap());
+        let arg = arg.replace("${assets_index_name}", json["assets"].as_str().unwrap());
+        // 非必要参数（迫真
+        let arg = arg.replace("${version_type}", "akiraka");
+        let arg = arg.replace("${version_name}", "vanilla");
+        return arg;
+    };
+
     // 启动参数
+    let mut arguments: Vec<String> = Vec::new();
+
+    // JVM参数
+    // Classpath参数
     #[cfg(target_os = "windows")]
         let path_separator = ";";
     #[cfg(not(target_os = "windows"))]
@@ -109,14 +145,55 @@ pub fn launch(
             classpath += library_dir.clone().join(i["downloads"]["artifact"]["path"].as_str().unwrap()).to_str().unwrap();
         }
         if i.get("downloads").is_some() && i["downloads"].get("classifiers").is_some() {
-            classpath += path_separator;
-            classpath += library_dir.clone().join(i["downloads"]["classifiers"]["path"].as_str().unwrap()).to_str().unwrap();
+            let natives = &i["natives"];
+            // 系统
+            let os = if OS == "macos" {
+                "osx"
+            } else {
+                OS
+            };
+            if natives.get(os).is_some() {
+                let natives = &i["downloads"]["classifiers"][&i["natives"][os].as_str().unwrap()];
+                if natives.is_null() {
+                    continue
+                }
+                classpath += path_separator;
+                classpath += library_dir.clone().join(natives["path"].as_str().unwrap()).to_str().unwrap();
+            }
         }
     }
+    arguments.push(String::from("-cp"));
+    arguments.push(classpath.clone());
     println!("{}", classpath);
 
+    // 主类
+    arguments.push(String::from(json["mainClass"].as_str().unwrap()));
+
+    // 游戏参数
+    if json.get("arguments").is_some() {
+        // 扁平化后的参数
+        let args = json["arguments"]["game"].as_array().unwrap();
+        for i in args {
+            if i.as_str().is_none() {
+                continue
+            }
+            let temp = i.as_str().unwrap();
+            println!("{}", temp);
+            let arg = replace_game_argument(String::from(temp));
+            arguments.push(arg);
+        }
+    } else {
+        // TODO: 扁平化前的参数
+    }
+
+    // println!("{}", to_absolute(java).to_str().unwrap());
+    for i in &arguments {
+        println!("{}", i);
+    }
+
     let proc = Command::new(java)
-        .arg("-version")
+        .args(arguments)
+        .current_dir(dir)
         .spawn()
         .expect("Could not execute Minecraft!");
     let stdout = proc.wait_with_output().unwrap().stdout;

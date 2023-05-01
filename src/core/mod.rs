@@ -1,6 +1,3 @@
-use std::env;
-use std::path::Path;
-
 pub mod install;
 pub mod launcher;
 pub mod network;
