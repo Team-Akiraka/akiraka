@@ -219,7 +219,6 @@ pub fn launch(
         }
     }
 
-    // println!("{}", to_absolute(java).to_str().unwrap());
     for i in &arguments {
         println!("{}", i);
     }
