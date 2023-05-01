@@ -21,6 +21,7 @@ Available commands are:
 -local
 -java       [path_to_java]
 -run        [name]      [path_to_java]"#;
+
 static mut DIR: String = String::new();
 
 fn main() {
