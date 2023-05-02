@@ -15,6 +15,7 @@ pub mod util;
 #[folder = "assets"]
 struct Asset;
 
+// 御坂美琴生日快乐！
 pub struct VersionSource {
     pub version_id: String,
     pub version_url: String,

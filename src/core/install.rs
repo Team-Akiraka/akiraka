@@ -16,6 +16,7 @@ pub fn install(
     time_out: usize,
     // TODO: 多线程
     pool_size: usize) -> Result<(), std::io::Error> {
+    // 御坂美琴生日快乐！
 
     // 下崽函数
     fn download(url: &str, mut file: File, client: Client) {

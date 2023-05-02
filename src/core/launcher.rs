@@ -11,6 +11,7 @@ pub fn launch(
     name: &str,
     dir: &Path,
     java: &Path) -> Result<(), String> {
+    // 御坂美琴生日快乐！
 
     // 文件夹检查函数
     fn check_dir(dir: &Path) -> bool {
@@ -75,12 +76,14 @@ pub fn launch(
         // ${game_directory}
         // --assetsDir
         // ${assets_root}
+        // ${game_assets}
         // --assetIndex
         // ${assets_index_name}
         // --uuid
         // ${auth_uuid}
         // --accessToken
         // ${auth_access_token}
+        // ${auth_session}
         // --userType
         // ${user_type}
         // --versionType
@@ -91,12 +94,17 @@ pub fn launch(
         // 必要参数（迫真
         let arg = arg.replace("${game_directory}", to_absolute(dir).to_str().unwrap());
         let arg = arg.replace("${assets_root}", to_absolute(dir.clone().join("assets").as_path()).to_str().unwrap());
+        let arg = arg.replace("${game_assets}", to_absolute(dir.clone().join("assets").as_path()).to_str().unwrap());
         let arg = arg.replace("${assets_index_name}", json["assets"].as_str().unwrap());
-        let arg = arg.replace("${user_properties}", "[]");
+        let arg = arg.replace("${user_properties}", "{}");
         // TODO: 账号
         let arg = arg.replace("${auth_uuid}", "00000000-0000-0000-0000-000000000000");
-        let arg = arg.replace("${auth_access_token}", "null");
         let arg = arg.replace("${auth_player_name}", "Dev");
+        let arg = arg.replace("${auth_access_token}", "null");
+        let arg = arg.replace("${auth_session}", "null");
+        let arg = arg.replace("${clientid}", "null");
+        let arg = arg.replace("${auth_xuid}", "null");
+        let arg = arg.replace("${user_type}", "msa");
         // 非必要参数（迫真
         let arg = arg.replace("${version_type}", "akiraka");
         let arg = arg.replace("${version_name}", "vanilla");

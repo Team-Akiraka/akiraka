@@ -25,6 +25,7 @@ Available commands are:
 static mut DIR: String = String::new();
 
 fn main() {
+    // 御坂美琴生日快乐！
     fn handle_command(command: &str) {
         if command == "" {
             // 检查命令是否为空
