@@ -13,6 +13,7 @@ pub fn launch(
     java: &Path) -> Result<(), String> {
     // 御坂美琴生日快乐！
 
+    // TODO: 我们是不是要支持下模组加载器？
     // 文件夹检查函数
     fn check_dir(dir: &Path) -> bool {
         if !dir.exists() || !dir.is_dir() {
