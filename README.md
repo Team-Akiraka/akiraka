@@ -1,4 +1,1 @@
-<div style="text-align: center;">
-# AkirakaMC
-A Fast, Simple and Multifunctional Minecraft Launcher
-</div>
+![Banner](https://raw.githubusercontent.com/Team-Akiraka/team-akiraka.github.io/main/banner.png)
