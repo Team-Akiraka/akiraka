@@ -61,8 +61,8 @@ fn check_rule(rules: &Vec<Value>) -> bool {
 }
 
 // 爪哇检查函数
-pub fn check_java(java: &str) -> Result<Value, String> {
-    let temp_dir = current_dir().unwrap().join(".temp");
+pub fn check_java(java: &str, temp_dir: &str) -> Result<Value, String> {
+    let temp_dir = current_dir().unwrap().join(temp_dir);
     create_dir_all(temp_dir.clone()).expect("Could not create .temp directory!");
     let temp_file_path = temp_dir.join("VersionChecker.class");
     let mut temp_file = File::create(temp_file_path.clone()).expect("Could not create temp file!");

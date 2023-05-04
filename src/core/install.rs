@@ -19,10 +19,11 @@ pub fn install(
     // 御坂美琴生日快乐！
 
     // 下崽函数
-    fn download(url: &str, mut file: File, client: Client) {
+    fn download(url: &str, mut file: &File, client: &Client) {
         file.write_all(&client.get(url).send().unwrap().bytes().unwrap()).expect("Could not write library file!");
         file.flush().expect("Could not flush file!");
     }
+
     // 下崽并解鸭函数
     fn download_and_extract(url: &str, mut file: File, extract_path: &Path, client: Client) {
         create_dir_all(extract_path).expect("Could not crate natives directory!");
@@ -44,7 +45,6 @@ pub fn install(
                 file.flush().expect("Could not flush extracted file!");
             }
         }
-        // natives_path
     }
 
     // Http客户端
@@ -80,21 +80,15 @@ pub fn install(
     // 下载
     // 游戏主文件
     let binding = versions_path.clone().join(String::from(&source.version_id) + ".jar");
-    let file = File::create(binding.as_path()).expect("Could not create Main file!");
     let url = &json["downloads"]["client"]["url"].as_str().unwrap();
-    println!("Downloading Main file: {}", url);
-    download(url, file, client.clone());
-
-    // 资源索引
-    let asset_index = &json["assetIndex"];
-    let binding = assets_path.clone().join("indexes").join(String::from(asset_index["id"].as_str().unwrap()) + ".json");
-    create_dir_all(binding.parent().unwrap()).expect("Could not create directory!");
-    let mut file = File::create(binding.as_path()).expect("Could not create Asset index file!");
-    let url = asset_index["url"].as_str().unwrap();
-    println!("Downloading Asset Index: {}", url);
-    let asset_index = client.get(url).send().expect("Errors while downloading Json!").text().expect("Errors while reading Json!");
-    file.write_all(asset_index.as_ref()).expect("Could not write to Asset index!");
-    let asset_index: Value = serde_json::from_str(&asset_index).unwrap();
+    let file = File::create(binding.as_path()).expect("Could not create Main file!");
+    let url = String::from(*url);
+    let file = file.try_clone().unwrap();
+    let c = client.clone();
+    pool.spawn(move || {
+        println!("Downloading Main file: {}", url);
+        download(url.as_str(), &file, &c);
+    });
 
     // 依赖库
     for library in json["libraries"].as_array().unwrap() {
@@ -108,18 +102,23 @@ pub fn install(
             continue;
         }
 
-        // TODO: 多线程下载以及下载源的支持
+        // TODO: 下载源的支持
         // 下载
         // Artifact
         if library["downloads"].get("artifact").is_some() {
             let file_path = library_path.clone().join(library["downloads"]["artifact"]["path"].as_str().unwrap());
             create_dir_all(file_path.clone().parent().unwrap()).expect("Could not create library path!");
-            let file = File::create(library_path.clone().join(library["downloads"]["artifact"]["path"].as_str().unwrap())).unwrap();
             let url = library["downloads"]["artifact"]["url"].as_str().unwrap();
-            println!("Downloading Library: {}", url);
-            download(url, file, client.clone())
-            // std::thread::spawn(move || download(url, file, client.clone()));
+            let file = File::create(library_path.clone().join(library["downloads"]["artifact"]["path"].as_str().unwrap())).unwrap();
+            let url = String::from(url);
+            let file = file.try_clone().unwrap();
+            let c = client.clone();
+            pool.spawn(move || {
+                println!("Downloading Library: {}", url);
+                download(url.as_str(), &file, &c);
+            });
         }
+        // TODO: 多线程下载以及下载源的支持
         // Classifiers
         if library["downloads"].get("classifiers").is_some() && library.get("natives").is_some() {
             let natives = &library["natives"];
@@ -144,9 +143,26 @@ pub fn install(
         }
     }
 
-    // TODO: 多线程下载以及下载源的支持
+    // 资源索引
+    let asset_index = &json["assetIndex"];
+    let binding = assets_path.clone().join("indexes").join(String::from(asset_index["id"].as_str().unwrap()) + ".json");
+    create_dir_all(binding.parent().unwrap()).expect("Could not create directory!");
+    let mut file = File::create(binding.as_path()).expect("Could not create Asset index file!");
+    let url = asset_index["url"].as_str().unwrap();
+    println!("Downloading Asset Index: {}", url);
+    let asset_index = client.get(url).send().expect("Errors while downloading Json!").text().expect("Errors while reading Json!");
+    file.write_all(asset_index.as_ref()).expect("Could not write to Asset index!");
+    let asset_index: Value = serde_json::from_str(&asset_index).unwrap();
+
+    // TODO: 下载源的支持
     // 资源
-    for i in asset_index["objects"].as_object().unwrap().keys() {
+    let mut keys: Vec<&String> = asset_index["objects"].as_object().unwrap().keys().collect();
+    keys.sort_by(|a, b| {
+        let temp_a = asset_index["objects"][a]["size"].as_u64().unwrap();
+        let temp_b = asset_index["objects"][b]["size"].as_u64().unwrap();
+        temp_b.cmp(&temp_a)
+    });
+    for i in keys {
         let hash = asset_index["objects"][i]["hash"].as_str().unwrap();
         let hash_short = &hash[0..2];
         let temp = assets_path.clone().join(format!("objects/{}", hash_short));
@@ -155,9 +171,16 @@ pub fn install(
         let url = temp.as_str();
         create_dir_all(path.clone()).expect("Could not create parent directories for Asset!");
         let file = File::create(path.join(hash)).expect("Could not create Asset file!");
-        println!("Downloading Asset: {}", url);
-        download(url, file, client.clone());
+        let url = String::from(url);
+        let file = file.try_clone().unwrap();
+        let c = client.clone();
+        pool.spawn(move || {
+            println!("Downloading Asset: {}", url);
+            download(&url, &file, &c);
+        });
     }
+
+    pool.join(|| (), || ());
 
     Ok(())
 }

@@ -17,11 +17,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Arrokoth233"
             VALUE "FileDescription", "Akiraka Launcher for Minecraft."
-            VALUE "FileVersion", "v0.1.0-internal-build-20230501"
+            VALUE "FileVersion", "v0.1.0-internal-build-20230504"
             VALUE "InternalName", "Akiraka"
             VALUE "LegalCopyright", "Copyright ©2021-2023 Arrokoth233, All Rights Reserved."
             VALUE "ProductName", "Akiraka"
-            VALUE "ProductVersion", "v0.1.0-internal-build-20230501"
+            VALUE "ProductVersion", "v0.1.0-internal-build-20230504"
         END
     END
     BLOCK "VarFileInfo"

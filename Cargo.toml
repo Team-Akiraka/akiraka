@@ -1,6 +1,6 @@
 [package]
 name = "akiraka"
-version = "0.1.0-internal-build-20230501"
+version = "0.1.0-internal-build-20230504"
 edition = "2021"
 build = "build.rs"
 
