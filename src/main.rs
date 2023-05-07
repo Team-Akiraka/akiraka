@@ -1,4 +1,4 @@
-use std::fs::{create_dir_all, read_dir};
+use std::fs::{create_dir_all, File, read_dir};
 use std::io::Write;
 use std::path::Path;
 use std::time::SystemTime;
@@ -48,7 +48,12 @@ fn main() {
                         create_dir_all(args[2]).expect("Could not create directories!");
                         if args[2].replace("\\", "/").contains("/") {
                             if &(args[2].replace("\\", "/"))[args[2].replace("\\", "/").rfind("/").unwrap()..] != "/.minecraft" {
-                                create_dir_all(String::from(args[2]) + "/.minecraft").expect("Could not create directories!");
+                                let path = args[2].to_owned() + "/.minecraft";
+                                let path = Path::new(path.as_str());
+                                create_dir_all(path).expect("Could not create directories!");
+                                let mut launcher_profiles = File::create(path.clone().join("launcher_profiles.json")).expect("Could not create Launcher Profiles!");
+                                launcher_profiles.write(String::from("{}").as_bytes()).expect("Could not write to Launcher Profiles!");
+                                launcher_profiles.flush().expect("Could not close Launcher Profiles!");
                             }
                         }
                     } else if args[1] == "change" {

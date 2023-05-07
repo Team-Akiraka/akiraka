@@ -52,6 +52,12 @@ pub fn install(
 
     // 目录
     create_dir_all(dir.clone()).expect("Could not create directory!");
+    let launcher_profiles_path = Path::new(dir.as_str()).join("launcher_profiles.json");
+    if !launcher_profiles_path.exists() {
+        let mut launcher_profiles = File::create(launcher_profiles_path).expect("Could not create Launcher Profiles!");
+        launcher_profiles.write(String::from("{}").as_bytes()).expect("Could not write to Launcher Profiles!");
+        launcher_profiles.flush().expect("Could not flush Launcher Profiles!");
+    }
     let binding = Path::new(String::from(&dir).as_str()).join("assets");
     let assets_path = binding.as_path();
     let binding = Path::new(String::from(&dir).as_str()).join("libraries");
