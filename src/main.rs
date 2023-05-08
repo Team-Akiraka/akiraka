@@ -6,22 +6,10 @@ use std::time::SystemTime;
 use crate::core::install::install;
 use crate::core::launcher::launch;
 use crate::core::network::get_version_sources;
-use crate::core::{check_java, util};
+use crate::core::{Asset, check_java, util};
 
 mod core;
 
-const HELP: &str = r#"
-Available commands are:
--help
--exit
--dir        new         [path]
-            change      [path]
-            []
--index      (+s, -s, +r, -r, +ob, -ob, +oa, -oa)
- install    [index]     [timeout]   [thread_pool_size]
--local
--java       [path_to_java]
--run        [name]      [path_to_java]"#;
 
 static mut DIR: String = String::new();
 const TEMP_DIR: &str = ".akiraka/.temp";
@@ -175,7 +163,9 @@ fn main() {
                 let buf = &mut buf[..amt];
                 println!("{}", std::str::from_utf8(buf).unwrap());
             } else if head == "help" {
-                println!("{}", HELP);
+                let data = Asset::get("help.txt").unwrap();
+                let data = std::str::from_utf8(&*data.data).unwrap();
+                println!("{}", data);
             } else {
                 unknown_command(command);
             }

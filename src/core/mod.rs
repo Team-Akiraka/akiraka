@@ -13,7 +13,7 @@ pub mod util;
 
 #[derive(RustEmbed)]
 #[folder = "assets"]
-struct Asset;
+pub struct Asset;
 
 // 御坂美琴生日快乐！
 pub struct VersionSource {

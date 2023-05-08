@@ -12,7 +12,7 @@ rayon = "1.5"
 rust-embed = "6.6.1"
 druid = { git = "https://github.com/linebender/druid.git", version = "0.8.3"}
 image = "0.24.6"
-sysinfo = "0.28.1"
+sysinfo = "0.29.0"
 zip = "0.6.2"
 [target.'cfg(windows)'.build-dependencies]
 windres = "0.2"

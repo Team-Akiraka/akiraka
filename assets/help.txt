@@ -1,0 +1,11 @@
+Available commands are:
+-help
+-exit
+-dir        new         [path]
+            change      [path]
+            []
+-index      (+s, -s, +r, -r, +ob, -ob, +oa, -oa)
+-install    [index]     [timeout]   [thread_pool_size]
+-local
+-java       [path_to_java]
+-run        [name]      [path_to_java]
