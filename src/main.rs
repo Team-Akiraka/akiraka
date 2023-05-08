@@ -1,5 +1,6 @@
 use std::fs::{create_dir_all, File, read_dir};
 use std::io::Write;
+use std::net::{SocketAddrV4, UdpSocket};
 use std::path::Path;
 use std::time::SystemTime;
 use crate::core::install::install;
@@ -165,6 +166,14 @@ fn main() {
                 } else {
                     unknown_arguments();
                 }
+            } else if head == "bridge" {
+                let socket = UdpSocket::bind("127.0.0.1:25565").unwrap();
+                socket.connect(SocketAddrV4::new("38.6.226.131".parse().unwrap(), 40001)).unwrap();
+                socket.send("hello, akiraka!".as_bytes()).unwrap();
+                let mut buf = [0u8; 1500];
+                let amt = socket.recv(&mut buf).unwrap();
+                let buf = &mut buf[..amt];
+                println!("{}", std::str::from_utf8(buf).unwrap());
             } else if head == "help" {
                 println!("{}", HELP);
             } else {
