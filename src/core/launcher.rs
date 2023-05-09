@@ -15,6 +15,7 @@ pub fn launch(
     // 御坂美琴生日快乐！
 
     // TODO: 我们是不是要支持下模组加载器？
+    // TODO: 哼哼哼啊啊啊啊我做不到啊啊啊啊啊啊啊
     // 文件夹检查函数
     fn check_dir(dir: &Path) -> bool {
         if !dir.exists() || !dir.is_dir() {
