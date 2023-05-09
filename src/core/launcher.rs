@@ -82,7 +82,7 @@ pub fn launch(
             return Err(String::from("Could not find inheritsFrom for version!"));
         }
 
-        // 如果找到版本，则...
+        // 如果找到版本，则合并版本文件
         println!("{inherits}");
     }
 
