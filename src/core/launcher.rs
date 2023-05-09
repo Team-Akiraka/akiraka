@@ -1,6 +1,7 @@
 use std::env::consts::{OS};
 use std::{env};
-use std::fs::File;
+use std::fmt::format;
+use std::fs::{File, read_dir};
 use std::io::{Read};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -54,6 +55,36 @@ pub fn launch(
     let temp: &mut String = &mut String::new();
     json.read_to_string(temp).expect("Could not read JSON!");
     let json: Value = serde_json::from_str(temp.as_str()).expect("JSON format error!");
+
+    // 是否包含依赖的版本
+    if json.get("inheritsFrom").is_some() {
+        // 通过ID获取已安装的游戏
+        let inherits_from = json["inheritsFrom"].as_str().unwrap();
+        let versions_dir = versions_dir.clone().parent().unwrap();
+        let mut inherits = String::new();
+        for i in read_dir(versions_dir.clone()).unwrap() {
+            let name = i.unwrap().file_name();
+            let name = name.to_str().unwrap();
+            let path = versions_dir.clone().join(name).join(format!("{}.json", name));
+            if path.exists() && path.is_file() {
+                let mut file = File::open(versions_dir.clone().join(name).join(format!("{}.json", name))).expect("Could not open file!");
+                let mut buf = String::new();
+                file.read_to_string(&mut buf).unwrap();
+                let mut buf: Value = serde_json::from_str(buf.as_str()).unwrap();
+                let id = buf["id"].as_str().unwrap();
+                if id == inherits_from {
+                    inherits = String::from(id);
+                    break;
+                }
+            }
+        }
+        if inherits == String::new() {
+            return Err(String::from("Could not find inheritsFrom for version!"));
+        }
+        println!("{inherits}");
+
+        // 如果找到版本，则
+    }
 
     // 替换游戏参数的函数
     let replace_jvm_argument = |arg: String| -> String {
@@ -133,28 +164,30 @@ pub fn launch(
     }
     // 添加参数
     if json.get("arguments").is_some() {
-        for i in json["arguments"]["jvm"].as_array().unwrap() {
-            if i.is_string() {
-                if should_skip(String::from(i.as_str().unwrap())) {
-                    continue
-                }
-                arguments.push(replace_jvm_argument(String::from(i.as_str().unwrap())));
-            } else {
-                if i.get("rules").is_some() {
-                    if !check_rule(i["rules"].as_array().unwrap()) {
+        if json["arguments"].get("jvm").is_some() {
+            for i in json["arguments"]["jvm"].as_array().unwrap() {
+                if i.is_string() {
+                    if should_skip(String::from(i.as_str().unwrap())) {
                         continue
                     }
-                    if i["value"].is_string() {
-                        if should_skip(String::from(i["value"].as_str().unwrap())) {
+                    arguments.push(replace_jvm_argument(String::from(i.as_str().unwrap())));
+                } else {
+                    if i.get("rules").is_some() {
+                        if !check_rule(i["rules"].as_array().unwrap()) {
                             continue
                         }
-                        arguments.push(replace_jvm_argument(String::from(i["value"].as_str().unwrap())));
-                    } else if i["value"].is_array() {
-                        for j in i["value"].as_array().unwrap() {
-                            if should_skip(String::from(j.as_str().unwrap())) {
+                        if i["value"].is_string() {
+                            if should_skip(String::from(i["value"].as_str().unwrap())) {
                                 continue
                             }
-                            arguments.push(replace_jvm_argument(String::from(j.as_str().unwrap())));
+                            arguments.push(replace_jvm_argument(String::from(i["value"].as_str().unwrap())));
+                        } else if i["value"].is_array() {
+                            for j in i["value"].as_array().unwrap() {
+                                if should_skip(String::from(j.as_str().unwrap())) {
+                                    continue
+                                }
+                                arguments.push(replace_jvm_argument(String::from(j.as_str().unwrap())));
+                            }
                         }
                     }
                 }
