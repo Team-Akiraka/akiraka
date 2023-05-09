@@ -80,9 +80,9 @@ pub fn launch(
         if inherits == String::new() {
             return Err(String::from("Could not find inheritsFrom for version!"));
         }
-        println!("{inherits}");
 
-        // 如果找到版本，则
+        // 如果找到版本，则...
+        println!("{inherits}");
     }
 
     // 替换游戏参数的函数
