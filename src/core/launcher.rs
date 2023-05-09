@@ -6,7 +6,7 @@ use std::io::{Read};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use serde_json::Value;
-use crate::core::check_rule;
+use crate::core::{check_rule, merge_json};
 
 pub fn launch(
     name: &str,
@@ -62,6 +62,7 @@ pub fn launch(
         let inherits_from = json["inheritsFrom"].as_str().unwrap();
         let versions_dir = versions_dir.clone().parent().unwrap();
         let mut inherits = String::new();
+        let mut inherits_json: Value = "{}".parse().unwrap();
         for i in read_dir(versions_dir.clone()).unwrap() {
             let name = i.unwrap().file_name();
             let name = name.to_str().unwrap();
@@ -74,6 +75,7 @@ pub fn launch(
                 let id = buf["id"].as_str().unwrap();
                 if id == inherits_from {
                     inherits = String::from(id);
+                    inherits_json = buf;
                     break;
                 }
             }
@@ -83,7 +85,7 @@ pub fn launch(
         }
 
         // 如果找到版本，则合并版本文件
-        println!("{inherits}");
+        println!("{:?}", merge_json(json.clone(), inherits_json));
     }
 
     // 替换游戏参数的函数

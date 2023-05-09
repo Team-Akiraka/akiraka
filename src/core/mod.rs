@@ -81,3 +81,41 @@ pub fn check_java(java: &str, temp_dir: &str) -> Result<Value, String> {
     remove_file(temp_file_path.as_path()).expect("Could not delete temp file!");
     Ok(res)
 }
+
+pub fn merge_json(json: Value, inherit: Value) -> Result<Value, String> {
+    let mut out = inherit;
+    for key in json.as_object().unwrap().keys() {
+        println!("{key}");
+        match key.as_str() {
+            "_comment_" => {
+                out[key] = json[key].clone();
+            }
+            "id" => {
+                out[key] = json[key].clone();
+            }
+            "logging" => {
+                out[key] = json[key].clone();
+            }
+            "mainClass" => {
+                out[key] = json[key].clone();
+            }
+            "releaseTime" => {
+                out[key] = json[key].clone();
+            }
+            "time" => {
+                out[key] = json[key].clone();
+            }
+            "type" => {
+                out[key] = json[key].clone();
+            }
+            "arguments" => {
+                // TODO: Arguments
+            }
+            "libraries" => {
+                // TODO: Libraries
+            }
+            _ => {}
+        }
+    }
+    Ok(out)
+}
