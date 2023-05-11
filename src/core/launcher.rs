@@ -57,7 +57,9 @@ pub fn launch(
     let json: Value = serde_json::from_str(temp.as_str()).expect("JSON format error!");
 
     // 是否包含依赖的版本
-    if json.get("inheritsFrom").is_some() {
+    let has_inherit = json.get("inheritsFrom").is_some();
+    let mut inherit_id = String::new();
+    let json = if has_inherit {
         // 通过ID获取已安装的游戏
         let inherits_from = json["inheritsFrom"].as_str().unwrap();
         let versions_dir = versions_dir.clone().parent().unwrap();
@@ -68,6 +70,7 @@ pub fn launch(
             let name = name.to_str().unwrap();
             let path = versions_dir.clone().join(name).join(format!("{}.json", name));
             if path.exists() && path.is_file() {
+                inherit_id = String::from(name);
                 let mut file = File::open(versions_dir.clone().join(name).join(format!("{}.json", name))).expect("Could not open file!");
                 let mut buf = String::new();
                 file.read_to_string(&mut buf).unwrap();
@@ -85,8 +88,12 @@ pub fn launch(
         }
 
         // 如果找到版本，则合并版本文件
-        println!("{:?}", merge_json(json.clone(), inherits_json));
-    }
+
+        // println!("{:?}", );
+        merge_json(json.clone(), inherits_json).unwrap()
+    } else {
+        json
+    };
 
     // 替换游戏参数的函数
     let replace_jvm_argument = |arg: String| -> String {
@@ -203,7 +210,16 @@ pub fn launch(
         let path_separator = ":";
     let temp = versions_dir.join(format!("{}.jar", name));
     let temp = to_absolute(temp.as_path());
-    let mut classpath = String::from(temp.as_path().to_str().unwrap());
+    let mut classpath = if temp.exists() {
+        String::from(temp.as_path().to_str().unwrap())
+    } else {
+        String::new()
+    };
+
+    if has_inherit {
+        classpath += path_separator;
+        classpath += to_absolute(versions_dir.clone().join(inherit_id.clone()).join(format!("{}.jar", inherit_id.clone())).as_path()).to_str().unwrap();
+    }
 
     for i in json["libraries"].as_array().unwrap() {
         // 检查规则
@@ -264,7 +280,12 @@ pub fn launch(
         }
     }
 
-    for i in &arguments {
+    // TODO: 调试
+    // for i in &arguments {
+    //     println!("{}", i);
+    // }
+
+    for i in classpath.split(";") {
         println!("{}", i);
     }
 

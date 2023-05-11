@@ -83,9 +83,8 @@ pub fn check_java(java: &str, temp_dir: &str) -> Result<Value, String> {
 }
 
 pub fn merge_json(json: Value, inherit: Value) -> Result<Value, String> {
-    let mut out = inherit;
+    let mut out = inherit.clone();
     for key in json.as_object().unwrap().keys() {
-        println!("{key}");
         match key.as_str() {
             "_comment_" => {
                 out[key] = json[key].clone();
@@ -109,10 +108,27 @@ pub fn merge_json(json: Value, inherit: Value) -> Result<Value, String> {
                 out[key] = json[key].clone();
             }
             "arguments" => {
-                // TODO: Arguments
+                if json["arguments"].get("jvm").is_some() {
+                    let mut arr = inherit["arguments"]["jvm"].as_array().unwrap().clone();
+                    for j in json["arguments"]["jvm"].as_array().unwrap() {
+                        arr.push(j.clone());
+                    }
+                    out["arguments"]["jvm"] = Value::Array(arr);
+                }
+                if json["arguments"].get("game").is_some() {
+                    let mut arr = inherit["arguments"]["game"].as_array().unwrap().clone();
+                    for j in json["arguments"]["game"].as_array().unwrap() {
+                        arr.push(j.clone());
+                    }
+                    out["arguments"]["game"] = Value::Array(arr);
+                }
             }
             "libraries" => {
-                // TODO: Libraries
+                let mut arr = inherit["libraries"].as_array().unwrap().clone();
+                for j in json["libraries"].as_array().unwrap() {
+                    arr.push(j.clone());
+                }
+                out["libraries"] = Value::Array(arr);
             }
             _ => {}
         }
