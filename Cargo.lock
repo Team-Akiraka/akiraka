@@ -22,7 +22,7 @@ dependencies = [
 
 [[package]]
 name = "akiraka"
-version = "0.1.0-internal-build-20230508"
+version = "0.1.0-internal-build-20230512"
 dependencies = [
  "druid",
  "image",

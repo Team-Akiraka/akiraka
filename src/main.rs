@@ -1,6 +1,5 @@
 use std::fs::{create_dir_all, File, read_dir};
-use std::io::{Read, Write};
-use std::net::{Shutdown, SocketAddrV4, TcpStream, UdpSocket};
+use std::io::{Write};
 use std::path::Path;
 use std::time::SystemTime;
 use crate::core::install::install;
@@ -154,14 +153,6 @@ fn main() {
                 } else {
                     unknown_arguments();
                 }
-            // } else if head == "bridge" {
-            //     let socket = UdpSocket::bind("127.0.0.1:25565").unwrap();
-            //     socket.connect(SocketAddrV4::new("38.6.226.131".parse().unwrap(), 40001)).unwrap();
-            //     socket.send("hello, akiraka!".as_bytes()).unwrap();
-            //     let mut buf = [0u8; 1500];
-            //     let amt = socket.recv(&mut buf).unwrap();
-            //     let buf = &mut buf[..amt];
-            //     println!("{}", std::str::from_utf8(buf).unwrap());
             } else if head == "help" {
                 let data = Asset::get("help.txt").unwrap();
                 let data = std::str::from_utf8(&*data.data).unwrap();
@@ -183,7 +174,7 @@ fn main() {
     // Minecraft购买链接：https://www.xbox.com/zh-cn/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj
     // 购买链接更新：https://www.xbox.com/zh-CN/games/store/minecraft-java-bedrock-edition-for-pc/9NXP44L49SHJ/0010
     unsafe { DIR = String::from(Path::new(util::current_dir().as_str()).join(".minecraft").as_path().to_str().unwrap()); }
-    println!("Akiraka Command Tool [Version 0.1.0-dev.20230508]\n(c) Arrokoth233. All rights reserved\n");
+    println!("Akiraka Command Tool [Version 0.1.0-dev.20230512]\n(c) Arrokoth233. All rights reserved\n");
     loop {
         print!(">>");
         std::io::stdout().flush().expect("Flush Error!");

@@ -1,12 +1,11 @@
 use std::env::consts::{OS};
 use std::{env};
-use std::fmt::format;
 use std::fs::{File, read_dir};
-use std::io::{Read};
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use serde_json::Value;
-use crate::core::{check_rule, merge_json};
+use crate::core::{Asset, check_rule, merge_json};
 
 pub fn launch(
     name: &str,
@@ -59,7 +58,7 @@ pub fn launch(
     // 是否包含依赖的版本
     let has_inherit = json.get("inheritsFrom").is_some();
     let mut inherit_id = String::new();
-    let json = if has_inherit {
+    let json: Value = if has_inherit {
         // 通过ID获取已安装的游戏
         let inherits_from = json["inheritsFrom"].as_str().unwrap();
         let versions_dir = versions_dir.clone().parent().unwrap();
@@ -74,7 +73,7 @@ pub fn launch(
                 let mut file = File::open(versions_dir.clone().join(name).join(format!("{}.json", name))).expect("Could not open file!");
                 let mut buf = String::new();
                 file.read_to_string(&mut buf).unwrap();
-                let mut buf: Value = serde_json::from_str(buf.as_str()).unwrap();
+                let buf: Value = serde_json::from_str(buf.as_str()).unwrap();
                 let id = buf["id"].as_str().unwrap();
                 if id == inherits_from {
                     inherits = String::from(id);
@@ -88,12 +87,15 @@ pub fn launch(
         }
 
         // 如果找到版本，则合并版本文件
-
-        // println!("{:?}", );
         merge_json(json.clone(), inherits_json).unwrap()
     } else {
         json
     };
+
+    if !dir.clone().join("assets/logging.xml").exists() {
+        let mut x = File::create(dir.clone().join("assets/logging.xml")).unwrap();
+        x.write(&*Asset::get("logging.xml").unwrap().data).unwrap();
+    }
 
     // 替换游戏参数的函数
     let replace_jvm_argument = |arg: String| -> String {
@@ -157,7 +159,14 @@ pub fn launch(
     let mut arguments: Vec<String> = Vec::new();
 
     // JVM参数
+    // Native库
     arguments.push(format!("-Djava.library.path={}", to_absolute(versions_dir.clone().join("natives").as_path()).to_str().unwrap()));
+    // Log4j修复
+    arguments.push(String::from("-Djava.rmi.server.useCodebaseOnly=true"));
+    arguments.push(String::from("-Dcom.sun.jndi.rmi.object.trustURLCodebase=false"));
+    arguments.push(String::from("-Dcom.sun.jndi.cosnaming.object.trustURLCodebase=false"));
+    arguments.push(String::from("-Dlog4j2.formatMsgNoLookups=true"));
+
     // 游戏提供的参数
     // 检查是否需要跳过
     fn should_skip(arg: String) -> bool {
@@ -204,6 +213,7 @@ pub fn launch(
         }
     }
     // Classpath参数
+    // TODO: 使用依赖名获取路径（支持Fabric和Quilt）
     #[cfg(target_os = "windows")]
         let path_separator = ";";
     #[cfg(not(target_os = "windows"))]
@@ -218,7 +228,7 @@ pub fn launch(
 
     if has_inherit {
         classpath += path_separator;
-        classpath += to_absolute(versions_dir.clone().join(inherit_id.clone()).join(format!("{}.jar", inherit_id.clone())).as_path()).to_str().unwrap();
+        classpath += to_absolute(versions_dir.clone().parent().unwrap().join(inherit_id.clone()).join(format!("{}.jar", inherit_id.clone())).as_path()).to_str().unwrap();
     }
 
     for i in json["libraries"].as_array().unwrap() {
@@ -284,9 +294,10 @@ pub fn launch(
     // for i in &arguments {
     //     println!("{}", i);
     // }
-
-    for i in classpath.split(";") {
-        println!("{}", i);
+    let mut x: Vec<&str> = classpath.split(";").collect();
+    x.sort();
+    for i in x {
+        println!("{}", i.replace("/", "\\"));
     }
 
     let proc = Command::new(java)

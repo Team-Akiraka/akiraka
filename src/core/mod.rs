@@ -92,9 +92,9 @@ pub fn merge_json(json: Value, inherit: Value) -> Result<Value, String> {
             "id" => {
                 out[key] = json[key].clone();
             }
-            "logging" => {
-                out[key] = json[key].clone();
-            }
+            // "logging" => {
+            //     out[key] = json[key].clone();
+            // }
             "mainClass" => {
                 out[key] = json[key].clone();
             }
