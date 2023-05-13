@@ -135,3 +135,21 @@ pub fn merge_json(json: Value, inherit: Value) -> Result<Value, String> {
     }
     Ok(out)
 }
+
+#[allow(dead_code)]
+pub fn name_to_url(name: String) -> String {
+    let split: Vec<&str> = name.split(":").collect();
+    let package = split[0];
+    let name = split[1];
+    let version = split[2];
+    return format!("{}/{}/{}/{}-{}.jar", package, name, version, name, version);
+}
+
+#[allow(dead_code)]
+pub fn name_to_path(name: String) -> String {
+    let split: Vec<&str> = name.split(":").collect();
+    let package = split[0];
+    let name = split[1];
+    let version = split[2];
+    return format!("{}/{}/{}/{}-{}.jar", String::from(package).replace(".", "/"), name, version, name, version);
+}

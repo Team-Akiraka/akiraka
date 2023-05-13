@@ -5,7 +5,7 @@ use std::time::SystemTime;
 use crate::core::install::install;
 use crate::core::launcher::launch;
 use crate::core::network::get_version_sources;
-use crate::core::{Asset, check_java, util};
+use crate::core::{Asset, check_java, name_to_path, util};
 
 mod core;
 
@@ -153,6 +153,8 @@ fn main() {
                 } else {
                     unknown_arguments();
                 }
+            } else if head == "test" {
+                println!("{:?}", name_to_path(String::from("net.fabricmc:tiny-mappings-parser:0.3.0+build.17")));
             } else if head == "help" {
                 let data = Asset::get("help.txt").unwrap();
                 let data = std::str::from_utf8(&*data.data).unwrap();

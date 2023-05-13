@@ -1,11 +1,11 @@
 use std::env::consts::{OS};
 use std::{env};
-use std::fs::{File, read_dir};
+use std::fs::{File, read_dir, remove_file};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use serde_json::Value;
-use crate::core::{Asset, check_rule, merge_json};
+use crate::core::{Asset, check_rule, merge_json, name_to_path};
 
 pub fn launch(
     name: &str,
@@ -161,6 +161,7 @@ pub fn launch(
     // JVM参数
     // Native库
     arguments.push(format!("-Djava.library.path={}", to_absolute(versions_dir.clone().join("natives").as_path()).to_str().unwrap()));
+    arguments.push(String::from(r"-Dminecraft.client.jar=.minecraft\versions\1.14.4\1.14.4.jar"));
     // Log4j修复
     arguments.push(String::from("-Djava.rmi.server.useCodebaseOnly=true"));
     arguments.push(String::from("-Dcom.sun.jndi.rmi.object.trustURLCodebase=false"));
@@ -220,7 +221,12 @@ pub fn launch(
         let path_separator = ":";
     let temp = versions_dir.join(format!("{}.jar", name));
     let temp = to_absolute(temp.as_path());
-    let mut classpath = if temp.exists() {
+
+    if temp.exists() && File::open(temp.clone()).unwrap().metadata().unwrap().len() == 0 {
+        remove_file(temp.as_path()).unwrap();
+    }
+
+    let mut classpath = if temp.exists() && !has_inherit{
         String::from(temp.as_path().to_str().unwrap())
     } else {
         String::new()
@@ -243,26 +249,31 @@ pub fn launch(
         }
 
         // TODO: Path by name
-        if i.get("downloads").is_some() && i["downloads"].get("artifact").is_some() {
-            classpath += path_separator;
-            classpath += library_dir.clone().join(i["downloads"]["artifact"]["path"].as_str().unwrap()).to_str().unwrap();
-        }
-        if i.get("downloads").is_some() && i["downloads"].get("classifiers").is_some() {
-            let natives = &i["natives"];
-            // 系统
-            let os = if OS == "macos" {
-                "osx"
-            } else {
-                OS
-            };
-            if natives.get(os).is_some() {
-                let natives = &i["downloads"]["classifiers"][&i["natives"][os].as_str().unwrap()];
-                if natives.is_null() {
-                    continue
-                }
+        if i.get("downloads").is_some() {
+            if i["downloads"].get("artifact").is_some() {
                 classpath += path_separator;
-                classpath += library_dir.clone().join(natives["path"].as_str().unwrap()).to_str().unwrap();
+                classpath += library_dir.clone().join(i["downloads"]["artifact"]["path"].as_str().unwrap()).to_str().unwrap();
             }
+            if i["downloads"].get("classifiers").is_some() {
+                let natives = &i["natives"];
+                // 系统
+                let os = if OS == "macos" {
+                    "osx"
+                } else {
+                    OS
+                };
+                if natives.get(os).is_some() {
+                    let natives = &i["downloads"]["classifiers"][&i["natives"][os].as_str().unwrap()];
+                    if natives.is_null() {
+                        continue
+                    }
+                    classpath += path_separator;
+                    classpath += library_dir.clone().join(natives["path"].as_str().unwrap()).to_str().unwrap();
+                }
+            }
+        } else {
+            classpath += path_separator;
+            classpath += library_dir.clone().join(name_to_path(String::from(i["name"].as_str().unwrap()))).to_str().unwrap();
         }
     }
     arguments.push(String::from("-cp"));
