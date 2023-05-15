@@ -3,8 +3,8 @@ use druid::widget::{Button};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
-use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION};
-use winapi::um::winuser::SendMessageA;
+use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION, GetWindowLongA, GetWindowLongPtrA, GetWindowLongPtrW, GWL_STYLE, SendMessageA, SetWindowLongA, SetWindowLongPtrW, WS_MAXIMIZEBOX, WS_SIZEBOX};
+use winapi::um::winuser::{GetWindowLongW, SetWindowLongW, UpdateWindow, WS_BORDER, WS_CAPTION};
 
 #[allow(dead_code)]
 struct TitleBarState {
@@ -52,6 +52,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
                     #[allow(unsafe_code)]
                     if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
                         unsafe {
+                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
                             ReleaseCapture();
                             SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
                         }
@@ -70,6 +71,13 @@ impl<T: Data> Widget<T> for TitleBar<T> {
 
     #[allow(unused_variables)]
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        #[cfg(target_os = "windows")]
+        #[allow(unsafe_code)]
+        if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
+            unsafe {
+                SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
+            }
+        }
         // self.exit_button.update(ctx, old_data, data, env);
     }
 
