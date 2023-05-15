@@ -46,8 +46,6 @@ impl<T: Data> Widget<T> for TitleBar<T> {
             }
             Event::MouseMove(mouse_event) => {
                 let pos = mouse_event.pos;
-                // TODO: 检测鼠标位置
-                // self.dragging &=
                 if self.dragging {
                     // TODO: 跨平台
                     #[cfg(target_os = "windows")]
@@ -62,7 +60,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
             }
             _ => {}
         }
-        self.exit_button.event(ctx, event, data, env);
+        // self.exit_button.event(ctx, event, data, env);
     }
 
     #[allow(unused_variables)]
