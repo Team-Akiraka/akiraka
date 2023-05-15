@@ -1,9 +1,10 @@
-use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetExt};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget};
 use druid::widget::{Button};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION};
+use winapi::um::winuser::SendMessageA;
 
 #[allow(dead_code)]
 struct TitleBarState {
@@ -18,11 +19,12 @@ pub struct TitleBar<T> {
 
 impl<T: druid::Data> TitleBar<T> {
     pub fn new() -> Self {
+        let exit_button = Button::new("X");
         Self {
             size: Size::new(0.0, 0.0),
             dragging: false,
             fill: Color::rgba(1.0, 1.0, 1.0, 1.0),
-            exit_button: Button::new("114514")
+            exit_button
         }
     }
 
@@ -43,6 +45,9 @@ impl<T: Data> Widget<T> for TitleBar<T> {
                 self.dragging = false;
             }
             Event::MouseMove(mouse_event) => {
+                let pos = mouse_event.pos;
+                // TODO: 检测鼠标位置
+                // self.dragging &=
                 if self.dragging {
                     // TODO: 跨平台
                     #[cfg(target_os = "windows")]
@@ -50,7 +55,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
                     if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
                         unsafe {
                             ReleaseCapture();
-                            SendMessageW(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
+                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
                         }
                     }
                 }
@@ -62,19 +67,20 @@ impl<T: Data> Widget<T> for TitleBar<T> {
 
     #[allow(unused_variables)]
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-        self.exit_button.lifecycle(ctx, event, data, env);
+        // self.exit_button.lifecycle(ctx, event, data, env);
     }
 
     #[allow(unused_variables)]
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        self.exit_button.update(ctx, old_data, data, env);
+        // self.exit_button.update(ctx, old_data, data, env);
     }
 
     #[allow(unused_variables)]
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
         self.size.width = ctx.window().get_size().width;
         let self_child = Size::new(bc.max().width, self.size.height);
-        self.exit_button.layout(ctx, bc, data, env);
+
+        // self.exit_button.layout(ctx, bc, data, env);
 
         return self_child;
     }
@@ -85,7 +91,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         ctx.fill(rect, &self.fill);
 
         ctx.with_save(|ctx| {
-            self.exit_button.paint(ctx, data, env);
+            // self.exit_button.paint(ctx, data, env);
         })
     }
 }
