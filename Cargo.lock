@@ -28,6 +28,7 @@ dependencies = [
  "druid",
  "image",
  "rust-embed",
+ "winapi",
  "windres",
 ]
 

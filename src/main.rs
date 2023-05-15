@@ -1,13 +1,13 @@
+#![windows_subsystem = "windows"]
 mod widget;
 
-use std::fmt::format;
 use druid::widget::{Align, Flex, Label, TextBox};
-use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Widget, WindowDesc, WidgetExt, Screen, Color, KeyOrValue, Rect};
-use crate::widget::TitleBar;
+use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Widget, WindowDesc, WidgetExt, Screen, Color, Size, UnitPoint, WindowState};
+use crate::widget::title_bar::TitleBar;
 
 const VERTICAL_WIDGET_SPACING: f64 = 20.0;
 const TEXT_BOX_WIDTH: f64 = 200.0;
-const WINDOW_TITLE: LocalizedString<HelloState> = LocalizedString::new("Hello World!");
+const WINDOW_TITLE: LocalizedString<HelloState> = LocalizedString::new("Akiraka - Internal build");
 
 #[derive(Clone, Data, Lens)]
 struct HelloState {
@@ -21,25 +21,24 @@ fn main() {
         .with_min_size((600.0, 400.0))
         .window_size((600.0, 400.0))
         .set_position(((scr_rect.width() / 2.0) - 300.0, (scr_rect.height() / 2.0) - 200.0))
+        .set_window_state(WindowState::Restored)
         .show_titlebar(false);
-    println!("{:?}", (scr_rect.width() / 2.0, scr_rect.height() / 2.0));
 
     let initial_state = HelloState {
         name: "World".into(),
     };
 
     AppLauncher::with_window(main_window)
-        .configure_env(|env, state| {
+        .configure_env(|_env, _state| {
             // TODO: 环境
         })
         .launch(initial_state)
         .expect("Failed to launch application");
 }
 
+#[allow(unused_variables)]
 fn build_root_widget() -> impl Widget<HelloState> {
-    // a label that will determine its text based on the current app data.
     let label = Label::new(|data: &HelloState, env: &Env| format!("Hello {}!", data.name));
-    // a text_box that modifies `name`.
     let text_box = TextBox::new()
         .with_placeholder("Who are we greeting?")
         .fix_width(TEXT_BOX_WIDTH)
@@ -49,8 +48,8 @@ fn build_root_widget() -> impl Widget<HelloState> {
     label2.set_text_color(<druid::Color as Into<Color>>::into(Color::rgb8(255, 0, 0)));
 
     let mut title_bar = TitleBar::new();
+    title_bar.set_size(Size::new(600.0, 48.0));
 
-    // arrange the two widgets vertically, with some padding
     let layout = Flex::column()
         .with_child(title_bar)
         .with_spacer(VERTICAL_WIDGET_SPACING)
@@ -60,6 +59,5 @@ fn build_root_widget() -> impl Widget<HelloState> {
         .with_spacer(VERTICAL_WIDGET_SPACING)
         .with_child(label2);
 
-    // center the two widgets in the available space
-    Align::centered(layout)
+    Align::horizontal(UnitPoint::new(0.0, 0.0),layout)
 }
