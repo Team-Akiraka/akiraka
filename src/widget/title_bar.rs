@@ -1,10 +1,10 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget};
-use druid::widget::{Button};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetExt};
+use druid::widget::{Align, Button, Flex, SizedBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
+use winapi::um::dwmapi::DwmExtendFrameIntoClientArea;
 #[cfg(target_os = "windows")]
-use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION, GetWindowLongA, GetWindowLongPtrA, GetWindowLongPtrW, GWL_STYLE, SendMessageA, SetWindowLongA, SetWindowLongPtrW, WS_MAXIMIZEBOX, WS_SIZEBOX};
-use winapi::um::winuser::{GetWindowLongW, SetWindowLongW, UpdateWindow, WS_BORDER, WS_CAPTION};
+use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION, GetWindowLongA, GetWindowLongPtrA, GetWindowLongPtrW, GWL_STYLE, SendMessageA, SetWindowLongA, SetWindowLongPtrW, WS_MAXIMIZEBOX, WS_SIZEBOX, GetWindowLongW, SetWindowLongW, WS_BORDER, WS_CAPTION};
 
 #[allow(dead_code)]
 struct TitleBarState {
@@ -14,17 +14,24 @@ pub struct TitleBar<T> {
     size: Size,
     dragging: bool,
     fill: Color,
-    exit_button: Button<T>
+    col: SizedBox<T>
 }
 
 impl<T: druid::Data> TitleBar<T> {
     pub fn new() -> Self {
         let exit_button = Button::new("X");
+        let col = Flex::column()
+            .with_child(exit_button)
+            // .center()
+            .align_right()
+            // .padding(Insets::new(8.0, 8.0, 8.0, 8.0))
+            .fix_height(48.0);
+
         Self {
             size: Size::new(0.0, 0.0),
             dragging: false,
             fill: Color::rgba(1.0, 1.0, 1.0, 1.0),
-            exit_button
+            col
         }
     }
 
@@ -61,12 +68,12 @@ impl<T: Data> Widget<T> for TitleBar<T> {
             }
             _ => {}
         }
-        // self.exit_button.event(ctx, event, data, env);
+        self.col.event(ctx, event, data, env);
     }
 
     #[allow(unused_variables)]
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-        // self.exit_button.lifecycle(ctx, event, data, env);
+        self.col.lifecycle(ctx, event, data, env);
     }
 
     #[allow(unused_variables)]
@@ -78,7 +85,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
                 SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
             }
         }
-        // self.exit_button.update(ctx, old_data, data, env);
+        self.col.update(ctx, old_data, data, env);
     }
 
     #[allow(unused_variables)]
@@ -86,7 +93,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         self.size.width = ctx.window().get_size().width;
         let self_child = Size::new(bc.max().width, self.size.height);
 
-        // self.exit_button.layout(ctx, bc, data, env);
+        self.col.layout(ctx, bc, data, env);
 
         return self_child;
     }
@@ -97,7 +104,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         ctx.fill(rect, &self.fill);
 
         ctx.with_save(|ctx| {
-            // self.exit_button.paint(ctx, data, env);
+            self.col.paint(ctx, data, env);
         })
     }
 }
