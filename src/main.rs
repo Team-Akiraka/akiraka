@@ -48,7 +48,7 @@ fn build_root_widget() -> impl Widget<HelloState> {
     label2.set_text_color(<druid::Color as Into<Color>>::into(Color::rgb8(255, 0, 0)));
 
     let mut title_bar = TitleBar::new();
-    title_bar.set_size(Size::new(600.0, 48.0));
+    title_bar.set_size(Size::new(600.0, 40.0));
 
     let layout = Flex::column()
         .with_child(title_bar)

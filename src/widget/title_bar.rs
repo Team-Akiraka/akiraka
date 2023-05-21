@@ -2,9 +2,9 @@ use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWin
 use druid::widget::{Align, Button, Flex, SizedBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
-use winapi::um::dwmapi::DwmExtendFrameIntoClientArea;
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION, GetWindowLongA, GetWindowLongPtrA, GetWindowLongPtrW, GWL_STYLE, SendMessageA, SetWindowLongA, SetWindowLongPtrW, WS_MAXIMIZEBOX, WS_SIZEBOX, GetWindowLongW, SetWindowLongW, WS_BORDER, WS_CAPTION};
+use crate::widget::title_bar_button;
 
 #[allow(dead_code)]
 struct TitleBarState {
@@ -14,18 +14,18 @@ pub struct TitleBar<T> {
     size: Size,
     dragging: bool,
     fill: Color,
-    col: SizedBox<T>
+    col: Align<T>
 }
 
 impl<T: druid::Data> TitleBar<T> {
     pub fn new() -> Self {
-        let exit_button = Button::new("X");
+        let exit_button = title_bar_button::Button::new("114514");
         let col = Flex::column()
             .with_child(exit_button)
             // .center()
             .align_right()
             // .padding(Insets::new(8.0, 8.0, 8.0, 8.0))
-            .fix_height(48.0);
+            .fix_height(40.0);
 
         Self {
             size: Size::new(0.0, 0.0),
@@ -95,7 +95,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
 
         self.col.layout(ctx, bc, data, env);
 
-        return self_child;
+        self_child
     }
 
     #[allow(unused_variables)]
