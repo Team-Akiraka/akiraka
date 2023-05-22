@@ -1,10 +1,10 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetExt};
-use druid::widget::{Align, Button, Flex, SizedBox};
+use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, ImageBuf, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetExt};
+use druid::widget::{Flex, Image, SizedBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
-use winapi::um::winuser::{SendMessageW, ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION, GetWindowLongA, GetWindowLongPtrA, GetWindowLongPtrW, GWL_STYLE, SendMessageA, SetWindowLongA, SetWindowLongPtrW, WS_MAXIMIZEBOX, WS_SIZEBOX, GetWindowLongW, SetWindowLongW, WS_BORDER, WS_CAPTION};
-use crate::widget::title_bar_button;
+use winapi::um::winuser::{ReleaseCapture, WM_SYSCOMMAND, SC_MOVE, HTCAPTION, GWL_STYLE, SendMessageA, WS_MAXIMIZEBOX, GetWindowLongW, SetWindowLongW};
+use crate::widget::{icon_button};
 
 #[allow(dead_code)]
 struct TitleBarState {
@@ -12,24 +12,20 @@ struct TitleBarState {
 
 pub struct TitleBar<T> {
     size: Size,
-    dragging: bool,
     fill: Color,
-    col: Align<T>
+    col: SizedBox<T>
 }
 
 impl<T: druid::Data> TitleBar<T> {
     pub fn new() -> Self {
-        let exit_button = title_bar_button::Button::new("114514");
+        let exit_button = icon_button::IconButton::new(Image::new(ImageBuf::empty()), Size::new(40.0, 40.0));
         let col = Flex::column()
             .with_child(exit_button)
-            // .center()
             .align_right()
-            // .padding(Insets::new(8.0, 8.0, 8.0, 8.0))
             .fix_height(40.0);
 
         Self {
             size: Size::new(0.0, 0.0),
-            dragging: false,
             fill: Color::rgba(1.0, 1.0, 1.0, 1.0),
             col
         }
@@ -46,25 +42,21 @@ impl<T: Data> Widget<T> for TitleBar<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         match event {
             Event::MouseDown(mouse_event) => {
-                self.dragging = true;
-            }
-            Event::MouseUp(mouse_event) => {
-                self.dragging = false;
-            }
-            Event::MouseMove(mouse_event) => {
                 let pos = mouse_event.pos;
-                if self.dragging {
-                    // TODO: 跨平台
-                    #[cfg(target_os = "windows")]
-                    #[allow(unsafe_code)]
-                    if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
-                        unsafe {
-                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
-                            ReleaseCapture();
-                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
-                        }
+                // TODO: 跨平台
+                #[cfg(target_os = "windows")]
+                #[allow(unsafe_code)]
+                if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
+                    unsafe {
+                        SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
+                        ReleaseCapture();
+                        SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
                     }
                 }
+            }
+            Event::MouseUp(mouse_event) => {
+            }
+            Event::MouseMove(mouse_event) => {
             }
             _ => {}
         }

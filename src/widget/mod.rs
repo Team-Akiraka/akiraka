@@ -1,2 +1,2 @@
 pub mod title_bar;
-pub mod title_bar_button;
+pub mod icon_button;
