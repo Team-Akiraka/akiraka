@@ -3,14 +3,16 @@ use druid::widget::{Click, ControllerHost, Image};
 
 pub struct IconButton {
     image: Image,
-    size: Size
+    size: Size,
+    entered: bool
 }
 
 impl IconButton {
     pub fn new(image: Image, size: Size) -> Self {
         Self {
             image,
-            size
+            size,
+            entered: false
         }
     }
 }
@@ -30,9 +32,9 @@ impl<T: Data> Widget<T> for IconButton {
                 }
                 ctx.set_active(false);
             }
-            _ => ()
+            _ => (),
         }
-        // self.image.event(ctx, event, data, env);
+        self.image.event(ctx, event, data, env);
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
@@ -52,14 +54,15 @@ impl<T: Data> Widget<T> for IconButton {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        let active = ctx.is_active() && !ctx.is_disabled();
+        let is_active = ctx.is_active() && !ctx.is_disabled();
+        let is_hot = ctx.is_hot();
+        let rect = Rect::from_origin_size(Point::ORIGIN, self.size);
+        ctx.fill(rect, &env.get(if is_active {
+            theme::BACKGROUND_DARK
+        } else {
+            theme::PLACEHOLDER_COLOR
+        }));
         ctx.with_save(move |ctx| {
-            let rect = Rect::from_origin_size(Point::ORIGIN, self.size);
-            ctx.fill(rect, &env.get(if active {
-                theme::BACKGROUND_DARK
-            } else {
-                theme::PLACEHOLDER_COLOR
-            }));
 
             ctx.transform(Affine::scale(0.75));
             self.image.paint(ctx, data, env);

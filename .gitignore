@@ -1,4 +1,6 @@
-/.akiraka
-/.minecraft
 /target
 /.idea
+/.vscode
+
+/.akiraka
+/.minecraft
