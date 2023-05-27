@@ -2,8 +2,7 @@
 mod widget;
 
 use druid::widget::{Align, Flex, Label, TextBox};
-use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Widget, WindowDesc, WidgetExt, Screen, Color, Size, UnitPoint, WindowState};
-use crate::widget::title_bar::TitleBar;
+use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Widget, WindowDesc, WidgetExt, Screen, Color, UnitPoint, WindowState};
 use crate::widget::window::WindowWidget;
 
 const VERTICAL_WIDGET_SPACING: f64 = 20.0;

@@ -1,10 +1,9 @@
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RawWindowHandle, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetPod};
 use crate::widget::title_bar::TitleBar;
 
-const TITLE_BAR_HEIGHT: f64 = 40.0;
+const TITLE_BAR_HEIGHT: f64 = 48.0;
 
 pub struct WindowWidget<T> {
-    // title_bar: TitleBar,
     title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
@@ -12,12 +11,13 @@ pub struct WindowWidget<T> {
 impl<T: Data> WindowWidget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
         Self {
-            title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
+            title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT, Color::rgba8(63, 63, 63, 127)))),
             inner: WidgetPod::new(Box::new(inner)),
         }
     }
 }
 
+#[allow(unused_variables)]
 impl<T: Data> Widget<T> for WindowWidget<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         self.title_bar.event(ctx, event, data, env);

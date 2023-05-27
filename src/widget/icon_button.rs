@@ -1,18 +1,17 @@
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, Rect, RenderContext, Size, theme, UpdateCtx, Widget};
-use druid::widget::{Click, ControllerHost, Image};
+use druid::widget::{Image};
 
 pub struct IconButton {
     image: Image,
-    size: Size,
-    entered: bool
+    size: Size
 }
 
+#[allow(unused)]
 impl IconButton {
     pub fn new(image: Image, size: Size) -> Self {
         Self {
             image,
-            size,
-            entered: false
+            size
         }
     }
 }
@@ -55,7 +54,6 @@ impl<T: Data> Widget<T> for IconButton {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let is_active = ctx.is_active() && !ctx.is_disabled();
-        let is_hot = ctx.is_hot();
         let rect = Rect::from_origin_size(Point::ORIGIN, self.size);
         ctx.fill(rect, &env.get(if is_active {
             theme::BACKGROUND_DARK

@@ -1,6 +1,4 @@
-use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod};
-use druid::platform_menus::mac::file::print;
-use druid::widget::{Align, Button, Flex, FlexParams, List};
+use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
@@ -20,17 +18,18 @@ impl TitleBarButton {
     }
 }
 
+#[allow(unused_variables)]
 impl<T: Data> Widget<T> for TitleBarButton {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         match event {
-            Event::MouseDown(_) => {
-                if !ctx.is_disabled() {
+            Event::MouseDown(event) => {
+                if event.button == MouseButton::Left && !ctx.is_disabled() {
                     ctx.set_active(true);
                     ctx.request_paint();
                 }
             }
-            Event::MouseUp(_) => {
-                if ctx.is_active() && !ctx.is_disabled() {
+            Event::MouseUp(event) => {
+                if event.button == MouseButton::Left && ctx.is_active() && !ctx.is_disabled() {
                     ctx.request_paint();
                 }
                 ctx.set_active(false);
@@ -72,13 +71,14 @@ pub struct TitleBar<T> {
     minimize_button: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
+#[allow(unused_variables)]
 impl<T: Data> TitleBar<T> {
-    pub fn new(height: f64) -> Self {
+    pub fn new(height: f64, fill: Color) -> Self {
         let exit_button = TitleBarButton::new(height);
         let minimize_button = TitleBarButton::new(height);
 
         Self {
-            fill: Color::rgb(0.5, 0.6, 1.0),
+            fill,
             height,
             exit_button: WidgetPod::new(Box::new(exit_button)),
             minimize_button: WidgetPod::new(Box::new(minimize_button))
@@ -86,6 +86,7 @@ impl<T: Data> TitleBar<T> {
     }
 }
 
+#[allow(unused_variables)]
 impl<T: Data> Widget<T> for TitleBar<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         match event {
@@ -125,20 +126,18 @@ impl<T: Data> Widget<T> for TitleBar<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        self.exit_button.set_origin(ctx, Point::new(bc.max().width - 40.0, 0.0));
+        self.exit_button.set_origin(ctx, Point::new(bc.max().width - self.height, 0.0));
         bc.constrain(self.exit_button.layout(ctx, bc, data, env));
-
-        self.minimize_button.set_origin(ctx, Point::new(bc.max().width - 80.0, 0.0));
+        self.minimize_button.set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
         bc.constrain(self.minimize_button.layout(ctx, bc, data, env));
 
-        bc.constrain(Size::new(bc.max().width, self.height))
+        Size::new(bc.max().width, self.height)
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let rect = Rect::from_origin_size(Point::ORIGIN, Size::new(ctx.window().get_size().width, self.height));
         ctx.fill(rect, &self.fill);
 
-        // self.button_layout.paint(ctx, data, env);
         self.exit_button.paint(ctx, data, env);
         self.minimize_button.paint(ctx, data, env);
     }
