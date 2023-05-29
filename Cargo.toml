@@ -5,7 +5,7 @@ edition = "2021"
 build = "build.rs"
 
 [dependencies]
-akiraka-core = { path = "core" }
+akiraka-core = { git = "https://github.com/Team-Akiraka/Akiraka-Core.git" }
 rust-embed = "6.6.1"
 druid = { git = "https://github.com/linebender/druid.git", version = "0.8.3", features = ["raw-win-handle"] }
 image = "0.24.6"
@@ -14,25 +14,7 @@ windres = "0.2"
 
 [target.'cfg(target_os="windows")'.dependencies.winapi]
 version = "0.3.9"
-features = ["dwmapi", "winbase"]
+features = ["winbase", "dwmapi", "uxtheme", "winnt"]
 
 [profile.release]
 opt-level = 'z'
-
-#[workspace]
-#members = [
-#    "core",
-#    "app"
-#]
-#
-##[dependencies.windows]
-##version = "0.48"
-##features = [
-##    "Data_Xml_Dom",
-##    "Win32_Foundation",
-##    "Win32_Graphics",
-##    "Win32_Graphics_Dwm",
-##    "Win32_Security",
-##    "Win32_System_Threading",
-##    "Win32_UI_WindowsAndMessaging",
-##]

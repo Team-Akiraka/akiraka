@@ -1,8 +1,9 @@
 #![windows_subsystem = "windows"]
 mod widget;
+mod theme;
 
 use druid::widget::{Align, Flex, Label, TextBox};
-use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Widget, WindowDesc, WidgetExt, Screen, Color, UnitPoint, WindowState};
+use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Screen, UnitPoint, Widget, WidgetExt, WindowDesc, WindowState};
 use crate::widget::window::WindowWidget;
 
 const VERTICAL_WIDGET_SPACING: f64 = 20.0;
@@ -31,6 +32,7 @@ fn main() {
     AppLauncher::with_window(main_window)
         .configure_env(|_env, _state| {
             // TODO: 环境
+            theme::theme::init(_env);
         })
         .launch(initial_state)
         .expect("Failed to launch application");
@@ -38,21 +40,21 @@ fn main() {
 
 #[allow(unused_variables)]
 fn build_root_widget() -> impl Widget<HelloState> {
+    let x = |data: &HelloState, env: &Env| format!("Hello {}!", data.name);
     let label = Label::new(|data: &HelloState, env: &Env| format!("Hello {}!", data.name));
     let text_box = TextBox::new()
         .with_placeholder("Who are we greeting?")
         .fix_width(TEXT_BOX_WIDTH)
         .lens(HelloState::name);
 
-    let mut label2 = Label::new(|data: &HelloState, env: &Env| "Are you ok?");
-    label2.set_text_color(<druid::Color as Into<Color>>::into(Color::rgb8(255, 0, 0)));
-
     let layout = Flex::column()
+        .with_spacer(VERTICAL_WIDGET_SPACING)
         .with_child(label)
         .with_spacer(VERTICAL_WIDGET_SPACING)
         .with_child(text_box)
-        .with_spacer(VERTICAL_WIDGET_SPACING)
-        .with_child(label2);
+        .align_horizontal(UnitPoint::TOP);
+        // .center();
 
-    Align::centered(layout.align_vertical(UnitPoint::new(0.0, 0.0)))
+    layout
+    // Align::centered(layout.align_vertical(UnitPoint::new(0.0, 0.0)))
 }
