@@ -1,5 +1,6 @@
 use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, ImageBuf, Key, KeyOrValue, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
 use druid::piet::d2d::SolidColorBrush;
+use druid::piet::ImageFormat;
 use druid::widget::Image;
 use image::GenericImageView;
 #[cfg(target_os = "windows")]
@@ -7,6 +8,7 @@ use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, SetWindowLongW, WM_SYSCOMMAND, WS_MAXIMIZEBOX};
 use crate::theme::theme;
+use crate::widget::Asset;
 
 struct TitleBarButton {
     size: f64,
@@ -82,8 +84,29 @@ pub struct TitleBar<T> {
 #[allow(unused_variables)]
 impl<T: Data> TitleBar<T> {
     pub fn new(height: f64) -> Self {
-        let exit_button = TitleBarButton::new(height, Image::new(ImageBuf::empty()));
-        let minimize_button = TitleBarButton::new(height, Image::new(ImageBuf::empty()));
+        let raw_img = Asset::get("close.png").unwrap().data;
+        let img_data = image::load_from_memory(&raw_img).unwrap();
+        let rgb_img = img_data.to_rgba8();
+        let img_size = rgb_img.dimensions();
+        let img_buf = ImageBuf::from_raw(
+            rgb_img.to_vec(),
+            ImageFormat::RgbaPremul,
+            img_size.0 as usize,
+            img_size.1 as usize
+        );
+        let exit_button = TitleBarButton::new(height, Image::new(img_buf));
+
+        let raw_img = Asset::get("minimize.png").unwrap().data;
+        let img_data = image::load_from_memory(&raw_img).unwrap();
+        let rgb_img = img_data.to_rgba8();
+        let img_size = rgb_img.dimensions();
+        let img_buf = ImageBuf::from_raw(
+            rgb_img.to_vec(),
+            ImageFormat::RgbaPremul,
+            img_size.0 as usize,
+            img_size.1 as usize
+        );
+        let minimize_button = TitleBarButton::new(height, Image::new(img_buf));
 
         Self {
             height,
