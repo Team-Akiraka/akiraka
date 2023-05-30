@@ -1,11 +1,7 @@
-<!--suppress HtmlDeprecatedAttribute -->
-<div  align="center">    
-<img src="https://raw.githubusercontent.com/Team-Akiraka/team-akiraka.github.io/main/Logo%20(Latest%20-%20Plain%20Clear).png" width="50%" height="50%" alt="">
-</div>
+# Tauri + Vanilla
 
----
-<div  align="center">
-This Project is licensed under GNU Lesser General Public License v3.0
-</div>
+This template should help get you started developing with Tauri in vanilla HTML, CSS and Javascript.
 
----
+## Recommended IDE Setup
+
+- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
