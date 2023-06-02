@@ -1,4 +1,4 @@
-use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, ImageBuf, Key, KeyOrValue, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, ImageBuf, Key, KeyOrValue, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
 use druid::piet::d2d::SolidColorBrush;
 use druid::piet::ImageFormat;
 use druid::widget::Image;
@@ -71,7 +71,10 @@ impl<T: Data> Widget<T> for TitleBarButton {
             ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON));
         }
 
-        self.icon.paint(ctx, data, env);
+        ctx.with_save(|ctx| {
+            ctx.transform(Affine::scale(1.0));
+            self.icon.paint(ctx, data, env);
+        });
     }
 }
 
