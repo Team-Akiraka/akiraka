@@ -10,6 +10,60 @@ use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, 
 use crate::theme::theme;
 use crate::widget::Asset;
 
+struct DraggableArea {
+    height: f64
+}
+
+impl DraggableArea {
+    pub fn new(height: f64) -> Self {
+        Self {
+            height
+        }
+    }
+}
+
+#[allow(unused_variables)]
+impl<T> Widget<T> for DraggableArea {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        match event {
+            Event::MouseDown(mouse_event) => {
+                // if !(self.exit_button.is_hot() || self.minimize_button.is_hot()) {
+                    // TODO: 跨平台
+                    #[cfg(target_os = "windows")]
+                    #[allow(unsafe_code)]
+                    if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
+                        unsafe {
+                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
+                            ReleaseCapture();
+                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
+                        }
+                    }
+                // }
+            }
+            Event::MouseUp(mouse_event) => {
+            }
+            Event::MouseMove(mouse_event) => {
+            }
+            _ => {}
+        }
+    }
+
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    }
+
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    }
+
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        Size::new(bc.max().width, self.height)
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        let rect = Rect::from_origin_size(Point::ORIGIN, ctx.size());
+        ctx.fill(rect, &Color::rgba8(255, 127,255, 63));
+    }
+}
+
 struct TitleBarButton {
     size: f64,
     icon: Image
@@ -80,6 +134,7 @@ impl<T: Data> Widget<T> for TitleBarButton {
 
 pub struct TitleBar<T> {
     height: f64,
+    draggable_area: WidgetPod<T, Box<dyn Widget<T>>>,
     exit_button: WidgetPod<T, Box<dyn Widget<T>>>,
     minimize_button: WidgetPod<T, Box<dyn Widget<T>>>
 }
@@ -113,6 +168,7 @@ impl<T: Data> TitleBar<T> {
 
         Self {
             height,
+            draggable_area: WidgetPod::new(Box::new(DraggableArea::new(height))),
             exit_button: WidgetPod::new(Box::new(exit_button)),
             minimize_button: WidgetPod::new(Box::new(minimize_button))
         }
@@ -122,43 +178,30 @@ impl<T: Data> TitleBar<T> {
 #[allow(unused_variables)]
 impl<T: Data> Widget<T> for TitleBar<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
-        match event {
-            Event::MouseDown(mouse_event) => {
-                if !(self.exit_button.is_hot() || self.minimize_button.is_hot()) {
-                    // TODO: 跨平台
-                    #[cfg(target_os = "windows")]
-                    #[allow(unsafe_code)]
-                    if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
-                        unsafe {
-                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
-                            ReleaseCapture();
-                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
-                        }
-                    }
-                }
-            }
-            Event::MouseUp(mouse_event) => {
-            }
-            Event::MouseMove(mouse_event) => {
-            }
-            _ => {}
-        }
-
         self.exit_button.event(ctx, event, data, env);
         self.minimize_button.event(ctx, event, data, env);
+
+        if !(self.exit_button.is_hot() || self.minimize_button.is_hot()) {
+            self.draggable_area.event(ctx, event, data, env);
+        }
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.draggable_area.lifecycle(ctx, event, data, env);
         self.exit_button.lifecycle(ctx, event, data, env);
         self.minimize_button.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.draggable_area.update(ctx, data, env);
         self.exit_button.update(ctx, data, env);
         self.minimize_button.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        self.draggable_area.set_origin(ctx, Point::ORIGIN);
+        bc.constrain(self.draggable_area.layout(ctx, bc, data, env));
+
         self.exit_button.set_origin(ctx, Point::new(bc.max().width - self.height, 0.0));
         bc.constrain(self.exit_button.layout(ctx, bc, data, env));
         self.minimize_button.set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
@@ -171,6 +214,7 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         let rect = Rect::from_origin_size(Point::ORIGIN, Size::new(ctx.window().get_size().width, self.height));
         ctx.fill(rect, &env.get(theme::COLOR_PRIMARY_TITLE_BAR));
 
+        self.draggable_area.paint(ctx, data, env);
         self.exit_button.paint(ctx, data, env);
         self.minimize_button.paint(ctx, data, env);
     }
