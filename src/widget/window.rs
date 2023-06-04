@@ -1,5 +1,4 @@
-use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetPod};
-use crate::theme::theme;
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetPod};
 use crate::widget::title_bar::TitleBar;
 
 const TITLE_BAR_HEIGHT: f64 = 44.0;

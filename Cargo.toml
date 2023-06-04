@@ -7,8 +7,9 @@ build = "build.rs"
 [dependencies]
 akiraka-core = { git = "https://github.com/Team-Akiraka/akiraka-core.git" }
 rust-embed = "6.6.1"
-druid = { git = "https://github.com/linebender/druid.git", version = "0.8.3", features = ["raw-win-handle"] }
+druid = { git = "https://github.com/linebender/druid.git", version = "0.8.3", features = ["raw-win-handle", "svg"] }
 image = "0.24.6"
+
 [target.'cfg(windows)'.build-dependencies]
 windres = "0.2"
 

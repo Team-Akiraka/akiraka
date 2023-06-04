@@ -1,8 +1,6 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, ImageBuf, Key, KeyOrValue, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
-use druid::piet::d2d::SolidColorBrush;
-use druid::piet::ImageFormat;
-use druid::widget::Image;
-use image::GenericImageView;
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
+use druid::platform_menus::mac::file::print;
+use druid::widget::{ControllerHost, Svg, SvgData};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
@@ -27,18 +25,16 @@ impl<T> Widget<T> for DraggableArea {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         match event {
             Event::MouseDown(mouse_event) => {
-                // if !(self.exit_button.is_hot() || self.minimize_button.is_hot()) {
-                    // TODO: 跨平台
-                    #[cfg(target_os = "windows")]
-                    #[allow(unsafe_code)]
-                    if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
-                        unsafe {
-                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
-                            ReleaseCapture();
-                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
-                        }
+                // TODO: 跨平台
+                #[cfg(target_os = "windows")]
+                #[allow(unsafe_code)]
+                if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
+                    unsafe {
+                        SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
+                        ReleaseCapture();
+                        SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
                     }
-                // }
+                }
             }
             Event::MouseUp(mouse_event) => {
             }
@@ -60,17 +56,17 @@ impl<T> Widget<T> for DraggableArea {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let rect = Rect::from_origin_size(Point::ORIGIN, ctx.size());
-        ctx.fill(rect, &Color::rgba8(255, 127,255, 63));
+        ctx.fill(rect, &Color::rgba8(255, 255,255, 0));
     }
 }
 
 struct TitleBarButton {
     size: f64,
-    icon: Image
+    icon: Svg
 }
 
 impl TitleBarButton {
-    pub fn new(size: f64, icon: Image) -> Self {
+    pub fn new(size: f64, icon: Svg) -> Self {
         Self {
             size,
             icon
@@ -126,7 +122,7 @@ impl<T: Data> Widget<T> for TitleBarButton {
         }
 
         ctx.with_save(|ctx| {
-            ctx.transform(Affine::scale(1.0));
+            ctx.transform(Affine::scale(0.5).then_translate(Vec2::new(12.0 - 1.0, 12.0 - 1.0)));
             self.icon.paint(ctx, data, env);
         });
     }
@@ -142,29 +138,28 @@ pub struct TitleBar<T> {
 #[allow(unused_variables)]
 impl<T: Data> TitleBar<T> {
     pub fn new(height: f64) -> Self {
-        let raw_img = Asset::get("close.png").unwrap().data;
-        let img_data = image::load_from_memory(&raw_img).unwrap();
-        let rgb_img = img_data.to_rgba8();
-        let img_size = rgb_img.dimensions();
-        let img_buf = ImageBuf::from_raw(
-            rgb_img.to_vec(),
-            ImageFormat::RgbaPremul,
-            img_size.0 as usize,
-            img_size.1 as usize
-        );
-        let exit_button = TitleBarButton::new(height, Image::new(img_buf));
+        let svg = std::str::from_utf8(&Asset::get("icon/close.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
+        // let raw_img = Asset::get("close.png").unwrap().data;
+        // let img_data = image::load_from_memory(&raw_img).unwrap();
+        // let rgb_img = img_data.to_rgba8();
+        // let img_size = rgb_img.dimensions();
+        // let img_buf = ImageBuf::from_raw(
+        //     rgb_img.to_vec(),
+        //     ImageFormat::RgbaPremul,
+        //     img_size.0 as usize,
+        //     img_size.1 as usize
+        // );
+        // let exit_button = TitleBarButton::new(height, Image::new(img_buf));
+        let exit_button = TitleBarButton::new(height, Svg::new(svg.clone()))
+            .on_click(|ctx, t: &mut T, env| {
+                ctx.window().clone().close();
+            });
 
-        let raw_img = Asset::get("minimize.png").unwrap().data;
-        let img_data = image::load_from_memory(&raw_img).unwrap();
-        let rgb_img = img_data.to_rgba8();
-        let img_size = rgb_img.dimensions();
-        let img_buf = ImageBuf::from_raw(
-            rgb_img.to_vec(),
-            ImageFormat::RgbaPremul,
-            img_size.0 as usize,
-            img_size.1 as usize
-        );
-        let minimize_button = TitleBarButton::new(height, Image::new(img_buf));
+        let svg = std::str::from_utf8(&Asset::get("icon/minimize.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
+        let minimize_button = TitleBarButton::new(height, Svg::new(svg.clone()))
+            .on_click(|ctx, t: &mut T, env| {
+                ctx.window().clone().set_window_state(WindowState::Minimized);
+            });
 
         Self {
             height,

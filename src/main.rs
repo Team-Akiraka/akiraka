@@ -2,7 +2,7 @@
 mod widget;
 mod theme;
 
-use druid::widget::{Align, Flex, Label, TextBox};
+use druid::widget::{Flex, Label, TextBox};
 use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Screen, UnitPoint, Widget, WidgetExt, WindowDesc, WindowState};
 use crate::widget::window::WindowWidget;
 
