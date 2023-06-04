@@ -1,6 +1,7 @@
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
 use druid::platform_menus::mac::file::print;
-use druid::widget::{ControllerHost, Svg, SvgData};
+use druid::text::EditableText;
+use druid::widget::{ControllerHost, Svg, SvgData, TextBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
@@ -133,6 +134,7 @@ pub struct TitleBar<T> {
     draggable_area: WidgetPod<T, Box<dyn Widget<T>>>,
     exit_button: WidgetPod<T, Box<dyn Widget<T>>>,
     minimize_button: WidgetPod<T, Box<dyn Widget<T>>>
+    // search_bar: WidgetPod<T, Box<dyn Widget<dyn EditableText>>>
 }
 
 #[allow(unused_variables)]
@@ -161,11 +163,15 @@ impl<T: Data> TitleBar<T> {
                 ctx.window().clone().set_window_state(WindowState::Minimized);
             });
 
+        // let search_bar = TextBox::new()
+        //     .with_placeholder("Type here to search in libraries");
+
         Self {
             height,
             draggable_area: WidgetPod::new(Box::new(DraggableArea::new(height))),
             exit_button: WidgetPod::new(Box::new(exit_button)),
             minimize_button: WidgetPod::new(Box::new(minimize_button))
+            // search_bar: WidgetPod::new(Box::new(search_bar))
         }
     }
 }

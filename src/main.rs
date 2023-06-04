@@ -40,7 +40,6 @@ fn main() {
 
 #[allow(unused_variables)]
 fn build_root_widget() -> impl Widget<HelloState> {
-    let x = |data: &HelloState, env: &Env| format!("Hello {}!", data.name);
     let label = Label::new(|data: &HelloState, env: &Env| format!("Hello {}!", data.name));
     let text_box = TextBox::new()
         .with_placeholder("Who are we greeting?")
