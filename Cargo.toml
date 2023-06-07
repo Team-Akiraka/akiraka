@@ -18,4 +18,8 @@ version = "0.3.9"
 features = ["winbase", "dwmapi", "uxtheme", "winnt"]
 
 [profile.release]
+strip = true
 opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"

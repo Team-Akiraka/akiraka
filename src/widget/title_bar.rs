@@ -1,5 +1,5 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
-use druid::widget::{LensWrap, Svg, SvgData, TextBox};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, TextAlignment, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
+use druid::widget::{Align, LensWrap, Svg, SvgData, TextBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
@@ -63,14 +63,16 @@ impl<T> Widget<T> for DraggableArea {
 
 struct TitleBarButton {
     size: f64,
-    icon: Svg
+    icon: Svg,
+    data: SvgData,
 }
 
 impl TitleBarButton {
-    pub fn new(size: f64, icon: Svg) -> Self {
+    pub fn new(size: f64, data: SvgData) -> Self {
         Self {
             size,
-            icon
+            icon: Svg::new(data.clone()),
+            data,
         }
     }
 }
@@ -152,13 +154,13 @@ impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_inp
         //     img_size.1 as usize
         // );
         // let exit_button = TitleBarButton::new(height, Image::new(img_buf));
-        let exit_button = TitleBarButton::new(height, Svg::new(svg.clone()))
+        let exit_button = TitleBarButton::new(height, svg.clone())
             .on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().close();
             });
 
         let svg = std::str::from_utf8(&Asset::get("icon/minimize.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
-        let minimize_button = TitleBarButton::new(height, Svg::new(svg.clone()))
+        let minimize_button = TitleBarButton::new(height, svg.clone())
             .on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().set_window_state(WindowState::Minimized);
             });
@@ -167,8 +169,10 @@ impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_inp
         let search_bar = TextBox::new()
             // .with_placeholder(LocalizedString::new("Type here for a global search"))
             .with_placeholder(LocalizedString::new("Coming soon!"))
-            .with_text_size(16.0)
-            .lens(AppState::global_search_bar_input);
+            .with_text_size(14.0)
+            .with_text_alignment(TextAlignment::Start)
+            .lens(AppState::global_search_bar_input)
+            .padding(Insets::uniform(8.0));
 
         Self {
             height,
@@ -214,11 +218,11 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         bc.constrain(self.exit_button.layout(ctx, bc, data, env));
         self.minimize_button.set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
         bc.constrain(self.minimize_button.layout(ctx, bc, data, env));
-        self.search_bar.set_origin(ctx, Point::new(bc.max().width / 2.0 - 128.0, 7.0));
+        self.search_bar.set_origin(ctx, Point::new(bc.max().width / 2.0 - 128.0, 0.0));
         bc.constrain(self.search_bar.layout(ctx,
                                             &BoxConstraints::new(
-                                                Size::new(256.0, 30.0),
-                                                Size::new(256.0, 30.0))
+                                                Size::new(256.0, self.height),
+                                                Size::new(256.0, self.height))
                                             , data, env));
 
         Size::new(bc.max().width, self.height)

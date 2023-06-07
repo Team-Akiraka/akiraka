@@ -49,6 +49,6 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
         self.title_bar.paint(ctx, data, env);
         self.inner.paint(ctx, data, env);
         let rect = Rect::new(0.0, 0.0, ctx.window().get_size().width, ctx.window().get_size().height);
-        ctx.stroke(rect, &env.get(theme::COLOR_BORDER_LIGHT), 1.0);
+        ctx.stroke(rect, &env.get(theme::COLOR_BORDER_LIGHT), 2.0);
     }
 }
