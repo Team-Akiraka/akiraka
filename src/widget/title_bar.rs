@@ -1,3 +1,4 @@
+use std::fmt::{Formatter, LowerHex};
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, TextAlignment, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
 use druid::widget::{Align, LensWrap, Svg, SvgData, TextBox};
 #[cfg(target_os = "windows")]
@@ -61,17 +62,21 @@ impl<T> Widget<T> for DraggableArea {
     }
 }
 
+fn color_as_hex_string(color: Color) -> String {
+    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
+}
+
 struct TitleBarButton {
     size: f64,
     icon: Svg,
-    data: SvgData,
+    data: String,
 }
 
 impl TitleBarButton {
-    pub fn new(size: f64, data: SvgData) -> Self {
+    pub fn new(size: f64, data: String) -> Self {
         Self {
             size,
-            icon: Svg::new(data.clone()),
+            icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
             data,
         }
     }
@@ -126,6 +131,8 @@ impl<T: Data> Widget<T> for TitleBarButton {
 
         ctx.with_save(|ctx| {
             ctx.transform(Affine::scale(0.5).then_translate(Vec2::new(12.0 - 1.0, 12.0 - 1.0)));
+            // println!("{:?}", color_as_hex_string(Color::from(env.get(theme::COLOR_TEXT))));
+            self.icon = Svg::new(self.data.replace("{color}", color_as_hex_string(Color::from(env.get(theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap());
             self.icon.paint(ctx, data, env);
         });
     }
@@ -142,7 +149,6 @@ pub struct TitleBar<T> {
 #[allow(unused_variables)]
 impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_input, TextBox<String>>: Widget<T> {
     pub fn new(height: f64) -> Self {
-        let svg = std::str::from_utf8(&Asset::get("icon/close.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
         // let raw_img = Asset::get("close.png").unwrap().data;
         // let img_data = image::load_from_memory(&raw_img).unwrap();
         // let rgb_img = img_data.to_rgba8();
@@ -154,12 +160,16 @@ impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_inp
         //     img_size.1 as usize
         // );
         // let exit_button = TitleBarButton::new(height, Image::new(img_buf));
+
+        // let svg = std::str::from_utf8(&Asset::get("icon/close.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
+        let svg = std::str::from_utf8(&Asset::get("icon/close.svg").unwrap().data).unwrap().parse::<String>().unwrap();
         let exit_button = TitleBarButton::new(height, svg.clone())
             .on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().close();
             });
 
-        let svg = std::str::from_utf8(&Asset::get("icon/minimize.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
+        // let svg = std::str::from_utf8(&Asset::get("icon/minimize.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
+        let svg = std::str::from_utf8(&Asset::get("icon/minimize.svg").unwrap().data).unwrap().parse::<String>().unwrap();
         let minimize_button = TitleBarButton::new(height, svg.clone())
             .on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().set_window_state(WindowState::Minimized);
