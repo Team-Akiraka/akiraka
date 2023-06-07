@@ -20,19 +20,22 @@ pub const COLOR_CLEAR_BUTTON: Key<Color> = Key::new("team.akiraka.theme.color.cl
 pub const COLOR_CLEAR_BUTTON_HOT: Key<Color> = Key::new("team.akiraka.theme.color.clear.button.hot");
 pub const COLOR_CLEAR_BUTTON_ACTIVE: Key<Color> = Key::new("team.akiraka.theme.color.clear.button.active");
 
+pub const COLOR_BORDER_LIGHT: Key<Color> = theme::BORDER_LIGHT;
+pub const COLOR_BORDER_DARK: Key<Color> = theme::BORDER_DARK;
+
 pub const COLOR_CURSOR: Key<Color> = theme::CURSOR_COLOR;
 
 // 数值
 pub const RADIUS_TEXTBOX_BORDER: Key<RoundedRectRadii> = theme::TEXTBOX_BORDER_RADIUS;
 
 pub fn init(env: &mut Env) {
-    env.set(COLOR_WINDOW_BACKGROUND, Color::rgba8(233, 233, 233, 255));
+    env.set(COLOR_WINDOW_BACKGROUND, Color::rgba8(243, 243, 243, 255));
 
     env.set(COLOR_PRIMARY_TITLE_BAR, Color::rgba8(47, 255, 106, 0));
     env.set(COLOR_PRIMARY_LIGHT, Color::rgba8(29, 155, 48, 255));
     env.set(COLOR_PRIMARY_DARK, Color::rgba8(24, 129, 40, 255));
 
-    env.set(COLOR_BACKGROUND_LIGHT, Color::rgba8(233, 233, 233, 255));
+    env.set(COLOR_BACKGROUND_LIGHT, Color::rgba8(243, 243, 243, 255));
     env.set(COLOR_BACKGROUND_DARK, Color::rgba8(233, 233, 233, 255));
 
     env.set(COLOR_FOREGROUND_LIGHT, Color::rgba8(255, 255, 255, 255));
@@ -44,6 +47,9 @@ pub fn init(env: &mut Env) {
     env.set(COLOR_CLEAR_BUTTON, Color::rgba8(0, 0, 0, 0));
     env.set(COLOR_CLEAR_BUTTON_HOT, Color::rgba8(0, 0, 0, 63));
     env.set(COLOR_CLEAR_BUTTON_ACTIVE, Color::rgba8(0, 0, 0, 31));
+
+    env.set(COLOR_BORDER_LIGHT, Color::rgba8(163, 163,163, 255));
+    env.set(COLOR_BORDER_DARK, Color::rgba8(58, 58, 58, 255));
 
     env.set(COLOR_CURSOR, Color::rgba8(14, 14, 14, 255));
 

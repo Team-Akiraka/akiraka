@@ -1,11 +1,11 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
-use druid::platform_menus::mac::file::print;
-use druid::text::EditableText;
-use druid::widget::{ControllerHost, Svg, SvgData, TextBox};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
+use druid::widget::{LensWrap, Svg, SvgData, TextBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, SetWindowLongW, WM_SYSCOMMAND, WS_MAXIMIZEBOX};
+use crate::app_state_derived_lenses::{global_search_bar_input};
+use crate::AppState;
 use crate::theme::theme;
 use crate::widget::Asset;
 
@@ -133,12 +133,12 @@ pub struct TitleBar<T> {
     height: f64,
     draggable_area: WidgetPod<T, Box<dyn Widget<T>>>,
     exit_button: WidgetPod<T, Box<dyn Widget<T>>>,
-    minimize_button: WidgetPod<T, Box<dyn Widget<T>>>
-    // search_bar: WidgetPod<T, Box<dyn Widget<dyn EditableText>>>
+    minimize_button: WidgetPod<T, Box<dyn Widget<T>>>,
+    search_bar: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 #[allow(unused_variables)]
-impl<T: Data> TitleBar<T> {
+impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_input, TextBox<String>>: Widget<T> {
     pub fn new(height: f64) -> Self {
         let svg = std::str::from_utf8(&Asset::get("icon/close.svg").unwrap().data).unwrap().replace("{color}", "#000000").parse::<SvgData>().unwrap();
         // let raw_img = Asset::get("close.png").unwrap().data;
@@ -163,15 +163,19 @@ impl<T: Data> TitleBar<T> {
                 ctx.window().clone().set_window_state(WindowState::Minimized);
             });
 
-        // let search_bar = TextBox::new()
-        //     .with_placeholder("Type here to search in libraries");
+        // TODO: 搜索栏
+        let search_bar = TextBox::new()
+            // .with_placeholder(LocalizedString::new("Type here for a global search"))
+            .with_placeholder(LocalizedString::new("Coming soon!"))
+            .with_text_size(16.0)
+            .lens(AppState::global_search_bar_input);
 
         Self {
             height,
             draggable_area: WidgetPod::new(Box::new(DraggableArea::new(height))),
             exit_button: WidgetPod::new(Box::new(exit_button)),
-            minimize_button: WidgetPod::new(Box::new(minimize_button))
-            // search_bar: WidgetPod::new(Box::new(search_bar))
+            minimize_button: WidgetPod::new(Box::new(minimize_button)),
+            search_bar: WidgetPod::new(Box::new(search_bar))
         }
     }
 }
@@ -181,8 +185,9 @@ impl<T: Data> Widget<T> for TitleBar<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         self.exit_button.event(ctx, event, data, env);
         self.minimize_button.event(ctx, event, data, env);
+        self.search_bar.event(ctx, event, data, env);
 
-        if !(self.exit_button.is_hot() || self.minimize_button.is_hot()) {
+        if !(self.exit_button.is_hot() || self.minimize_button.is_hot() || self.search_bar.is_hot()) {
             self.draggable_area.event(ctx, event, data, env);
         }
     }
@@ -191,12 +196,14 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         self.draggable_area.lifecycle(ctx, event, data, env);
         self.exit_button.lifecycle(ctx, event, data, env);
         self.minimize_button.lifecycle(ctx, event, data, env);
+        self.search_bar.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
         self.draggable_area.update(ctx, data, env);
         self.exit_button.update(ctx, data, env);
         self.minimize_button.update(ctx, data, env);
+        self.search_bar.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
@@ -207,6 +214,12 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         bc.constrain(self.exit_button.layout(ctx, bc, data, env));
         self.minimize_button.set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
         bc.constrain(self.minimize_button.layout(ctx, bc, data, env));
+        self.search_bar.set_origin(ctx, Point::new(bc.max().width / 2.0 - 128.0, 7.0));
+        bc.constrain(self.search_bar.layout(ctx,
+                                            &BoxConstraints::new(
+                                                Size::new(256.0, 30.0),
+                                                Size::new(256.0, 30.0))
+                                            , data, env));
 
         Size::new(bc.max().width, self.height)
     }
@@ -218,5 +231,6 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         self.draggable_area.paint(ctx, data, env);
         self.exit_button.paint(ctx, data, env);
         self.minimize_button.paint(ctx, data, env);
+        self.search_bar.paint(ctx, data, env);
     }
 }

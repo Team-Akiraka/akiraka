@@ -1,14 +1,16 @@
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use crate::AppState;
+use crate::theme::theme;
 use crate::widget::title_bar::TitleBar;
 
-const TITLE_BAR_HEIGHT: f64 = 44.0;
+pub const TITLE_BAR_HEIGHT: f64 = 44.0;
 
 pub struct WindowWidget<T> {
     title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
-impl<T: Data> WindowWidget<T> {
+impl<T: Data> WindowWidget<T> where TitleBar<AppState>: druid::Widget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
@@ -46,5 +48,7 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         self.title_bar.paint(ctx, data, env);
         self.inner.paint(ctx, data, env);
+        let rect = Rect::new(0.0, 0.0, ctx.window().get_size().width, ctx.window().get_size().height);
+        ctx.stroke(rect, &env.get(theme::COLOR_BORDER_LIGHT), 1.0);
     }
 }
