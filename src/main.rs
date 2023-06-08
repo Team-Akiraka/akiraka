@@ -2,6 +2,7 @@
 mod widget;
 mod theme;
 
+use rust_embed::RustEmbed;
 use druid::widget::{Flex, Label};
 use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Screen, UnitPoint, Widget, WidgetExt, WindowDesc, WindowState};
 use crate::widget::{bottom_bar, window};
@@ -10,6 +11,10 @@ use crate::widget::window::WindowWidget;
 // const VERTICAL_WIDGET_SPACING: f64 = 20.0;
 // const TEXT_BOX_WIDTH: f64 = 200.0;
 const WINDOW_TITLE: LocalizedString<AppState> = LocalizedString::new("Akiraka - Internal build");
+
+#[derive(RustEmbed)]
+#[folder = "assets"]
+pub struct Asset;
 
 #[derive(Clone, Data, Lens)]
 pub struct AppState {

@@ -6,9 +6,8 @@ use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, SetWindowLongW, WM_SYSCOMMAND, WS_MAXIMIZEBOX};
 use crate::app_state_derived_lenses::{global_search_bar_input};
-use crate::AppState;
+use crate::{AppState, Asset};
 use crate::theme::theme;
-use crate::widget::Asset;
 
 struct DraggableArea {
     height: f64
@@ -37,6 +36,7 @@ impl<T> Widget<T> for DraggableArea {
                         SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
                     }
                 }
+                ctx.request_paint();
             }
             Event::MouseUp(mouse_event) => {
             }
@@ -179,7 +179,7 @@ impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_inp
         let search_bar = TextBox::new()
             // .with_placeholder(LocalizedString::new("Type here for a global search"))
             .with_placeholder(LocalizedString::new("Coming soon!"))
-            .with_text_size(14.0)
+            .with_text_size(13.0)
             .with_text_alignment(TextAlignment::Start)
             .lens(AppState::global_search_bar_input)
             .padding(Insets::uniform(8.0));
@@ -228,11 +228,11 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         bc.constrain(self.exit_button.layout(ctx, bc, data, env));
         self.minimize_button.set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
         bc.constrain(self.minimize_button.layout(ctx, bc, data, env));
-        self.search_bar.set_origin(ctx, Point::new(bc.max().width / 2.0 - 128.0, 0.0));
+        self.search_bar.set_origin(ctx, Point::new(bc.max().width / 2.0 - 160.0, 0.0));
         bc.constrain(self.search_bar.layout(ctx,
                                             &BoxConstraints::new(
-                                                Size::new(256.0, self.height),
-                                                Size::new(256.0, self.height))
+                                                Size::new(320.0, self.height),
+                                                Size::new(320.0, self.height))
                                             , data, env));
 
         Size::new(bc.max().width, self.height)
