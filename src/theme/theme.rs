@@ -27,9 +27,16 @@ pub const COLOR_BUTTON_BORDER: Key<Color> = Key::new("team.akiraka.theme.color.b
 pub const COLOR_BUTTON_BORDER_HOT: Key<Color> = Key::new("team.akiraka.theme.color.button.border.hot");
 pub const COLOR_BUTTON_BORDER_ACTIVE: Key<Color> = Key::new("team.akiraka.theme.color.button.border.active");
 
+pub const COLOR_TITLE_BAR_BUTTON: Key<Color> = Key::new("team.akiraka.theme.color.title_bar.button");
+pub const COLOR_TITLE_BAR_BUTTON_HOT: Key<Color> = Key::new("team.akiraka.theme.color.title_bar.button.hot");
+pub const COLOR_TITLE_BAR_BUTTON_ACTIVE: Key<Color> = Key::new("team.akiraka.theme.color.title_bar.button.active");
+
 pub const COLOR_CLEAR_BUTTON: Key<Color> = Key::new("team.akiraka.theme.color.clear.button");
 pub const COLOR_CLEAR_BUTTON_HOT: Key<Color> = Key::new("team.akiraka.theme.color.clear.button.hot");
 pub const COLOR_CLEAR_BUTTON_ACTIVE: Key<Color> = Key::new("team.akiraka.theme.color.clear.button.active");
+pub const COLOR_CLEAR_BUTTON_BORDER: Key<Color> = Key::new("team.akiraka.theme.color.clear.border.button");
+pub const COLOR_CLEAR_BUTTON_BORDER_HOT: Key<Color> = Key::new("team.akiraka.theme.color.clear.button.border.hot");
+pub const COLOR_CLEAR_BUTTON_BORDER_ACTIVE: Key<Color> = Key::new("team.akiraka.theme.color.clear.button.border.active");
 
 pub const COLOR_BORDER_LIGHT: Key<Color> = theme::BORDER_LIGHT;
 pub const COLOR_BORDER_DARK: Key<Color> = theme::BORDER_DARK;
@@ -73,9 +80,16 @@ pub fn init(env: &mut Env) {
     env.set(COLOR_BUTTON_BORDER_HOT, Color::rgba8(0x1d, 0x9b, 0x30, 0xff));
     env.set(COLOR_BUTTON_BORDER_ACTIVE, Color::rgba8(0x1d, 0x9b, 0x30, 0x7f));
 
+    env.set(COLOR_TITLE_BAR_BUTTON, Color::rgba8(0x00, 0x00, 0x00, 0x00));
+    env.set(COLOR_TITLE_BAR_BUTTON_HOT, Color::rgba8(0x00, 0x00, 0x00, 0x3f));
+    env.set(COLOR_TITLE_BAR_BUTTON_ACTIVE, Color::rgba8(0x00, 0x00, 0x00, 0x1f));
+
     env.set(COLOR_CLEAR_BUTTON, Color::rgba8(0x00, 0x00, 0x00, 0x00));
-    env.set(COLOR_CLEAR_BUTTON_HOT, Color::rgba8(0x00, 0x00, 0x00, 0x3f));
+    env.set(COLOR_CLEAR_BUTTON_HOT, Color::rgba8(0x00, 0x00, 0x00, 0x10));
     env.set(COLOR_CLEAR_BUTTON_ACTIVE, Color::rgba8(0x00, 0x00, 0x00, 0x1f));
+    env.set(COLOR_CLEAR_BUTTON_BORDER, Color::rgba8(0x00, 0x00, 0x00, 0x00));
+    env.set(COLOR_CLEAR_BUTTON_BORDER_HOT, Color::rgba8(0x00, 0x00, 0x00, 0x1f));
+    env.set(COLOR_CLEAR_BUTTON_BORDER_ACTIVE, Color::rgba8(0x00, 0x00, 0x00, 0x1f));
 
     env.set(COLOR_BORDER_LIGHT, Color::rgba8(0x00, 0x00,0x00, 0x1f));
     env.set(COLOR_BORDER_DARK, Color::rgba8(0x00, 0x00,0x00, 0x3f));

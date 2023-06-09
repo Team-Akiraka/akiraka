@@ -3,10 +3,11 @@ use druid::widget::{Flex};
 use crate::{AppState};
 use crate::theme::theme;
 use crate::widget::button::Button;
+use crate::widget::clear_button::ClearButton;
 use crate::widget::primary_button::PrimaryButton;
 
 pub fn build() -> impl Widget<AppState> {
-    let launch_button = PrimaryButton::new("Launch")
+    let launch_button = ClearButton::new("Launch")
         .fix_width(160.0)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 

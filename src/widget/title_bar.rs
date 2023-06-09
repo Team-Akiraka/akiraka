@@ -122,11 +122,11 @@ impl<T: Data> Widget<T> for TitleBarButton {
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let rect = Rect::from_origin_size(Point::ORIGIN, Size::new(self.size, self.size));
         if ctx.is_active() {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE));
+            ctx.fill(rect, &env.get(theme::COLOR_TITLE_BAR_BUTTON_ACTIVE));
         } else if ctx.is_hot() {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+            ctx.fill(rect, &env.get(theme::COLOR_TITLE_BAR_BUTTON_HOT));
         } else {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON));
+            ctx.fill(rect, &env.get(theme::COLOR_TITLE_BAR_BUTTON));
         }
 
         ctx.with_save(|ctx| {
