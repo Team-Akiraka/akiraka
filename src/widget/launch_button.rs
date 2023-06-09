@@ -1,27 +1,41 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Vec2, Widget};
-use druid::widget::{Click, ControllerHost, Label, LabelText, Svg, SvgData};
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
+use druid::widget::{Click, ControllerHost, Label, LabelText};
 
-const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
+const LABEL_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
-fn color_as_hex_string(color: Color) -> String {
-    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
+pub struct LaunchButton<T> {
+    label: Label<T>,
+    label_size: Size
 }
 
-pub struct IconClearButton {
-    icon: Svg,
-    data: String,
-}
+impl<T: Data> LaunchButton<T> {
+    pub fn new(text: impl Into<LabelText<T>>) -> LaunchButton<T> {
+        LaunchButton::from_label(Label::new(text)
+            .with_text_size(13.0))
+    }
 
-impl IconClearButton {
-    pub fn new(data: String) -> IconClearButton {
-        Self {
-            icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
-            data
+    pub fn from_label(label: Label<T>) -> LaunchButton<T> {
+        LaunchButton {
+            label,
+            label_size: Size::ZERO,
         }
     }
+
+    pub fn dynamic(text: impl Fn(&T, &Env) -> String + 'static) -> Self {
+        let text: LabelText<T> = text.into();
+        LaunchButton::new(text)
+    }
+
+    pub fn on_click(
+        self,
+        f: impl Fn(&mut EventCtx, &mut T, &Env) + 'static,
+    ) -> ControllerHost<Self, Click<T>> {
+        ControllerHost::new(self, Click::new(f))
+    }
+
 }
 
-impl<T: Data> Widget<T> for IconClearButton {
+impl<T: Data> Widget<T> for LaunchButton<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, _data: &mut T, _env: &Env) {
         match event {
             Event::MouseDown(event) => {
@@ -44,22 +58,26 @@ impl<T: Data> Widget<T> for IconClearButton {
         if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
             ctx.request_paint();
         }
-        self.icon.lifecycle(ctx, event, data, env)
+        self.label.lifecycle(ctx, event, data, env)
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        self.icon.update(ctx, old_data, data, env)
+        self.label.update(ctx, old_data, data, env)
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        let padding = Size::new(ICON_INSETS.x_value(), ICON_INSETS.y_value());
+        bc.debug_check("LaunchButton");
+        let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
+        let label_bc = bc.shrink(padding).loosen();
+        self.label_size = self.label.layout(ctx, &label_bc, data, env);
+        let min_height = env.get(theme::BORDERED_WIDGET_HEIGHT);
+        let baseline = self.label.baseline_offset();
+        ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
 
-        let icon_size = self.icon.layout(ctx, bc, data, env);
-        let button_size =
-            bc.constrain(Size::new(
-                icon_size.width,
-                icon_size.height
-            ));
+        let button_size = bc.constrain(Size::new(
+            self.label_size.width + padding.width,
+            (self.label_size.height + padding.height).max(min_height),
+        ));
         button_size
     }
 
@@ -94,10 +112,11 @@ impl<T: Data> Widget<T> for IconClearButton {
 
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
+        let label_offset = (size.to_vec2() - self.label_size.to_vec2()) / 2.0;
+
         ctx.with_save(|ctx| {
-            let svg_data = self.data.replace("{color}", color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap();
-            self.icon = Svg::new(svg_data);
-            self.icon.paint(ctx, data, env);
+            ctx.transform(Affine::translate(label_offset));
+            self.label.paint(ctx, data, env);
         });
     }
 }
