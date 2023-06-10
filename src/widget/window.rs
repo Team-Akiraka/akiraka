@@ -1,17 +1,9 @@
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
 use std::ptr;
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
 use lazy_static::lazy_static;
 use winapi::shared::minwindef::LPARAM;
-#[cfg(target_os = "windows")]
-use winapi::shared::windef::HWND;
-#[cfg(target_os = "windows")]
-use winapi::shared::windef::{HICON, HWND__};
-#[cfg(target_os = "windows")]
-use winapi::um::libloaderapi::GetModuleHandleW;
-#[cfg(target_os = "windows")]
-use winapi::um::winuser::{ICON_BIG, ICON_SMALL, IDI_APPLICATION, IMAGE_ICON, LoadImageW, LR_DEFAULTSIZE, LR_SHARED, LR_VGACOLOR, SendMessageW, WM_SETICON};
 use crate::AppState;
 use crate::theme::theme;
 use crate::widget::title_bar::TitleBar;
@@ -23,7 +15,7 @@ pub struct WindowWidget<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
-impl<T: Data> WindowWidget<T> where TitleBar<AppState>: druid::Widget<T> {
+impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
@@ -41,11 +33,15 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
                 #[cfg(target_os = "windows")]
                 #[allow(unsafe_code)]
                 {
-                    // use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, SetWindowLongW, WM_SYSCOMMAND, WS_MAXIMIZEBOX};
+                    use winapi::shared::windef::HWND;
+                    use winapi::shared::windef::{HICON, HWND__};
+                    use winapi::um::libloaderapi::GetModuleHandleW;
+                    use winapi::um::winuser::{ICON_BIG, ICON_SMALL, IDI_APPLICATION, IMAGE_ICON, LoadImageW, LR_DEFAULTSIZE, LR_SHARED, LR_VGACOLOR, SendMessageW, WM_SETICON, GetWindowLongW, GWL_STYLE, SetWindowLongW, WS_MAXIMIZEBOX};
                     if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
                         unsafe {
                             let hwnd = handle.hwnd as HWND;
 
+                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
 
                             lazy_static! {
                                 static ref PROGRAM_ICON: isize = unsafe {

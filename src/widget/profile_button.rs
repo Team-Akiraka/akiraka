@@ -59,11 +59,11 @@ impl<T: Data> Widget<T> for ProfileButton<T> {
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
         let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
 
-        // let icon_bc = bc.loosen();
-        let icon_size = self.icon.layout(ctx, bc, data, env);
+        let icon_bc = bc.loosen();
+        let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
 
         let layout_bc = bc.shrink(padding).shrink_max_width_to(bc.min().width - icon_size.width).loosen();
-        self.layout.set_origin(ctx, Point::new(icon_size.width - 4.0, -1.0));
+        self.layout.set_origin(ctx, Point::new(icon_size.width + 20.0, 0.0));
         self.layout.layout(ctx, &layout_bc, data, env);
         bc.min()
     }
@@ -100,11 +100,12 @@ impl<T: Data> Widget<T> for ProfileButton<T> {
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
         ctx.with_save(|ctx| {
-            ctx.transform(Affine::scale(0.75).then_translate(Vec2::new(6.0, 6.0)));
+            ctx.transform(Affine::scale(0.6).then_translate(Vec2::new(16.0 - 40.0, 9.0)));
             self.icon.paint(ctx, data, env)
         });
 
         ctx.with_save(|ctx| {
+            ctx.transform(Affine::translate(Vec2::new( -40.0, 0.0)));
             self.layout.paint(ctx, data, env);
         });
     }

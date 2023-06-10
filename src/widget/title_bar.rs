@@ -33,7 +33,6 @@ impl<T> Widget<T> for DraggableArea {
                 {
                     if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
                         unsafe {
-                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
                             ReleaseCapture();
                             SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
                         }

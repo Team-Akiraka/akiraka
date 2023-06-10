@@ -1,4 +1,4 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Widget, WidgetExt, WidgetPod};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::kurbo::Arc;
 use druid::widget::{Click, ControllerHost, Flex, Label, LabelText, Svg, SvgData};
 use crate::util::color_as_hex_string;
@@ -79,7 +79,7 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
         let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
 
         let layout_bc = bc.shrink(padding).shrink_max_width_to(bc.min().width - icon_size.width).loosen();
-        self.layout.set_origin(ctx, Point::new(icon_size.width - 4.0, -1.0));
+        self.layout.set_origin(ctx, Point::new(icon_size.width - 4.0, 0.0));
         self.layout.layout(ctx, &layout_bc, data, env);
         bc.min()
     }
@@ -118,7 +118,7 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
         ctx.with_save(|ctx| {
             let svg_data = self.icon_data.replace("{color}", color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str()).parse::<SvgData>().unwrap();
             self.icon = Svg::new(svg_data);
-            ctx.transform(Affine::scale(1.0));
+            ctx.transform(Affine::scale(1.0).then_translate(Vec2::new(0.5, 0.0)));
             self.icon.paint(ctx, data, env)
         });
 
