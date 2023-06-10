@@ -15,6 +15,7 @@ dependencies = [
  "akiraka-core",
  "druid",
  "image",
+ "lazy_static",
  "rust-embed",
  "winapi",
  "windres",

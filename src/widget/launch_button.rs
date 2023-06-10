@@ -1,29 +1,33 @@
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
-use druid::widget::{Click, ControllerHost, Label, LabelText};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Widget, WidgetExt, WidgetPod};
+use druid::kurbo::Arc;
+use druid::widget::{Click, ControllerHost, Flex, Label, LabelText, Svg, SvgData};
+
+fn color_as_hex_string(color: Color) -> String {
+    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
+}
 
 const LABEL_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
 pub struct LaunchButton<T> {
-    label: Label<T>,
-    label_size: Size
+    icon: Svg,
+    icon_data: String,
+    layout: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> LaunchButton<T> {
-    pub fn new(text: impl Into<LabelText<T>>) -> LaunchButton<T> {
-        LaunchButton::from_label(Label::new(text)
-            .with_text_size(13.0))
-    }
+    pub fn new(icon: String, text: impl Into<LabelText<T>>,) -> LaunchButton<T> {
+        let icon_data = icon.replace("{color}", "#000000").parse::<SvgData>().unwrap();
+        let label = Label::new(text).with_text_size(15.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(18.0);
+        let subtitle = Label::new("Unknown Instance").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);;
 
-    pub fn from_label(label: Label<T>) -> LaunchButton<T> {
         LaunchButton {
-            label,
-            label_size: Size::ZERO,
+            icon: Svg::new(icon_data.clone()),
+            icon_data: icon,
+            layout: WidgetPod::new(Box::new(Flex::column()
+                .with_child(label)
+                .with_child(subtitle)
+                .align_left()))
         }
-    }
-
-    pub fn dynamic(text: impl Fn(&T, &Env) -> String + 'static) -> Self {
-        let text: LabelText<T> = text.into();
-        LaunchButton::new(text)
     }
 
     pub fn on_click(
@@ -58,27 +62,29 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
         if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
             ctx.request_paint();
         }
-        self.label.lifecycle(ctx, event, data, env)
+        // self.label.lifecycle(ctx, event, data, env);
+        self.icon.lifecycle(ctx, event, data, env);
+        // self.subtitle.lifecycle(ctx, event, data, env);
+        self.layout.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        self.label.update(ctx, old_data, data, env)
+        // self.label.update(ctx, old_data, data, env);
+        self.icon.update(ctx, old_data, data, env);
+        // self.subtitle.update(ctx, old_data, data, env);
+        self.layout.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        bc.debug_check("LaunchButton");
         let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
-        let label_bc = bc.shrink(padding).loosen();
-        self.label_size = self.label.layout(ctx, &label_bc, data, env);
-        let min_height = env.get(theme::BORDERED_WIDGET_HEIGHT);
-        let baseline = self.label.baseline_offset();
-        ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
 
-        let button_size = bc.constrain(Size::new(
-            self.label_size.width + padding.width,
-            (self.label_size.height + padding.height).max(min_height),
-        ));
-        button_size
+        let icon_bc = bc.loosen();
+        let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
+
+        let layout_bc = bc.shrink(padding).shrink_max_width_to(bc.min().width - icon_size.width).loosen();
+        self.layout.set_origin(ctx, Point::new(icon_size.width - 4.0, -1.0));
+        self.layout.layout(ctx, &layout_bc, data, env);
+        bc.min()
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
@@ -112,11 +118,15 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
 
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
-        let label_offset = (size.to_vec2() - self.label_size.to_vec2()) / 2.0;
+        ctx.with_save(|ctx| {
+            let svg_data = self.icon_data.replace("{color}", color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str()).parse::<SvgData>().unwrap();
+            self.icon = Svg::new(svg_data);
+            ctx.transform(Affine::scale(1.0));
+            self.icon.paint(ctx, data, env)
+        });
 
         ctx.with_save(|ctx| {
-            ctx.transform(Affine::translate(label_offset));
-            self.label.paint(ctx, data, env);
+            self.layout.paint(ctx, data, env);
         });
     }
 }

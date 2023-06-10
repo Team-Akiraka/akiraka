@@ -1,4 +1,17 @@
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use std::ffi::OsStr;
+use std::os::windows::ffi::OsStrExt;
+use std::ptr;
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use lazy_static::lazy_static;
+use winapi::shared::minwindef::LPARAM;
+#[cfg(target_os = "windows")]
+use winapi::shared::windef::HWND;
+#[cfg(target_os = "windows")]
+use winapi::shared::windef::{HICON, HWND__};
+#[cfg(target_os = "windows")]
+use winapi::um::libloaderapi::GetModuleHandleW;
+#[cfg(target_os = "windows")]
+use winapi::um::winuser::{ICON_BIG, ICON_SMALL, IDI_APPLICATION, IMAGE_ICON, LoadImageW, LR_DEFAULTSIZE, LR_SHARED, LR_VGACOLOR, SendMessageW, WM_SETICON};
 use crate::AppState;
 use crate::theme::theme;
 use crate::widget::title_bar::TitleBar;
@@ -22,6 +35,54 @@ impl<T: Data> WindowWidget<T> where TitleBar<AppState>: druid::Widget<T> {
 #[allow(unused_variables)]
 impl<T: Data> Widget<T> for WindowWidget<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        match event {
+            Event::WindowConnected => {
+                // TODO: 跨平台
+                #[cfg(target_os = "windows")]
+                #[allow(unsafe_code)]
+                {
+                    // use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, SetWindowLongW, WM_SYSCOMMAND, WS_MAXIMIZEBOX};
+                    if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
+                        unsafe {
+                            let hwnd = handle.hwnd as HWND;
+
+
+                            lazy_static! {
+                                static ref PROGRAM_ICON: isize = unsafe {
+                                    let h_instance = GetModuleHandleW(ptr::null());
+
+                                    LoadImageW(
+                                        h_instance,
+                                        IDI_APPLICATION,
+                                        IMAGE_ICON,
+                                        0,
+                                        0,
+                                        LR_SHARED | LR_DEFAULTSIZE | LR_VGACOLOR
+                                    ).cast::<HICON>() as isize
+                                };
+                            }
+
+                            SendMessageW(
+                                hwnd,
+                                WM_SETICON,
+                                ICON_SMALL as usize,
+                                *PROGRAM_ICON
+                            );
+
+                            SendMessageW(
+                                hwnd,
+                                WM_SETICON,
+                                ICON_BIG as usize,
+                                *PROGRAM_ICON
+                            );
+
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+
         self.title_bar.event(ctx, event, data, env);
         self.inner.event(ctx, event, data, env);
     }

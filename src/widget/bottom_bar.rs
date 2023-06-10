@@ -9,7 +9,10 @@ use crate::widget::launch_button::LaunchButton;
 use crate::widget::primary_button::PrimaryButton;
 
 pub fn build() -> impl Widget<AppState> {
-    let launch_button = LaunchButton::new("Launch")
+    let launch_button = LaunchButton::new(
+        std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
+        "Launch"
+    )
         .fix_width(160.0)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
     // let launch_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse::<String>().unwrap());

@@ -9,6 +9,10 @@ use crate::app_state_derived_lenses::{global_search_bar_input};
 use crate::{AppState, Asset};
 use crate::theme::theme;
 
+fn color_as_hex_string(color: Color) -> String {
+    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
+}
+
 struct DraggableArea {
     height: f64
 }
@@ -29,11 +33,13 @@ impl<T> Widget<T> for DraggableArea {
                 // TODO: 跨平台
                 #[cfg(target_os = "windows")]
                 #[allow(unsafe_code)]
-                if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
-                    unsafe {
-                        SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
-                        ReleaseCapture();
-                        SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
+                {
+                    if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
+                        unsafe {
+                            SetWindowLongW(handle.hwnd as HWND, GWL_STYLE, GetWindowLongW(handle.hwnd as HWND, GWL_STYLE) & !WS_MAXIMIZEBOX as i32);
+                            ReleaseCapture();
+                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
+                        }
                     }
                 }
                 ctx.request_paint();
@@ -60,10 +66,6 @@ impl<T> Widget<T> for DraggableArea {
         let rect = Rect::from_origin_size(Point::ORIGIN, ctx.size());
         ctx.fill(rect, &Color::rgba8(255, 255,255, 0));
     }
-}
-
-fn color_as_hex_string(color: Color) -> String {
-    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
 }
 
 struct TitleBarButton {
