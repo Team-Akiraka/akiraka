@@ -26,6 +26,12 @@ pub fn build() -> impl Widget<AppState> {
         .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
+    let misc_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/puzzle.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    )
+        .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+        .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+
     let launch_button = LaunchButton::new(
         std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
         "Launch"
@@ -40,6 +46,8 @@ pub fn build() -> impl Widget<AppState> {
         .with_child(settings_button)
         .with_spacer(8.0)
         .with_child(download_button)
+        .with_spacer(8.0)
+        .with_child(misc_button)
         .with_flex_spacer(1.0)
         .with_child(launch_button)
         .center()
