@@ -10,7 +10,7 @@ pub struct Button<T> {
 
 impl<T: Data> Button<T> {
     pub fn new(text: impl Into<LabelText<T>>) -> Button<T> {
-        Button::from_label(Label::new(text)
+        Self::from_label(Label::new(text)
             .with_text_size(13.0))
     }
 
@@ -21,7 +21,7 @@ impl<T: Data> Button<T> {
         }
     }
 
-    pub fn dynamic(text: impl Fn(&T, &Env) -> String + 'static) -> Self {
+    pub fn dynamic(text: impl Fn(&T, &Env) -> String + 'static) -> Button<T> {
         let text: LabelText<T> = text.into();
         Button::new(text)
     }

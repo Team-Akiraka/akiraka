@@ -21,7 +21,7 @@ impl<T: Data> PrimaryButton<T> {
         }
     }
 
-    pub fn dynamic(text: impl Fn(&T, &Env) -> String + 'static) -> Self {
+    pub fn dynamic(text: impl Fn(&T, &Env) -> String + 'static) -> PrimaryButton<T> {
         let text: LabelText<T> = text.into();
         PrimaryButton::new(text)
     }

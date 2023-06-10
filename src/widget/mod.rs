@@ -7,3 +7,4 @@ pub mod primary_button;
 pub mod clear_button;
 pub mod icon_clear_button;
 pub mod launch_button;
+pub mod profile_button;

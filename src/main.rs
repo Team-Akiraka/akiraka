@@ -1,6 +1,7 @@
 #![windows_subsystem = "windows"]
 mod widget;
 mod theme;
+mod util;
 
 use rust_embed::RustEmbed;
 use druid::widget::{Flex, Label};

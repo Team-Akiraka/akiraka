@@ -1,11 +1,8 @@
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Vec2, Widget};
 use druid::widget::{Click, ControllerHost, Label, LabelText, Svg, SvgData};
+use crate::util::color_as_hex_string;
 
 const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
-
-fn color_as_hex_string(color: Color) -> String {
-    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
-}
 
 pub struct IconClearButton {
     icon: Svg,
