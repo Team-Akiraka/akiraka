@@ -7,6 +7,7 @@ mod ui;
 use rust_embed::RustEmbed;
 use druid::widget::{Flex, Label};
 use druid::{AppLauncher, Data, Env, Lens, LocalizedString, Screen, UnitPoint, Widget, WidgetExt, WindowDesc, WindowState};
+use crate::ui::main_page;
 use crate::widget::{bottom_bar, window};
 use crate::widget::window::WindowWidget;
 
@@ -48,18 +49,22 @@ fn main() {
 
 #[allow(unused_variables)]
 fn build_root_widget() -> impl Widget<AppState> {
-    let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
+    // let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
+
     // let text_box = TextBox::new()
     //     .with_placeholder("Who are we greeting?")
     //     .fix_width(TEXT_BOX_WIDTH)
     //     .lens(AppState::name);
 
-    let layout = Flex::column();
+    // let layout = Flex::column()
+    //     .with_child(main_page::build());
         // .with_spacer(VERTICAL_WIDGET_SPACING)
         // .with_child(label)
         // .with_child(text_box);
+        // .with_spacer(window::TITLE_BAR_HEIGHT);
+        // .expand();
 
-    layout
-        .with_spacer(window::TITLE_BAR_HEIGHT)
-        .align_horizontal(UnitPoint::BOTTOM)
+    // layout
+        // .center()
+    main_page::build()
 }
