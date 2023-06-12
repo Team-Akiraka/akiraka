@@ -53,14 +53,12 @@ fn build_root_widget() -> impl Widget<AppState> {
     //     .fix_width(TEXT_BOX_WIDTH)
     //     .lens(AppState::name);
 
-    let layout = Flex::column()
+    let layout = Flex::column();
         // .with_spacer(VERTICAL_WIDGET_SPACING)
         // .with_child(label)
-        .with_child(bottom_bar::build());
         // .with_child(text_box);
 
     layout
         .with_spacer(window::TITLE_BAR_HEIGHT)
         .align_horizontal(UnitPoint::BOTTOM)
-    // Align::centered(layout.align_vertical(UnitPoint::new(0.0, 0.0)))
 }

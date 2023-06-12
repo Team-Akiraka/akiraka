@@ -1,25 +1,29 @@
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
 use std::ptr;
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use lazy_static::lazy_static;
 use winapi::shared::minwindef::LPARAM;
 use crate::AppState;
 use crate::theme::theme;
+use crate::widget::bottom_bar;
 use crate::widget::title_bar::TitleBar;
 
 pub const TITLE_BAR_HEIGHT: f64 = 44.0;
 
 pub struct WindowWidget<T> {
     title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
-    inner: WidgetPod<T, Box<dyn Widget<T>>>
+    inner: WidgetPod<T, Box<dyn Widget<T>>>,
+    bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
+        let bottom_bar = bottom_bar::build();
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
             inner: WidgetPod::new(Box::new(inner)),
+            bottom_bar: WidgetPod::new(Box::new(bottom_bar))
         }
     }
 }
@@ -81,30 +85,40 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
 
         self.title_bar.event(ctx, event, data, env);
         self.inner.event(ctx, event, data, env);
+        self.bottom_bar.event(ctx, event, data, env);
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
         self.title_bar.lifecycle(ctx, event, data, env);
         self.inner.lifecycle(ctx, event, data, env);
+        self.bottom_bar.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
         self.title_bar.update(ctx, data, env);
         self.inner.update(ctx, data, env);
+        self.bottom_bar.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        self.title_bar.layout(ctx, bc, data, env);
+        let title_bar_bc = bc.loosen();
+        self.title_bar.layout(ctx, &title_bar_bc, data, env);
+
+        let bottom_bar_bc = bc.loosen();
+        self.bottom_bar.set_origin(ctx, Point::new(0.0, ctx.window().get_size().height - bottom_bar::BOTTOM_BAR_HEIGHT));
+        self.bottom_bar.layout(ctx, &bottom_bar_bc, data, env);
 
         let mut size = self.inner.layout(ctx, bc, data, env);
         self.inner.set_origin(ctx, (0.0, TITLE_BAR_HEIGHT).into());
         size.height += 0.0;
+
         bc.constrain(size)
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         self.title_bar.paint(ctx, data, env);
         self.inner.paint(ctx, data, env);
+        self.bottom_bar.paint(ctx, data, env);
         let rect = Rect::new(0.0, 0.0, ctx.window().get_size().width, ctx.window().get_size().height);
         ctx.stroke(rect, &env.get(theme::COLOR_BORDER_LIGHT), 2.0);
     }

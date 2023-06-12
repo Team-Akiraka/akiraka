@@ -1,4 +1,4 @@
-use druid::{Insets, Widget, WidgetExt};
+use druid::{Data, Insets, Widget, WidgetExt};
 use druid::widget::{Flex};
 use crate::{AppState, Asset};
 use crate::theme::theme;
@@ -9,7 +9,9 @@ use crate::widget::launch_button::LaunchButton;
 use crate::widget::primary_button::PrimaryButton;
 use crate::widget::profile_button::ProfileButton;
 
-pub fn build() -> impl Widget<AppState> {
+pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
+
+pub fn build<T: Data>() -> impl Widget<T> {
     let profile_button = ProfileButton::new()
         .fix_width(160.0)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
@@ -52,7 +54,7 @@ pub fn build() -> impl Widget<AppState> {
         .with_child(launch_button)
         .center()
         .padding(Insets::new(12.0, 6.0, 12.0, 6.0))
-        .fix_height(56.0)
+        .fix_height(BOTTOM_BAR_HEIGHT)
         .background(theme::COLOR_BACKGROUND_DARK)
         .border(theme::COLOR_BORDER_LIGHT, 1.0)
         .expand_width();
