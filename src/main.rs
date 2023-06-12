@@ -2,6 +2,7 @@
 mod widget;
 mod theme;
 mod util;
+mod ui;
 
 use rust_embed::RustEmbed;
 use druid::widget::{Flex, Label};
