@@ -1,4 +1,6 @@
+use std::collections::HashMap;
 use std::ffi::OsStr;
+use std::iter::Map;
 use std::os::windows::ffi::OsStrExt;
 use std::ptr;
 use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
@@ -6,7 +8,7 @@ use lazy_static::lazy_static;
 use winapi::shared::minwindef::LPARAM;
 use crate::AppState;
 use crate::theme::theme;
-use crate::widget::bottom_bar;
+use crate::ui::bottom_bar;
 use crate::widget::title_bar::TitleBar;
 
 pub const TITLE_BAR_HEIGHT: f64 = 44.0;
@@ -18,13 +20,17 @@ pub struct WindowWidget<T> {
 }
 
 impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
-    pub fn new(inner: impl Widget<T> + 'static) -> Self {
-        let bottom_bar = bottom_bar::build();
+    pub fn new(mut inner: impl Widget<T> + 'static) -> Self {
+        let bottom_bar = bottom_bar::build(&mut inner);
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
             inner: WidgetPod::new(Box::new(inner)),
             bottom_bar: WidgetPod::new(Box::new(bottom_bar))
         }
+    }
+
+    pub fn set_inner(&mut self, inner: impl Widget<T> + 'static) {
+        self.inner = WidgetPod::new(Box::new(inner));
     }
 }
 

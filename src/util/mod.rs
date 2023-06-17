@@ -1,3 +1,4 @@
+use std::time::{SystemTime, UNIX_EPOCH};
 use druid::{Color, ImageBuf, Size};
 use druid::piet::ImageFormat;
 use image::imageops::FilterType;
@@ -20,4 +21,8 @@ pub fn load_image(path: &str, size: Size, filter: FilterType) -> ImageBuf {
         img_size.1 as usize
     );
     img_buf
+}
+
+pub fn get_time() -> u128 {
+    SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis()
 }

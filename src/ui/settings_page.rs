@@ -1,11 +1,13 @@
 use druid::{Data, Insets, UnitPoint, Widget, WidgetExt};
 use druid::widget::{Align, Flex, FlexParams, Label};
-use crate::widget::{bottom_bar, window};
+use crate::ui;
+use crate::widget::{window};
+use crate::ui::{bottom_bar};
 
 pub const ID: &str = "MAIN_PAGE";
 
 pub fn build<T: Data>() -> impl Widget<T> {
-    let hello = Label::new("Hello")
+    let hello = Label::new("114514")
         .with_text_size(48.0)
         .align_left()
         .padding(Insets::uniform_xy(32.0, 0.0));
