@@ -17,7 +17,8 @@ pub struct WindowWidget<T> {
     title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     inner: WidgetPod<T, Box<dyn Widget<T>>>,
     bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>,
-    pages: HashMap<String, WidgetPod<T, Box<dyn Widget<T>>>>,
+    // pages: HashMap<String, WidgetPod<T, Box<dyn Widget<T>>>>,
+    pages: HashMap<String, Box<dyn Widget<T>>>,
     page: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
@@ -134,7 +135,6 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let page_id = unsafe { crate::PAGE_ID };
         if self.pages.contains_key(page_id) {
-            // self.page = WidgetPod::new(Box::new(self.pages.get(page_id).unwrap().clone()));
         }
         self.page.paint(ctx, data, env);
 
