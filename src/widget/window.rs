@@ -3,10 +3,10 @@ use std::ffi::OsStr;
 use std::iter::Map;
 use std::os::windows::ffi::OsStrExt;
 use std::ptr;
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use lazy_static::lazy_static;
 use winapi::shared::minwindef::LPARAM;
-use crate::AppState;
+use crate::{AppState, Empty};
 use crate::theme::theme;
 use crate::ui::bottom_bar;
 use crate::widget::title_bar::TitleBar;
@@ -16,16 +16,21 @@ pub const TITLE_BAR_HEIGHT: f64 = 44.0;
 pub struct WindowWidget<T> {
     title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     inner: WidgetPod<T, Box<dyn Widget<T>>>,
-    bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>
+    bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>,
+    pages: HashMap<String, WidgetPod<T, Box<dyn Widget<T>>>>,
+    page: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
-    pub fn new(mut inner: impl Widget<T> + 'static) -> Self {
-        let bottom_bar = bottom_bar::build(&mut inner);
+    pub fn new(inner: impl Widget<T> + 'static) -> Self {
+        let bottom_bar = bottom_bar::build();
+        let mut inner = WidgetPod::<T, Box<dyn Widget<T>>>::new(Box::new(inner));
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
-            inner: WidgetPod::new(Box::new(inner)),
-            bottom_bar: WidgetPod::new(Box::new(bottom_bar))
+            inner,
+            bottom_bar: WidgetPod::new(Box::new(bottom_bar)),
+            pages: HashMap::new(),
+            page: WidgetPod::new(Box::new(Empty {}))
         }
     }
 
@@ -89,24 +94,29 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
             _ => {}
         }
 
+        self.page.event(ctx, event, data, env);
         self.title_bar.event(ctx, event, data, env);
         self.inner.event(ctx, event, data, env);
         self.bottom_bar.event(ctx, event, data, env);
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.page.lifecycle(ctx, event, data, env);
         self.title_bar.lifecycle(ctx, event, data, env);
         self.inner.lifecycle(ctx, event, data, env);
         self.bottom_bar.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.page.update(ctx, data, env);
         self.title_bar.update(ctx, data, env);
         self.inner.update(ctx, data, env);
         self.bottom_bar.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        self.page.layout(ctx, bc, data, env);
+
         let title_bar_bc = bc.loosen();
         self.title_bar.layout(ctx, &title_bar_bc, data, env);
 
@@ -122,6 +132,12 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        let page_id = unsafe { crate::PAGE_ID };
+        if self.pages.contains_key(page_id) {
+            // self.page = WidgetPod::new(Box::new(self.pages.get(page_id).unwrap().clone()));
+        }
+        self.page.paint(ctx, data, env);
+
         self.title_bar.paint(ctx, data, env);
         self.inner.paint(ctx, data, env);
         self.bottom_bar.paint(ctx, data, env);

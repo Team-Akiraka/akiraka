@@ -6,7 +6,7 @@ use crate::widget::{window};
 use crate::ui::{bottom_bar};
 use crate::widget::button::Button;
 
-pub const ID: &str = "MAIN_PAGE";
+pub const ID: &str = "HELLO_PAGE";
 
 pub fn build<T: Data>() -> impl Widget<T> {
     let hello = Label::new("Hello")

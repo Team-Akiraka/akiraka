@@ -4,7 +4,7 @@ use crate::ui;
 use crate::widget::{window};
 use crate::ui::{bottom_bar};
 
-pub const ID: &str = "SETTINGS_PAGE";
+pub const ID: &str = "DOWNLOAD_PAGE";
 
 pub fn build<T: Data>() -> impl Widget<T> {
     let body = Flex::column()

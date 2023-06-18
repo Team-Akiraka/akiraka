@@ -64,8 +64,11 @@ impl<T: Data> Widget<T> for Empty {
 
 #[derive(Clone, Data, Lens)]
 pub struct AppState {
+    page_id: String,
     global_search_bar_input: String
 }
+
+pub static mut PAGE_ID: &str = hello_page::ID;
 
 fn main() {
     let scr_rect = Screen::get_monitors().get(0).unwrap().virtual_work_rect();
@@ -78,7 +81,8 @@ fn main() {
         .show_titlebar(false);
 
     let initial_state = AppState {
-        global_search_bar_input: "".into()
+        page_id: String::new(),
+        global_search_bar_input: String::new()
     };
 
     let root = build_root_widget();
