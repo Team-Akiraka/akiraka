@@ -115,7 +115,7 @@ fn build_root_widget() -> impl Widget<AppState> {
     //     }
     // });
 
-    // let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
+    let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
 
     // let text_box = TextBox::new()
     //     .with_placeholder("Who are we greeting?")

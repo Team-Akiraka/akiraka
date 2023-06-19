@@ -8,7 +8,7 @@ use std::ops::Fn;use lazy_static::lazy_static;
 use winapi::shared::minwindef::LPARAM;
 use crate::{AppState, Empty};
 use crate::theme::theme;
-use crate::ui::{bottom_bar, hello_page};
+use crate::ui::{bottom_bar, hello_page, settings_page};
 use crate::widget::title_bar::TitleBar;
 
 pub const TITLE_BAR_HEIGHT: f64 = 44.0;
@@ -18,7 +18,8 @@ pub struct WindowWidget<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>,
     bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     // pages: HashMap<String, WidgetPod<T, Box<dyn Widget<T>>>>,
-    pages: HashMap<String, Box<dyn Fn() -> dyn Widget<T>>>,
+    pages: HashMap<String, Box<dyn Fn() -> Box<dyn Widget<T>>>>,
+    page_id: String,
     page: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
@@ -26,12 +27,15 @@ impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
         let bottom_bar = bottom_bar::build();
         let inner = WidgetPod::<T, Box<dyn Widget<T>>>::new(Box::new(inner));
-        let mut pages = HashMap::<String, Box<dyn Fn() -> dyn Widget<T>>>::new();
+        let mut pages = HashMap::<String, Box<dyn Fn() -> Box<dyn Widget<T>>>>::new();
+        pages.insert(hello_page::ID.parse().unwrap(), Box::new(hello_page::build));
+        pages.insert(settings_page::ID.parse().unwrap(), Box::new(settings_page::build));
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
             inner,
             bottom_bar: WidgetPod::new(Box::new(bottom_bar)),
             pages,
+            page_id: String::new(),
             page: WidgetPod::new(Box::new(Empty {}))
         }
     }
@@ -103,6 +107,16 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        let page_id = unsafe { crate::PAGE_ID };
+        if String::from(page_id) != self.page_id {
+            if self.pages.contains_key(page_id) {
+                let func = self.pages.get(page_id).unwrap().clone();
+                self.page = WidgetPod::new(func());
+                // self.lifecycle(ctx, &LifeCycle::WidgetAdded, data, env);
+            }
+            self.page_id = String::from(page_id);
+        }
+
         self.page.lifecycle(ctx, event, data, env);
         self.title_bar.lifecycle(ctx, event, data, env);
         self.inner.lifecycle(ctx, event, data, env);
@@ -134,9 +148,6 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        let page_id = unsafe { crate::PAGE_ID };
-        if self.pages.contains_key(page_id) {
-        }
         self.page.paint(ctx, data, env);
 
         self.title_bar.paint(ctx, data, env);

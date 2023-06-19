@@ -6,10 +6,10 @@ use crate::ui::{bottom_bar};
 
 pub const ID: &str = "SETTINGS_PAGE";
 
-pub fn build<T: Data>() -> impl Widget<T> {
+pub fn build<T: Data>() -> Box<dyn Widget<T>> {
     let body = Flex::column()
         .expand_width();
 
-    body
-        .align_vertical(UnitPoint::TOP)
+    Box::new(body
+        .align_vertical(UnitPoint::TOP))
 }
