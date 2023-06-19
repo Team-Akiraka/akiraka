@@ -8,7 +8,7 @@ use crate::widget::button::Button;
 
 pub const ID: &str = "HELLO_PAGE";
 
-pub fn build<T: Data>() -> Box<dyn Widget<T>> {
+pub fn build<T: Data>() -> impl Widget<T> {
     let hello = Label::new("Hello")
         .with_text_size(48.0)
         .align_left()
@@ -26,6 +26,6 @@ pub fn build<T: Data>() -> Box<dyn Widget<T>> {
         .with_spacer(bottom_bar::BOTTOM_BAR_HEIGHT)
         .expand_width();
 
-    Box::new(body
-        .align_vertical(UnitPoint::TOP))
+    body
+        .align_vertical(UnitPoint::TOP)
 }

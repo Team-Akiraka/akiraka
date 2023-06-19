@@ -111,13 +111,13 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
         if String::from(page_id) != self.page_id {
             if self.pages.contains_key(page_id) {
                 let func = self.pages.get(page_id).unwrap().clone();
-                self.page = WidgetPod::new(func());
+                let mut page: WidgetPod<T, Box<dyn Widget<T>>> = WidgetPod::new(func());
+                self.page = page;
                 // self.lifecycle(ctx, &LifeCycle::WidgetAdded, data, env);
             }
             self.page_id = String::from(page_id);
         }
 
-        self.page.lifecycle(ctx, event, data, env);
         self.title_bar.lifecycle(ctx, event, data, env);
         self.inner.lifecycle(ctx, event, data, env);
         self.bottom_bar.lifecycle(ctx, event, data, env);
