@@ -16,27 +16,17 @@ pub const TITLE_BAR_HEIGHT: f64 = 44.0;
 pub struct WindowWidget<T> {
     title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     inner: WidgetPod<T, Box<dyn Widget<T>>>,
-    bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>,
-    // pages: HashMap<String, WidgetPod<T, Box<dyn Widget<T>>>>,
-    pages: HashMap<String, Box<dyn Fn() -> Box<dyn Widget<T>>>>,
-    page_id: String,
-    page: WidgetPod<T, Box<dyn Widget<T>>>
+    bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
         let bottom_bar = bottom_bar::build();
         let inner = WidgetPod::<T, Box<dyn Widget<T>>>::new(Box::new(inner));
-        let mut pages = HashMap::<String, Box<dyn Fn() -> Box<dyn Widget<T>>>>::new();
-        pages.insert(hello_page::ID.parse().unwrap(), Box::new(hello_page::build));
-        pages.insert(settings_page::ID.parse().unwrap(), Box::new(settings_page::build));
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
             inner,
             bottom_bar: WidgetPod::new(Box::new(bottom_bar)),
-            pages,
-            page_id: String::new(),
-            page: WidgetPod::new(Box::new(Empty {}))
         }
     }
 
@@ -100,39 +90,24 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
             _ => {}
         }
 
-        self.page.event(ctx, event, data, env);
         self.title_bar.event(ctx, event, data, env);
         self.inner.event(ctx, event, data, env);
         self.bottom_bar.event(ctx, event, data, env);
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-        let page_id = unsafe { crate::PAGE_ID };
-        if String::from(page_id) != self.page_id {
-            if self.pages.contains_key(page_id) {
-                let func = self.pages.get(page_id).unwrap().clone();
-                let mut page: WidgetPod<T, Box<dyn Widget<T>>> = WidgetPod::new(func());
-                self.page = page;
-                // self.lifecycle(ctx, &LifeCycle::WidgetAdded, data, env);
-            }
-            self.page_id = String::from(page_id);
-        }
-
         self.title_bar.lifecycle(ctx, event, data, env);
         self.inner.lifecycle(ctx, event, data, env);
         self.bottom_bar.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        self.page.update(ctx, data, env);
         self.title_bar.update(ctx, data, env);
         self.inner.update(ctx, data, env);
         self.bottom_bar.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        self.page.layout(ctx, bc, data, env);
-
         let title_bar_bc = bc.loosen();
         self.title_bar.layout(ctx, &title_bar_bc, data, env);
 
@@ -148,8 +123,6 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        self.page.paint(ctx, data, env);
-
         self.title_bar.paint(ctx, data, env);
         self.inner.paint(ctx, data, env);
         self.bottom_bar.paint(ctx, data, env);
