@@ -10,7 +10,7 @@ use rust_embed::RustEmbed;
 use druid::widget::{Align, Flex, Label, TabInfo};
 use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod, WindowDesc, WindowId, WindowState};
 use crate::ui::hello_page;
-use crate::widget::{window};
+use crate::widget::{paged_widget, window};
 use crate::ui::{bottom_bar};
 use crate::ui::download_page::build;
 use crate::widget::window::WindowWidget;
@@ -74,7 +74,7 @@ pub static mut PAGE_ID: &str = hello_page::ID;
 
 fn main() {
     let scr_rect = Screen::get_monitors().get(0).unwrap().virtual_work_rect();
-    let main_window = WindowDesc::new(WindowWidget::new(build_empty_widget()))
+    let main_window = WindowDesc::new(WindowWidget::new(paged_widget::PagedWidget::new()))
         .title(WINDOW_TITLE)
         .with_min_size((600.0, 400.0))
         .window_size((600.0, 400.0))
@@ -115,7 +115,7 @@ fn build_root_widget() -> impl Widget<AppState> {
     //     }
     // });
 
-    let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
+    // let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
 
     // let text_box = TextBox::new()
     //     .with_placeholder("Who are we greeting?")
