@@ -4,6 +4,7 @@ mod theme;
 mod util;
 mod ui;
 
+use std::any::Any;
 use std::collections::HashMap;
 use rust_embed::RustEmbed;
 use druid::widget::{Align, Flex, Label, TabInfo};
@@ -11,6 +12,7 @@ use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Ev
 use crate::ui::hello_page;
 use crate::widget::{window};
 use crate::ui::{bottom_bar};
+use crate::ui::download_page::build;
 use crate::widget::window::WindowWidget;
 
 const WINDOW_TITLE: LocalizedString<AppState> = LocalizedString::new("Akiraka - Internal build");
@@ -103,6 +105,16 @@ fn build_empty_widget() -> impl Widget<AppState> {
 
 #[allow(unused_variables)]
 fn build_root_widget() -> impl Widget<AppState> {
+    // fn test<T: Widget<AppState>>(_: impl Fn() -> T) {
+    // }
+    //
+    // let x = build_empty_widget;
+    // // test(build_empty_widget);
+    // test(|| {
+    //     Empty {
+    //     }
+    // });
+
     // let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
 
     // let text_box = TextBox::new()

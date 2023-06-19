@@ -4,11 +4,11 @@ use std::iter::Map;
 use std::os::windows::ffi::OsStrExt;
 use std::ptr;
 use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use lazy_static::lazy_static;
+use std::ops::Fn;use lazy_static::lazy_static;
 use winapi::shared::minwindef::LPARAM;
 use crate::{AppState, Empty};
 use crate::theme::theme;
-use crate::ui::bottom_bar;
+use crate::ui::{bottom_bar, hello_page};
 use crate::widget::title_bar::TitleBar;
 
 pub const TITLE_BAR_HEIGHT: f64 = 44.0;
@@ -18,19 +18,20 @@ pub struct WindowWidget<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>,
     bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>,
     // pages: HashMap<String, WidgetPod<T, Box<dyn Widget<T>>>>,
-    pages: HashMap<String, Box<dyn Widget<T>>>,
+    pages: HashMap<String, Box<dyn Fn() -> dyn Widget<T>>>,
     page: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Self {
         let bottom_bar = bottom_bar::build();
-        let mut inner = WidgetPod::<T, Box<dyn Widget<T>>>::new(Box::new(inner));
+        let inner = WidgetPod::<T, Box<dyn Widget<T>>>::new(Box::new(inner));
+        let mut pages = HashMap::<String, Box<dyn Fn() -> dyn Widget<T>>>::new();
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
             inner,
             bottom_bar: WidgetPod::new(Box::new(bottom_bar)),
-            pages: HashMap::new(),
+            pages,
             page: WidgetPod::new(Box::new(Empty {}))
         }
     }
