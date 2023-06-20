@@ -24,6 +24,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
         .with_child(name)
         .with_spacer(16.0)
         .with_spacer(bottom_bar::BOTTOM_BAR_HEIGHT)
+        .with_spacer(window::TITLE_BAR_HEIGHT)
         .expand_width();
 
     body

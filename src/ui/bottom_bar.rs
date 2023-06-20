@@ -29,6 +29,8 @@ pub fn build<T: Data>() -> impl Widget<T> {
         unsafe {
             crate::PAGE_ID = settings_page::ID;
         }
+        ctx.request_layout();
+        ctx.request_update();
         ctx.request_paint();
     });
 
