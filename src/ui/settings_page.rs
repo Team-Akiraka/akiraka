@@ -1,10 +1,11 @@
 use druid::{Data, Insets, UnitPoint, Widget, WidgetExt};
 use druid::widget::{Align, CrossAxisAlignment, Flex, FlexParams, Label, List, RadioGroup};
-use crate::ui;
+use crate::{Asset, ui};
 use crate::widget::{window};
 use crate::ui::{bottom_bar};
 use crate::widget::clear_button::ClearButton;
 use crate::widget::separator::Separator;
+use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
 
@@ -12,9 +13,9 @@ fn build_left<T: Data>() -> impl Widget<T> {
     let title = Label::new("Settings")
         .with_text_size(24.0)
         .fix_size(128.0, 32.0)
-        .padding(Insets::uniform_xy(24.0, 12.0));
+        .padding(Insets::uniform_xy(12.0, 12.0));
 
-    let about_button = ClearButton::new("About")
+    let about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About")
         .fix_size(128.0, 32.0);
 
     let network_button = ClearButton::new("Network")

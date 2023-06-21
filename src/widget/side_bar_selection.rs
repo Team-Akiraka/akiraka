@@ -1,5 +1,6 @@
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Vec2, Widget};
 use druid::widget::{Label, LabelText, Svg, SvgData};
+use crate::util::color_as_hex_string;
 
 pub struct SideBarSelection<T> {
     label: Label<T>,
@@ -40,8 +41,8 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
         if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
             ctx.request_paint();
         }
-        self.label.lifecycle(ctx, event, data, env)
-        self.icon.lifecycle(ctx, event, data, env)
+        self.label.lifecycle(ctx, event, data, env);
+        self.icon.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
@@ -50,19 +51,20 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        bc.debug_check("Button");
-        let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
-        let label_bc = bc.shrink(padding).loosen();
-        self.label_size = self.label.layout(ctx, &label_bc, data, env);
-        let min_height = env.get(theme::BORDERED_WIDGET_HEIGHT);
-        let baseline = self.label.baseline_offset();
-        ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
-
-        let button_size = bc.constrain(Size::new(
-            self.label_size.width + padding.width,
-            (self.label_size.height + padding.height).max(min_height),
-        ));
-        button_size
+        // let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
+        // let label_bc = bc.shrink(padding).loosen();
+        // self.label_size = self.label.layout(ctx, &label_bc, data, env);
+        // let min_height = env.get(theme::BORDERED_WIDGET_HEIGHT);
+        // let baseline = self.label.baseline_offset();
+        // ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
+        //
+        // let button_size = bc.constrain(Size::new(
+        //     self.label_size.width + padding.width,
+        //     (self.label_size.height + padding.height).max(min_height),
+        // ));
+        self.icon.layout(ctx, bc, data, env);
+        self.label.layout(ctx, bc, data, env);
+        bc.min()
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
@@ -76,30 +78,34 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             .inset(-stroke_width / 2.0)
             .to_rounded_rect(env.get(theme::BUTTON_BORDER_RADIUS));
 
-        let bg_gradient = if ctx.is_disabled() {
-            env.get(crate::theme::theme::COLOR_BUTTON_DISABLED)
-        } else if is_active {
-            env.get(crate::theme::theme::COLOR_BUTTON_ACTIVE)
+        let bg_gradient = if is_active {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else if is_hot {
-            env.get(crate::theme::theme::COLOR_BUTTON_HOT)
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_HOT)
         } else {
-            env.get(crate::theme::theme::COLOR_BUTTON_PRIMARY)
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON)
         };
 
         let border_color = if is_active {
-            env.get(crate::theme::theme::COLOR_BUTTON_BORDER_ACTIVE)
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
+        } else if is_hot {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_HOT)
         } else {
-            env.get(crate::theme::theme::COLOR_BUTTON_BORDER_HOT)
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER)
         };
 
         ctx.fill(rounded_rect, &bg_gradient);
 
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
-        let label_offset = (size.to_vec2() - self.label_size.to_vec2()) / 2.0;
+        ctx.with_save(|ctx| {
+            let svg_data = self.icon_data.replace("{color}", color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str()).parse::<SvgData>().unwrap();
+            self.icon = Svg::new(svg_data);
+            ctx.transform(Affine::scale(1.0).then_translate(Vec2::new(0.5, 0.0)));
+            self.icon.paint(ctx, data, env)
+        });
 
         ctx.with_save(|ctx| {
-            ctx.transform(Affine::translate(label_offset));
             self.label.paint(ctx, data, env);
         });
     }
