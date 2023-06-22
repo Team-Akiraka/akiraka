@@ -48,13 +48,13 @@ pub fn build<T: Data>() -> impl Widget<T> {
     });
 
     let misc_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/puzzle.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
         .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let launch_button = LaunchButton::new(
-        std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
+        std::str::from_utf8(&Asset::get("icon/play_slim.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
         "Launch"
     )
         .fix_width(160.0)

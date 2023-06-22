@@ -12,21 +12,45 @@ pub const ID: &str = "SETTINGS_PAGE";
 fn build_left<T: Data>() -> impl Widget<T> {
     let title = Label::new("Settings")
         .with_text_size(24.0)
-        .fix_size(128.0, 32.0)
-        .padding(Insets::uniform_xy(12.0, 12.0));
+        .fix_width(32.0)
+        .expand_width()
+        .padding(Insets::uniform_xy(12.0, 4.0));
+
+    let common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common")
+        .fix_height(32.0)
+        .expand_width();
+
+    let network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download")
+        .fix_height(32.0)
+        .expand_width();
+
+    let game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game")
+        .fix_height(32.0)
+        .expand_width();
+
+    let multiplayer_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/network.svg").unwrap().data).unwrap().parse().unwrap(), "Multiplayer")
+        .fix_height(32.0)
+        .expand_width();
 
     let about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About")
-        .fix_size(128.0, 32.0);
-
-    let network_button = ClearButton::new("Network")
-        .fix_size(128.0, 32.0);
+        .fix_height(32.0)
+        .expand_width();
 
     let body = Flex::column()
         .with_child(title)
+        .with_spacer(8.0)
+        .with_child(common_button)
+        .with_spacer(4.0)
+        .with_child(network_button)
+        .with_spacer(4.0)
+        .with_child(game_button)
+        .with_spacer(4.0)
+        .with_child(multiplayer_button)
         .with_spacer(4.0)
         .with_child(about_button)
         .with_spacer(4.0)
-        .with_child(network_button);
+        .fix_width(160.0)
+        .padding(Insets::uniform_xy(8.0, 8.0));
 
     let body = druid::widget::Scroll::new(body);
 

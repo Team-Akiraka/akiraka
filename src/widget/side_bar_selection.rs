@@ -1,9 +1,9 @@
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Vec2, Widget};
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, theme, UpdateCtx, Vec2, Widget, WidgetPod};
 use druid::widget::{Label, LabelText, Svg, SvgData};
 use crate::util::color_as_hex_string;
 
 pub struct SideBarSelection<T> {
-    label: Label<T>,
+    label: WidgetPod<T, Box<dyn Widget<T>>>,
     icon: Svg,
     icon_data: String
 }
@@ -11,7 +11,7 @@ pub struct SideBarSelection<T> {
 impl<T: Data> SideBarSelection<T> {
     pub fn new(icon: String, text: impl Into<LabelText<T>>) -> SideBarSelection<T> {
         SideBarSelection {
-            label: Label::new(text),
+            label: WidgetPod::new(Box::new(Label::new(text).with_text_size(14.0))),
             icon: Svg::new(icon.replace("{color}", "#000000").parse::<SvgData>().unwrap()),
             icon_data: icon
         }
@@ -46,7 +46,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        self.label.update(ctx, old_data, data, env);
+        self.label.update(ctx, data, env);
         self.icon.update(ctx, old_data, data, env);
     }
 
@@ -62,8 +62,12 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
         //     self.label_size.width + padding.width,
         //     (self.label_size.height + padding.height).max(min_height),
         // ));
-        self.icon.layout(ctx, bc, data, env);
-        self.label.layout(ctx, bc, data, env);
+        let padding = Size::new(8.0, 8.0);
+        let icon_bc = bc.shrink(padding).loosen();
+        let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
+
+        self.label.set_origin(ctx, Point::new(icon_size.width + 4.0, 5.5));
+        let label_size = self.label.layout(ctx, bc, data, env);
         bc.min()
     }
 
