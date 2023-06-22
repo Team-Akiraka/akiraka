@@ -1,15 +1,10 @@
-use std::any::Any;
-use std::borrow::Borrow;
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, WidgetExt, WidgetPod};
-use druid::widget::{Widget, Flex, SizedBox};
-use crate::{Asset, Empty};
+use druid::{Data, Insets, WidgetExt};
+use druid::widget::{Widget, Flex};
+use crate::{Asset};
 use crate::theme::theme;
-use crate::ui::{change_scene, download_page, hello_page, settings_page};
-use crate::widget::button::Button;
-use crate::widget::clear_button::ClearButton;
+use crate::ui::{download_page, settings_page};
 use crate::widget::icon_clear_button::IconClearButton;
 use crate::widget::launch_button::LaunchButton;
-use crate::widget::primary_button::PrimaryButton;
 use crate::widget::profile_button::ProfileButton;
 
 pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
@@ -25,7 +20,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
         .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
-    let settings_button = settings_button.on_click(|ctx, data, env| {
+    let settings_button = settings_button.on_click(|ctx, _data, _env| {
         unsafe {
             crate::PAGE_ID = settings_page::ID;
         }
@@ -40,7 +35,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
         .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
-    let download_button = download_button.on_click(|ctx, data, env| {
+    let download_button = download_button.on_click(|ctx, _data, _env| {
         unsafe {
             crate::PAGE_ID = download_page::ID;
         }

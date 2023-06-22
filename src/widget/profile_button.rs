@@ -1,5 +1,5 @@
 use druid::widget::{Flex, Image, Label};
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, ImageBuf, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use image::imageops::FilterType;
 use crate::util;
 
@@ -13,7 +13,7 @@ pub struct ProfileButton<T> {
 impl<T: Data> ProfileButton<T> {
     pub fn new() -> ProfileButton<T> {
         let user_name = Label::new("Unknown User").with_text_size(15.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(18.0);
-        let user_type = Label::new("Unknown Type").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);;
+        let user_type = Label::new("Unknown Type").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);
 
         ProfileButton {
             icon: Image::new(util::load_image("icon/steve_head.png", Size::new(64.0, 64.0), FilterType::Nearest)),
@@ -26,7 +26,7 @@ impl<T: Data> ProfileButton<T> {
 }
 
 impl<T: Data> Widget<T> for ProfileButton<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, _data: &mut T, _env: &Env) {
         match event {
             Event::MouseDown(event) => {
                 if !ctx.is_disabled() && event.button == MouseButton::Left {
@@ -52,7 +52,7 @@ impl<T: Data> Widget<T> for ProfileButton<T> {
         self.layout.lifecycle(ctx, event, data, env);
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
         self.layout.update(ctx, data, env);
     }
 

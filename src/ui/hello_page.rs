@@ -1,10 +1,7 @@
-use std::ptr::{null, null_mut};
-use druid::{Data, Insets, UnitPoint, WidgetExt, WidgetPod};
-use druid::widget::{Widget, Align, Flex, FlexParams, Label};
-use crate::{AppState, ui};
+use druid::{Data, Insets, UnitPoint, WidgetExt};
+use druid::widget::{Widget, Flex, Label};
 use crate::widget::{window};
 use crate::ui::{bottom_bar};
-use crate::widget::button::Button;
 
 pub const ID: &str = "HELLO_PAGE";
 

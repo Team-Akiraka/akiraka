@@ -19,7 +19,7 @@ impl<T: Data> SideBarSelection<T> {
 }
 
 impl<T: Data> Widget<T> for SideBarSelection<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, _data: &mut T, _env: &Env) {
         match event {
             Event::MouseDown(event) => {
                 if !ctx.is_disabled() && event.button == MouseButton::Left {
@@ -67,7 +67,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
         let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
 
         self.label.set_origin(ctx, Point::new(icon_size.width + 4.0, 5.5));
-        let label_size = self.label.layout(ctx, bc, data, env);
+        let _label_size = self.label.layout(ctx, bc, data, env);
         bc.min()
     }
 

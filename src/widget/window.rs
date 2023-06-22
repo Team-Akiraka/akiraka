@@ -1,14 +1,9 @@
-use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::iter::Map;
-use std::os::windows::ffi::OsStrExt;
 use std::ptr;
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, InternalEvent, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use std::ops::Fn;use lazy_static::lazy_static;
-use winapi::shared::minwindef::LPARAM;
-use crate::{AppState, Empty};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use lazy_static::lazy_static;
+use crate::{AppState};
 use crate::theme::theme;
-use crate::ui::{bottom_bar, hello_page, settings_page};
+use crate::ui::{bottom_bar};
 use crate::widget::title_bar::TitleBar;
 
 pub const TITLE_BAR_HEIGHT: f64 = 44.0;
@@ -45,7 +40,7 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
                 #[allow(unsafe_code)]
                 {
                     use winapi::shared::windef::HWND;
-                    use winapi::shared::windef::{HICON, HWND__};
+                    use winapi::shared::windef::{HICON};
                     use winapi::um::libloaderapi::GetModuleHandleW;
                     use winapi::um::winuser::{ICON_BIG, ICON_SMALL, IDI_APPLICATION, IMAGE_ICON, LoadImageW, LR_DEFAULTSIZE, LR_SHARED, LR_VGACOLOR, SendMessageW, WM_SETICON, GetWindowLongW, GWL_STYLE, SetWindowLongW, WS_MAXIMIZEBOX};
                     if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {

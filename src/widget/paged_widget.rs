@@ -1,4 +1,3 @@
-use std::any::Any;
 use std::collections::HashMap;
 use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetPod};
 use crate::ui::{hello_page, settings_page};
@@ -54,7 +53,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
         for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
             x.update(ctx, data, env);
         }

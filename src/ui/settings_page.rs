@@ -1,10 +1,6 @@
 use druid::{Data, Insets, UnitPoint, Widget, WidgetExt};
-use druid::widget::{Align, CrossAxisAlignment, Flex, FlexParams, Label, List, RadioGroup};
-use crate::{Asset, ui};
-use crate::widget::{window};
-use crate::ui::{bottom_bar};
-use crate::widget::clear_button::ClearButton;
-use crate::widget::separator::Separator;
+use druid::widget::{CrossAxisAlignment, Flex, FlexParams, Label};
+use crate::{Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";

@@ -1,8 +1,5 @@
-use druid::{Data, Insets, UnitPoint, Widget, WidgetExt};
-use druid::widget::{Align, Flex, FlexParams, Label};
-use crate::ui;
-use crate::widget::{window};
-use crate::ui::{bottom_bar};
+use druid::{Data, UnitPoint, Widget, WidgetExt};
+use druid::widget::{Flex};
 
 pub const ID: &str = "DOWNLOAD_PAGE";
 

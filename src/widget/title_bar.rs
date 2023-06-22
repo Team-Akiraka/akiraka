@@ -1,10 +1,9 @@
-use std::fmt::{Formatter, LowerHex};
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, TextAlignment, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
-use druid::widget::{Align, LensWrap, Svg, SvgData, TextBox};
+use druid::widget::{LensWrap, Svg, SvgData, TextBox};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
-use winapi::um::winuser::{GetWindowLongW, GWL_STYLE, HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, SetWindowLongW, WM_SYSCOMMAND, WS_MAXIMIZEBOX};
+use winapi::um::winuser::{HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, WM_SYSCOMMAND};
 use crate::app_state_derived_lenses::{global_search_bar_input};
 use crate::{AppState, Asset};
 use crate::theme::theme;

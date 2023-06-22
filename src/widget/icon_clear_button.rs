@@ -1,5 +1,5 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Vec2, Widget};
-use druid::widget::{Click, ControllerHost, Label, LabelText, Svg, SvgData};
+use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
+use druid::widget::{Svg, SvgData};
 use crate::util::color_as_hex_string;
 
 const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
@@ -49,7 +49,7 @@ impl<T: Data> Widget<T> for IconClearButton {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        let padding = Size::new(ICON_INSETS.x_value(), ICON_INSETS.y_value());
+        // let padding = Size::new(ICON_INSETS.x_value(), ICON_INSETS.y_value());
 
         let icon_size = self.icon.layout(ctx, bc, data, env);
         let button_size =

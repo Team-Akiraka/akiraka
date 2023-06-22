@@ -1,5 +1,4 @@
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::kurbo::Arc;
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::widget::{Click, ControllerHost, Flex, Label, LabelText, Svg, SvgData};
 use crate::util::color_as_hex_string;
 
@@ -15,7 +14,7 @@ impl<T: Data> LaunchButton<T> {
     pub fn new(icon: String, text: impl Into<LabelText<T>>,) -> LaunchButton<T> {
         let icon_data = icon.replace("{color}", "#000000").parse::<SvgData>().unwrap();
         let label = Label::new(text).with_text_size(15.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(18.0);
-        let subtitle = Label::new("Unknown Instance").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);;
+        let subtitle = Label::new("Unknown Instance").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);
 
         LaunchButton {
             icon: Svg::new(icon_data.clone()),

@@ -4,15 +4,10 @@ mod theme;
 mod util;
 mod ui;
 
-use std::any::Any;
-use std::collections::HashMap;
 use rust_embed::RustEmbed;
-use druid::widget::{Align, Flex, Label, TabInfo};
-use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod, WindowDesc, WindowId, WindowState};
+use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
 use crate::ui::hello_page;
-use crate::widget::{paged_widget, window};
-use crate::ui::{bottom_bar};
-use crate::ui::download_page::build;
+use crate::widget::{paged_widget};
 use crate::widget::window::WindowWidget;
 
 const WINDOW_TITLE: LocalizedString<AppState> = LocalizedString::new("Akiraka - Internal build");
