@@ -71,6 +71,11 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
 
         match event {
+            Event::WindowConnected => {
+                self.current_id = hello_page::ID.parse().unwrap();
+                self.t = 0.0;
+                ctx.request_anim_frame();
+            }
             Event::AnimFrame(interval) => {
                 self.t += (*interval as f64) * 1e-9;
                 println!("{}", self.t);
