@@ -8,6 +8,7 @@ pub struct ClearButton<T> {
     label_size: Size
 }
 
+#[allow(unused)]
 impl<T: Data> ClearButton<T> {
     pub fn new(text: impl Into<LabelText<T>>) -> ClearButton<T> {
         ClearButton::from_label(Label::new(text)

@@ -5,6 +5,7 @@ pub struct Separator {
     width: f64
 }
 
+#[allow(unused)]
 impl Separator {
     pub fn new(width: f64) -> Separator {
         Separator {

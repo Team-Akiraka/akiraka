@@ -23,6 +23,7 @@ pub fn load_image(path: &str, size: Size, filter: FilterType) -> ImageBuf {
     img_buf
 }
 
+#[allow(unused)]
 pub fn get_time() -> u128 {
     SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis()
 }

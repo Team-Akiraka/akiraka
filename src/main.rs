@@ -33,7 +33,7 @@ impl<T> Delegate<T> {
 }
 
 impl<T: Data> AppDelegate<T> for Delegate<T> {
-    fn event(&mut self, ctx: &mut DelegateCtx, window_id: WindowId, event: Event, data: &mut T, env: &Env) -> Option<Event> {
+    fn event(&mut self, _ctx: &mut DelegateCtx, _window_id: WindowId, event: Event, _data: &mut T, _env: &Env) -> Option<Event> {
         Some(event)
     }
 }
@@ -42,20 +42,20 @@ struct Empty {
 }
 
 impl<T: Data> Widget<T> for Empty {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut T, _env: &Env) {
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, _ctx: &mut LifeCycleCtx, _event: &LifeCycle, _data: &T, _env: &Env) {
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &T, _data: &T, _env: &Env) {
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, _ctx: &mut LayoutCtx, _bc: &BoxConstraints, _data: &T, _env: &Env) -> Size {
         Size::ZERO
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, _ctx: &mut PaintCtx, _data: &T, _env: &Env) {
     }
 }
 
@@ -93,6 +93,7 @@ fn main() {
         .expect("Failed to launch application");
 }
 
+#[allow(unused)]
 fn build_empty_widget() -> impl Widget<AppState> {
     Empty {
     }

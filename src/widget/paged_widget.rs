@@ -6,6 +6,7 @@ struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
+#[allow(unused)]
 impl<T> Child<T> {
     fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
         Child {
@@ -21,6 +22,7 @@ impl<T> Child<T> {
     }
 }
 
+#[allow(unused)]
 pub struct PagedWidget<T> {
     children: HashMap<String, Child<T>>,
     current_id: String,

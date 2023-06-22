@@ -8,6 +8,7 @@ pub struct Button<T> {
     label_size: Size
 }
 
+#[allow(unused)]
 impl<T: Data> Button<T> {
     pub fn new(text: impl Into<LabelText<T>>) -> Button<T> {
         Self::from_label(Label::new(text)
