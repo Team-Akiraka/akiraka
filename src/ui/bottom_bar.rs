@@ -37,9 +37,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
         unsafe {
             crate::PAGE_ID = download_page::ID;
         }
-        ctx.request_update();
-        ctx.request_layout();
-        ctx.request_paint();
+        ctx.request_anim_frame();
     });
 
     let misc_button = IconClearButton::new(
