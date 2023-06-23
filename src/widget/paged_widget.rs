@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use crate::ui::{download_page, hello_page, settings_page};
 use crate::util;
 
@@ -28,6 +28,7 @@ pub struct PagedWidget<T> {
     children: HashMap<String, Child<T>>,
     current_id: String,
     last_id: String,
+    inner_size: Size,
     t: f64
 }
 
@@ -43,6 +44,7 @@ impl<T: Data> PagedWidget<T> {
             children,
             current_id: hello_page::ID.parse().unwrap(),
             last_id: String::new(),
+            inner_size: Size::ZERO,
             t: 1.0
         }
     }
@@ -78,9 +80,10 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             }
             Event::AnimFrame(interval) => {
                 self.t += (*interval as f64) * 1e-9;
-                println!("{}", self.t);
-                if self.t < 0.4 {
+                if self.t <= 0.2 {
                     ctx.request_anim_frame();
+                    ctx.request_paint();
+                } else {
                     ctx.request_paint();
                 }
             }
@@ -108,13 +111,24 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
             bc.constrain(x.layout(ctx, bc, data, env));
         }
-        bc.max()
+        self.inner_size = bc.max();
+        self.inner_size
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let x = self.children.get_mut(&self.current_id);
         if x.is_some() {
-            ctx.transform(Affine::scale(self.t / 0.4));
+            let s = if self.t / 0.2 < 1.0 {
+                self.t / 0.2
+            } else {
+                1.0
+            };
+            // TODO: Easing
+            // let s = ;
+            let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
+            let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
+            ctx.transform(Affine::scale(s)
+                .then_translate(Vec2::new(w, h)));
             x.unwrap().inner.paint(ctx, data, env);
         }
     }
