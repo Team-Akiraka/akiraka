@@ -3,6 +3,7 @@ mod widget;
 mod theme;
 mod util;
 mod ui;
+mod animations;
 
 use rust_embed::RustEmbed;
 use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};

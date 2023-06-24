@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use crate::ui::{download_page, hello_page, settings_page};
-use crate::util;
+use crate::{animations, util};
 
 struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
@@ -132,11 +132,13 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
                 // } else {
                 //     1.0 - (-2.0 * s + 2.0).powf(5.0) / 2.0
                 // }
-                1.0 - (-2.0 * s + 2.0).powf(5.0) / 2.0
+                // 1.0 - (-2.0 * s + 2.0).powf(5.0) / 2.0
+                // animations::ease_in_sine(s)
+                animations::elastic::ease_out(s)
             } else {
                 1.0
             };
-            let s = s / 4.0 + 0.75;
+            // let s = s / 2.0 + 0.5;
             // TODO: Easing
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
