@@ -1,7 +1,7 @@
-IDI_ICON1 ICON "icon_256.ico"
-IDI_ICON2 ICON "icon_64.ico"
-IDI_ICON3 ICON "icon_32.ico"
-IDI_ICON4 ICON "icon_16.ico"
+IDI_ICON1 1 "icon_256.ico"
+IDI_ICON2 2 "icon_64.ico"
+IDI_ICON3 3 "icon_32.ico"
+IDI_ICON4 4 "icon_16.ico"
 
 1 VERSIONINFO
 FILEVERSION 0,1,0
