@@ -138,7 +138,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             } else {
                 1.0
             };
-            // let s = s / 2.0 + 0.5;
+            let s = s / 2.0 + 0.5;
             // TODO: Easing
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
