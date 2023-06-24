@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use crate::ui::{download_page, hello_page, settings_page};
-use crate::{animations, util};
+use crate::{animations};
 
 struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>

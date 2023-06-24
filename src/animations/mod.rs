@@ -1,3 +1,4 @@
+#[allow(unused)]
 pub mod sine {
     use std::f64::consts::PI;
 
@@ -14,6 +15,7 @@ pub mod sine {
     }
 }
 
+#[allow(unused)]
 pub mod circ {
     pub fn ease_in(x: f64) -> f64 {
         1.0 - (1.0 - x.powf(2.0))
@@ -32,6 +34,7 @@ pub mod circ {
     }
 }
 
+#[allow(unused)]
 pub mod elastic {
     use std::f64::consts::PI;
 
