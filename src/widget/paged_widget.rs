@@ -23,7 +23,7 @@ impl<T> Child<T> {
     }
 }
 
-const ANIMATION_TIME: f64 = 0.6;
+const ANIMATION_TIME: f64 = 0.3;
 
 #[allow(unused)]
 pub struct PagedWidget<T> {
@@ -124,11 +124,11 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             let s = if self.t / ANIMATION_TIME < 1.0 {
                 let s = self.t / ANIMATION_TIME;
 
-                animations::elastic::ease_out(s)
+                animations::back::ease_out(s)
             } else {
                 1.0
             };
-            let s = s / 2.0 + 0.5;
+            let s = s / 4.0 + 0.75;
             // TODO: Easing
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;

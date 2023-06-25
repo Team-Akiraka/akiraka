@@ -60,3 +60,21 @@ pub mod elastic {
         0.0
     }
 }
+
+#[allow(unused)]
+pub mod back {
+    const C1: f64 = 1.14158;
+    const C3: f64 = C1 + 1.0;
+
+    pub fn ease_in(x: f64) -> f64 {
+        0.0
+    }
+
+    pub fn ease_out(x: f64) -> f64 {
+        1.0 + C3 * (x - 1.0).powf(3.0) + C1 * (x - 1.0).powf(2.0)
+    }
+
+    pub fn ease_both(x: f64) -> f64 {
+        0.0
+    }
+}
