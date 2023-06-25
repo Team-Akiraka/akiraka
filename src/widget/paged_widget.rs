@@ -118,22 +118,12 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        // let c1 = 1.70158;
-        // let c3 = c1 + 1.0;
 
         let x = self.children.get_mut(&self.current_id);
         if x.is_some() {
             let s = if self.t / ANIMATION_TIME < 1.0 {
                 let s = self.t / ANIMATION_TIME;
-                // 1.0 + c3 * (s - 1.0).powf(3.0) + c1 * (s - 1.0).powf(2.0)
 
-                // if s < 0.5 {
-                //     16.0 * s.powf(5.0)
-                // } else {
-                //     1.0 - (-2.0 * s + 2.0).powf(5.0) / 2.0
-                // }
-                // 1.0 - (-2.0 * s + 2.0).powf(5.0) / 2.0
-                // animations::ease_in_sine(s)
                 animations::elastic::ease_out(s)
             } else {
                 1.0
