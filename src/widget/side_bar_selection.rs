@@ -16,6 +16,10 @@ impl<T: Data> SideBarSelection<T> {
             icon_data: icon
         }
     }
+
+    pub fn set_enabled(&mut self, state: bool) {
+        self.set_enabled(state);
+    }
 }
 
 impl<T: Data> Widget<T> for SideBarSelection<T> {
@@ -31,7 +35,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
                 if ctx.is_active() && !ctx.is_disabled() {
                     ctx.request_paint();
                 }
-                ctx.set_active(false);
+                // ctx.set_active(false);
             }
             _ => (),
         }
