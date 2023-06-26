@@ -51,17 +51,6 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        // let padding = Size::new(LABEL_INSETS.x_value(), LABEL_INSETS.y_value());
-        // let label_bc = bc.shrink(padding).loosen();
-        // self.label_size = self.label.layout(ctx, &label_bc, data, env);
-        // let min_height = env.get(theme::BORDERED_WIDGET_HEIGHT);
-        // let baseline = self.label.baseline_offset();
-        // ctx.set_baseline_offset(baseline + LABEL_INSETS.y1);
-        //
-        // let button_size = bc.constrain(Size::new(
-        //     self.label_size.width + padding.width,
-        //     (self.label_size.height + padding.height).max(min_height),
-        // ));
         let padding = Size::new(8.0, 8.0);
         let icon_bc = bc.shrink(padding).loosen();
         let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
@@ -72,6 +61,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        // println!("{}", self.enabled);
         let is_active = ctx.is_active() && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
         let size = ctx.size();
