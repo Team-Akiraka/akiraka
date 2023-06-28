@@ -17,12 +17,6 @@ fn main() {
             set_shadow(wnd, true).unwrap();
             wnd.set_fullscreen(false).unwrap();
             wnd.set_focus().unwrap();
-
-            let id = wnd.listen_global("root", |event| {
-                println!("{:?}", event);
-            });
-            wnd.unlisten(id);
-            
             wnd.show().unwrap();
             Ok(())
         })
