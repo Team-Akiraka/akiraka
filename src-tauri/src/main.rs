@@ -23,6 +23,7 @@ fn main() {
             });
             wnd.unlisten(id);
             
+            wnd.show().unwrap();
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])

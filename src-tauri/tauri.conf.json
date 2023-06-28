@@ -19,6 +19,7 @@
       },
       "window": {
         "all": false,
+        "center": true,
         "close": true,
         "hide": true,
         "show": true,
@@ -48,9 +49,14 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "akiraka",
-        "width": 800,
-        "height": 600
+        "title": "Akiraka - Internal build",
+        "visible": false,
+        "decorations": false,
+        "width": 600,
+        "height": 400,
+        "minWidth": 600,
+        "minHeight": 400,
+        "center": true
       }
     ]
   }
