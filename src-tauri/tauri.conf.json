@@ -48,6 +48,7 @@
     "windows": [
       {
         "fullscreen": false,
+        "focus": true,
         "resizable": true,
         "title": "Akiraka - Internal build",
         "visible": false,
