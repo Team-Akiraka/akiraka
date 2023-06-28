@@ -47,6 +47,7 @@
     "windows": [
       {
         "fullscreen": false,
+        "decorations": false,
         "resizable": true,
         "title": "akiraka",
         "width": 800,

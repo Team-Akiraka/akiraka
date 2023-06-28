@@ -9,6 +9,7 @@
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  user-select: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
@@ -91,7 +92,7 @@ button {
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
-    background-color: #2f2f2f;
+    background-color: #2b2b2b;
   }
 
   a:hover {
