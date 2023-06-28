@@ -21,7 +21,7 @@ p {
 
 #title-bar {
   height: 48px;
-  background: transparent;
+  background: red;
   user-select: none;
   display: flex;
   justify-content: flex-end;
@@ -32,13 +32,13 @@ p {
 }
 
 #title-bar-draggable {
-  height: 42px;
-  background: transparent;
+  height: 44px;
+  background: blue;
   user-select: none;
   display: flex;
   justify-content: flex-end;
   position: fixed;
-  top: 6px;
-  left: 6px;
-  right: 6px;
+  top: 4px;
+  left: 4px;
+  right: 4px;
 }
