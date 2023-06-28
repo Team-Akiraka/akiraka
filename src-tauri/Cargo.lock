@@ -30,10 +30,12 @@ dependencies = [
 name = "akiraka"
 version = "0.0.0"
 dependencies = [
+ "raw-window-handle",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
+ "winapi",
  "window-shadows",
 ]
 
