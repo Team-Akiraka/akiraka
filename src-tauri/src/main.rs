@@ -12,13 +12,12 @@ fn greet(name: &str) -> String {
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            let wnd = app.windows();
-            let wnd = wnd.values().next().unwrap();
+            let wnd = &app.get_window("main").unwrap();
             wnd.set_decorations(false).unwrap();
             set_shadow(wnd, true).unwrap();
             wnd.set_fullscreen(false).unwrap();
             wnd.set_focus().unwrap();
-            // wnd.set_always_on_top(true).unwrap();
+            
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])
