@@ -1,3 +1,5 @@
+@import url(./titlebar.css);
+
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -17,28 +19,4 @@
 
 p {
   color: #0f0f0f;
-}
-
-#title-bar {
-  height: 48px;
-  background: red;
-  user-select: none;
-  display: flex;
-  justify-content: flex-end;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
-#title-bar-draggable {
-  height: 44px;
-  background: blue;
-  user-select: none;
-  display: flex;
-  justify-content: flex-end;
-  position: fixed;
-  top: 4px;
-  left: 4px;
-  right: 4px;
 }

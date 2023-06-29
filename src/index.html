@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Akiraka - Internal build</title>
     <script type="module" src="/main.js" defer></script>
@@ -13,9 +13,23 @@
       <div id="title-bar">
         <div data-tauri-drag-region id="title-bar-draggable">
         </div>
+  
+        <div class="title-bar-button" id="minimize-button">
+          <img src="./assets/minimize.svg" style="pointer-events: none;" />
+        </div>
+        <div class="title-bar-button" id="close-button">
+          <img src="./assets/close.svg" style="pointer-events: none;" />
+        </div>
+  
+        <script type="text/javascript">
+          document.getElementById("minimize-button").addEventListener("click", () => this.__TAURI__.window.appWindow.minimize());
+          document.getElementById("close-button").addEventListener("click", () => this.__TAURI__.window.appWindow.close());
+        </script>
       </div>
-
-      <p style="box-align: center;">Akiraka</p>
+  
+      <div class="root" style="display: flex;justify-content: flex-end;position: fixed;top: 48px;">
+        <p style="box-align: center;">Akiraka</p>
+      </div>
     </div>
   </body>
 </html>
