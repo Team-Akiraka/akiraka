@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- start css -->
+  <link rel="stylesheet" type="text/css" href="./css/main.css">
+  <title>Aakiraka - Main</title>
+</head>
+
+<body>
+  <div id="wrap" style="height: 100%;">
+    <div id="head">
+      <div data-tauri-drag-region class="titlebar">
+        <div data-tauri-drag-region class="middle">
+          <input type="text" id="search-input" maxlength="20" placeholder="在此输入进行搜索">
+        </div>
+        <div>
+          <div class="titlebar-button" id="titlebar-minimize">
+            <img src="./image/svg/minimize.svg" alt="minimize" />
+          </div>
+          <div class="titlebar-button" id="titlebar-close">
+            <img src="./image/svg/close.svg" alt="close" />
+          </div>
+          <script type="text/javascript">
+            document.getElementById('titlebar-minimize').addEventListener('click', () => this.__TAURI__.window.appWindow.minimize());
+            document.getElementById('titlebar-close').addEventListener('click', () => this.__TAURI__.window.appWindow.close());
+          </script>
+        </div>
+      </div>
+    </div>
+    <div id="main">111</div>
+    <div id="foot">
+      <!--<div class="bottom">
+        <img src="https://avatars.githubusercontent.com/u/87651575?s=96&v=4">
+      </div>DEBUG-->
+      <div class="middle">
+        <div id="user-info">
+          <div style="display: flex;flex-direction: row;margin: 0 5px;">
+            <img src="https://avatars.githubusercontent.com/u/87651575?s=96&v=4" class="avatar">
+            <div style="display: flex;flex-direction: column;" id="user-data">
+              <p id="user-name">1145141919810</p>
+              <p id="user-type">Microsoft账户</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</html>
