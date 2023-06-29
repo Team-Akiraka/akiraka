@@ -1,63 +1,77 @@
 {
   "build": {
-    "beforeDevCommand": "",
+    "withGlobalTauri": true,
     "beforeBuildCommand": "",
-    "devPath": "../src",
-    "distDir": "../src",
-    "withGlobalTauri": true
+    "beforeDevCommand": "",
+    "devPath": "./ui",
+    "distDir": "./ui"
   },
   "package": {
     "productName": "akiraka",
-    "version": "0.1.0-internal"
+    "version": "0.1.0"
   },
   "tauri": {
     "allowlist": {
       "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
       "window": {
         "all": false,
-        "center": true,
         "close": true,
         "hide": true,
         "show": true,
-        "maximize": false,
         "minimize": true,
-        "unmaximize": false,
         "unminimize": true,
         "startDragging": true
       }
     },
     "bundle": {
       "active": true,
-      "targets": "all",
-      "identifier": "com.tauri.dev",
+      "category": "DeveloperTool",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
       "icon": [
         "icons/icon_32.png",
         "icons/icon_128.png",
         "icons/icon_256.png",
         "icons/icon.icns",
         "icons/icon.ico"
-      ]
+      ],
+      "identifier": "com.tauri.dev",
+      "longDescription": "",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": [],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
     },
     "security": {
       "csp": null
     },
+    "updater": {
+      "active": false
+    },
     "windows": [
       {
-        "fullscreen": false,
-        "focus": true,
-        "resizable": true,
-        "title": "Akiraka - Internal build",
-        "visible": false,
+        "label": "main",
         "decorations": false,
-        "width": 600,
-        "height": 400,
-        "minWidth": 600,
-        "minHeight": 400,
-        "center": true
+        "fullscreen": false,
+        "height": 600,
+        "resizable": true,
+        "center": true,
+        "title": "Akiraka - Internal build",
+        "width": 800
       }
     ]
   }

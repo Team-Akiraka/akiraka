@@ -1,0 +1,25 @@
+img.avatar {
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    vertical-align: middle;
+    margin: 2px;
+}
+
+div#user-info {
+    margin: 10px 0;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+div#user-data {
+    display: -webkit-flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 8px;
+}
+
+p#user-type {
+    color: rgba(0, 0, 0, 0.35);
+    font-size: 8px;
+}

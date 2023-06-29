@@ -1,0 +1,32 @@
+/*
+input#search-input::-ms-input-placeholder {
+    text-align: center;
+}
+
+input#search-input::-webkit-input-placeholder {
+    text-align: center;
+}
+*/
+
+input#search-input {
+    border-radius: 10px;
+    height: 60%;
+    border-style: solid;
+    outline: 0px;
+    transform: translate(50px, 0);
+    width: 40%;
+    font-size: medium;
+}
+
+div.middle {
+    display: -webkit-flex;
+    justify-content: center;
+    align-items: center;
+    flex: auto;
+}
+
+div.titlebar {
+    border-bottom: 2px;
+    border-bottom-style: solid;
+    border-bottom-color: rgba(0, 0, 0, 0.5);
+}
