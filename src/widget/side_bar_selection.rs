@@ -38,8 +38,9 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
                 if ctx.is_active() && !ctx.is_disabled() {
                     ctx.request_paint();
                 }
-                // ctx.set_active(false);
+                ctx.set_active(true);
                 self.pressing = false;
+                ctx.request_paint();
             }
             _ => (),
         }
@@ -85,6 +86,8 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else if is_hot {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_HOT)
+        } else if is_active {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON)
         };
@@ -93,6 +96,8 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
         } else if is_hot {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_HOT)
+        } else if is_active {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER)
         };
