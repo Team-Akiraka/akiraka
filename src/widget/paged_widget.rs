@@ -124,7 +124,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             let s = if self.t / ANIMATION_TIME < 1.0 {
                 let s = self.t / ANIMATION_TIME;
 
-                animations::sine::ease_out(s)
+                animations::expo::ease_out(s)
             } else {
                 1.0
             };

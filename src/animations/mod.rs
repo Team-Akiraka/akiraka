@@ -78,3 +78,25 @@ pub mod back {
         0.0
     }
 }
+
+#[allow(unused)]
+pub mod expo {
+    const C1: f64 = 1.74158;
+    const C3: f64 = C1 + 1.0;
+
+    pub fn ease_in(x: f64) -> f64 {
+        0.0
+    }
+
+    pub fn ease_out(x: f64) -> f64 {
+        if x == 1.0 {
+            1.0
+        } else {
+            1.0 - (2.0_f64).powf(-10.0 * x)
+        }
+    }
+
+    pub fn ease_both(x: f64) -> f64 {
+        0.0
+    }
+}
