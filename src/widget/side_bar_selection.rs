@@ -5,7 +5,8 @@ use crate::util::color_as_hex_string;
 pub struct SideBarSelection<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,
     icon: Svg,
-    icon_data: String
+    icon_data: String,
+    pressed: bool
 }
 
 impl<T: Data> SideBarSelection<T> {
@@ -13,7 +14,8 @@ impl<T: Data> SideBarSelection<T> {
         SideBarSelection {
             label: WidgetPod::new(Box::new(Label::new(text).with_text_size(14.0))),
             icon: Svg::new(icon.replace("{color}", "#000000").parse::<SvgData>().unwrap()),
-            icon_data: icon
+            icon_data: icon,
+            pressed: false
         }
     }
 
