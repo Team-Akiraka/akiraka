@@ -6,7 +6,7 @@ pub struct SideBarSelection<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,
     icon: Svg,
     icon_data: String,
-    pressed: bool
+    pressing: bool
 }
 
 impl<T: Data> SideBarSelection<T> {
@@ -15,7 +15,7 @@ impl<T: Data> SideBarSelection<T> {
             label: WidgetPod::new(Box::new(Label::new(text).with_text_size(14.0))),
             icon: Svg::new(icon.replace("{color}", "#000000").parse::<SvgData>().unwrap()),
             icon_data: icon,
-            pressed: false
+            pressing: false
         }
     }
 
@@ -29,7 +29,8 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
         match event {
             Event::MouseDown(event) => {
                 if !ctx.is_disabled() && event.button == MouseButton::Left {
-                    ctx.set_active(true);
+                    // ctx.set_active(true);
+                    self.pressing = true;
                     ctx.request_paint();
                 }
             }
@@ -37,7 +38,8 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
                 if ctx.is_active() && !ctx.is_disabled() {
                     ctx.request_paint();
                 }
-                ctx.set_active(false);
+                // ctx.set_active(false);
+                self.pressing = false;
             }
             _ => (),
         }
@@ -69,6 +71,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         // println!("{}", self.enabled);
         let is_active = ctx.is_active() && !ctx.is_disabled();
+        let is_pressing = self.pressing && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
         let size = ctx.size();
         let stroke_width = env.get(theme::BUTTON_BORDER_WIDTH);
@@ -78,7 +81,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             .inset(-stroke_width / 2.0)
             .to_rounded_rect(env.get(theme::BUTTON_BORDER_RADIUS));
 
-        let bg_gradient = if is_active {
+        let bg_gradient = if is_pressing {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else if is_hot {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_HOT)
@@ -86,7 +89,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON)
         };
 
-        let border_color = if is_active {
+        let border_color = if is_pressing {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
         } else if is_hot {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_HOT)
