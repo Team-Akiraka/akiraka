@@ -7,7 +7,6 @@ use crate::{AppState, Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
-static mut SELECTED: u64 = 0;
 
 fn build_left<T: Data>() -> impl Widget<T> {
     let title = Label::new("Settings")
@@ -16,6 +15,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .expand_width()
         .padding(Insets::uniform_xy(12.0, 4.0));
 
+    let mut SELECTED: u64 = 0;
     let mut buttons: HashMap<u64, &SideBarSelection<T>> = HashMap::new();
 
     let mut common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common", 0);
