@@ -72,6 +72,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
+            println!("{}", 111);
             x.paint(ctx, data, env);
         }
     }
@@ -153,11 +154,19 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .fix_width(160.0)
         .padding(Insets::uniform_xy(8.0, 8.0));
 
-    let paged = PagedWidget::new(HashMap::new());
+    fn test<T: Data>() -> impl Widget<T> {
+        Label::new("114514").expand()
+    }
+
+    let mut children = HashMap::new();
+    children.insert(0, Child::new(WidgetPod::new(Box::new(test()))));
+    let paged = PagedWidget::new(children)
+        .expand();
 
     let body = Flex::row()
         .with_child(left)
-        .with_flex_child(paged, FlexParams::new(1.0, CrossAxisAlignment::Center));
+        // .with_flex_child(paged, FlexParams::new(1.0, CrossAxisAlignment::Center));
+        .with_child(paged);
 
     body
         .align_vertical(UnitPoint::TOP)
