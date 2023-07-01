@@ -18,6 +18,7 @@ impl<T> Child<T> {
     fn widget_mut(&mut self) -> Option<&mut WidgetPod<T, Box<dyn Widget<T>>>> {
         Some(&mut self.inner)
     }
+
     fn widget(&self) -> Option<&WidgetPod<T, Box<dyn Widget<T>>>> {
         Some(&self.inner)
     }
@@ -29,7 +30,6 @@ const ANIMATION_TIME: f64 = 0.3;
 pub struct PagedWidget<T> {
     children: HashMap<String, Child<T>>,
     current_id: String,
-    last_id: String,
     inner_size: Size,
     t: f64
 }
@@ -45,7 +45,6 @@ impl<T: Data> PagedWidget<T> {
         PagedWidget {
             children,
             current_id: hello_page::ID.parse().unwrap(),
-            last_id: String::new(),
             inner_size: Size::ZERO,
             t: 1.0
         }
@@ -53,7 +52,6 @@ impl<T: Data> PagedWidget<T> {
 
     fn detect_scene_change(&mut self) -> bool {
         if self.current_id.as_str() != unsafe { crate::PAGE_ID } {
-            self.last_id = self.current_id.clone();
             self.current_id = String::from(unsafe { crate::PAGE_ID });
             true
         } else {

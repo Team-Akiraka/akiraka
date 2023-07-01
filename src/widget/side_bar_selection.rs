@@ -57,7 +57,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
                 if ctx.is_active() && !ctx.is_disabled() {
                     ctx.request_paint();
                 }
-                ctx.set_active(true);
+                // ctx.set_active(true);
                 self.pressing = false;
                 ctx.request_paint();
             }
