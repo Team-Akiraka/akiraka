@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, lens, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::widget::{Label, LabelText, Svg, SvgData, TextBox};
 use crate::util::color_as_hex_string;
@@ -6,21 +7,34 @@ pub struct SideBarSelection<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,
     icon: Svg,
     icon_data: String,
+    id: u64,
+    click_event: fn(),
     pressing: bool
 }
 
 impl<T: Data> SideBarSelection<T> {
-    pub fn new(icon: String, text: impl Into<LabelText<T>>) -> SideBarSelection<T> {
-        SideBarSelection {
+    pub fn new(icon: String, text: impl Into<LabelText<T>>, id: u64) -> SideBarSelection<T> {
+        let this = SideBarSelection {
             label: WidgetPod::new(Box::new(Label::new(text).with_text_size(14.0))),
             icon: Svg::new(icon.replace("{color}", "#000000").parse::<SvgData>().unwrap()),
             icon_data: icon,
+            id,
+            click_event: || {},
             pressing: false
-        }
+        };
+        this
     }
 
     pub fn set_enabled(&mut self, state: bool) {
-        self.set_enabled(state);
+        self.pressing = state;
+    }
+
+    pub fn update_state(&mut self, id: u64) {
+        if self.id == id {
+            self.set_enabled(true);
+        } else {
+            self.set_enabled(false);
+        }
     }
 }
 
@@ -30,6 +44,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             Event::MouseDown(event) => {
                 if !ctx.is_disabled() && event.button == MouseButton::Left {
                     // ctx.set_active(true);
+                    self.click_event();
                     self.pressing = true;
                     ctx.request_paint();
                 }

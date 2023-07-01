@@ -1,10 +1,13 @@
+use std::borrow::ToOwned;
+use std::collections::HashMap;
 use druid::{Data, Insets, UnitPoint, Widget, WidgetExt};
+use druid::piet::TextStorage;
 use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, Tabs, TabsEdge, TabsTransition};
 use crate::{Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
-pub const CURRENT_PAGE: &str = "SETTINGS";
+static mut SELECTED: u64 = 0;
 
 fn build_left<T: Data>() -> impl Widget<T> {
     let title = Label::new("Settings")
@@ -13,11 +16,22 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .expand_width()
         .padding(Insets::uniform_xy(12.0, 4.0));
 
-    let mut common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common");
-    let mut network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download");
-    let mut game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game");
-    let mut multiplayer_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/network.svg").unwrap().data).unwrap().parse().unwrap(), "Multiplayer");
-    let mut about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About");
+    let mut buttons = HashMap::<u64, SideBarSelection<T>>::new();
+
+    let mut common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common", 0);
+    buttons.insert(0, common_button);
+
+    let mut network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download", 1);
+    buttons.insert(1, network_button);
+
+    let mut game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game", 2);
+    buttons.insert(2, game_button);
+
+    let mut multiplayer_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/network.svg").unwrap().data).unwrap().parse().unwrap(), "Multiplayer", 3);
+    buttons.insert(3, multiplayer_button);
+
+    let mut about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About", 4);
+    buttons.insert(4, about_button);
 
     let common_button = common_button
         .fix_height(32.0)
