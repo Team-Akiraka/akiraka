@@ -4,6 +4,7 @@ use crate::{Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
+pub const CURRENT_PAGE: &str = "SETTINGS";
 
 fn build_left<T: Data>() -> impl Widget<T> {
     let title = Label::new("Settings")

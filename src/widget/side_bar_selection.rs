@@ -1,5 +1,5 @@
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, theme, UpdateCtx, Vec2, Widget, WidgetPod};
-use druid::widget::{Label, LabelText, Svg, SvgData};
+use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, lens, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::widget::{Label, LabelText, Svg, SvgData, TextBox};
 use crate::util::color_as_hex_string;
 
 pub struct SideBarSelection<T> {
