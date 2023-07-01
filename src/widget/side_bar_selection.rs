@@ -7,8 +7,8 @@ pub struct SideBarSelection<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,
     icon: Svg,
     icon_data: String,
-    id: u64,
-    click_event: fn(),
+    pub id: u64,
+    pub click_event: fn(&SideBarSelection<T>),
     pressing: bool
 }
 
@@ -19,7 +19,7 @@ impl<T: Data> SideBarSelection<T> {
             icon: Svg::new(icon.replace("{color}", "#000000").parse::<SvgData>().unwrap()),
             icon_data: icon,
             id,
-            click_event: || {},
+            click_event: |_| {},
             pressing: false
         };
         this
@@ -27,6 +27,10 @@ impl<T: Data> SideBarSelection<T> {
 
     pub fn set_enabled(&mut self, state: bool) {
         self.pressing = state;
+    }
+
+    pub fn set_click_event(&mut self, event: fn(&SideBarSelection<T>)) {
+        self.click_event = event;
     }
 
     pub fn update_state(&mut self, id: u64) {
@@ -44,7 +48,7 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
             Event::MouseDown(event) => {
                 if !ctx.is_disabled() && event.button == MouseButton::Left {
                     // ctx.set_active(true);
-                    self.click_event();
+                    (self.click_event)(self);
                     self.pressing = true;
                     ctx.request_paint();
                 }
