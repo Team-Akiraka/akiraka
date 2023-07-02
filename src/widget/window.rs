@@ -36,7 +36,7 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         match event {
             Event::WindowConnected => {
-                // TODO: 跨平台
+                // TODO: Multiplatform
                 #[cfg(target_os = "windows")]
                 #[allow(unsafe_code)]
                 {

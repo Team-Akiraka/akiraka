@@ -26,7 +26,7 @@ impl<T> Widget<T> for DraggableArea {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         match event {
             Event::MouseDown(mouse_event) => {
-                // TODO: 跨平台
+                // TODO: Multiplatform
                 #[cfg(target_os = "windows")]
                 #[allow(unsafe_code)]
                 {
@@ -157,7 +157,7 @@ impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_inp
                 ctx.window().clone().set_window_state(WindowState::Minimized);
             });
 
-        // TODO: 搜索栏
+        // TODO: Search bar
         let search_bar = TextBox::new()
             // .with_placeholder(LocalizedString::new("Type here for a global search"))
             .with_placeholder(LocalizedString::new("Coming soon!"))
