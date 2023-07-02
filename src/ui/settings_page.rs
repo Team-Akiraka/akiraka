@@ -73,7 +73,6 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
-            println!("{}", 111);
             x.paint(ctx, data, env);
         }
     }
@@ -135,10 +134,6 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .fix_height(32.0)
         .expand_width();
 
-    // let game_button = game_button
-    //     .fix_height(32.0)
-    //     .expand_width();
-
     let left = Flex::column()
         .with_child(title)
         .with_spacer(8.0)
@@ -162,8 +157,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
     let mut children = HashMap::new();
     children.insert(0, Child::new(WidgetPod::new(Box::new(test()))));
     let paged = PagedWidget::new(children)
-        .expand_width()
-        .fix_height(64.0);
+        .expand();
 
     let body = Flex::row()
         .with_child(left)
@@ -171,7 +165,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         // .with_child(paged);
 
     body
-        .align_vertical(UnitPoint::TOP)
+        .align_vertical(UnitPoint::CENTER)
         .align_left()
 }
 
