@@ -67,6 +67,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.layout(ctx, bc, data, env);
         }
+        println!("{:?}", bc.min());
         bc.min()
     }
 
@@ -161,12 +162,13 @@ fn build_left<T: Data>() -> impl Widget<T> {
     let mut children = HashMap::new();
     children.insert(0, Child::new(WidgetPod::new(Box::new(test()))));
     let paged = PagedWidget::new(children)
-        .expand();
+        .expand_width()
+        .fix_height(64.0);
 
     let body = Flex::row()
         .with_child(left)
-        // .with_flex_child(paged, FlexParams::new(1.0, CrossAxisAlignment::Center));
-        .with_child(paged);
+        .with_flex_child(paged, FlexParams::new(1.0, CrossAxisAlignment::Center));
+        // .with_child(paged);
 
     body
         .align_vertical(UnitPoint::TOP)
