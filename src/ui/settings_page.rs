@@ -160,7 +160,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .expand();
 
     let body = Flex::row()
-        .with_child(left)
+        // .with_child(left)
         .with_flex_child(paged, FlexParams::new(1.0, CrossAxisAlignment::Center));
         // .with_child(paged);
 
