@@ -143,7 +143,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .fix_height(32.0)
         .expand_width();
 
-    let left = Flex::column()
+    let body = Flex::column()
         .with_child(title)
         .with_spacer(8.0)
         .with_child(common_button)
@@ -160,6 +160,12 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .padding(Insets::uniform_xy(8.0, 8.0))
         .align_horizontal(UnitPoint::CENTER);
 
+    body
+        .align_vertical(UnitPoint::TOP)
+        .align_left()
+}
+
+fn build_right<T: Data>() -> impl Widget<T> {
     fn test<T: Data>() -> impl Widget<T> {
         Label::new("114514").expand()
     }
@@ -168,24 +174,8 @@ fn build_left<T: Data>() -> impl Widget<T> {
     children.insert(0, Child::new(WidgetPod::new(Box::new(test()))));
     let paged = PagedWidget::new(children)
         .expand_width();
-        // .fix_width(200.0)
-        // .fix_height(64.0);
 
-    let body = Flex::row()
-        .with_child(left)
-        // .with_flex_child(paged, FlexParams::new(1.0, CrossAxisAlignment::Center));
-        .with_child(paged);
-
-    body
-        .align_vertical(UnitPoint::TOP)
-        .align_left()
-}
-
-fn build_right<T: Data>() -> impl Widget<T> {
-    let body = Flex::column();
-
-    body
-        .align_vertical(UnitPoint::TOP)
+    paged
 }
 
 pub fn build<T: Data>() -> impl Widget<T> {
