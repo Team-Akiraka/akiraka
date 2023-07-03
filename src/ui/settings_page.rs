@@ -126,7 +126,9 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        let _rect = ctx.size().to_rect();
+        let rect = ctx.size().to_rect();
+        ctx.fill(rect, &Color::RED);
+
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
             let s = if self.t / ANIMATION_TIME < 1.0 {
