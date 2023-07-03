@@ -62,6 +62,7 @@ impl<T: Data> PagedWidget<T> {
 
 impl<T: Data> Widget<T> for PagedWidget<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        println!("111");
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.request_anim_frame();
@@ -92,6 +93,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        println!("222");
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.request_anim_frame();
@@ -103,6 +105,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        println!("333");
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.request_anim_frame();
@@ -113,6 +116,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        println!("444");
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.layout(ctx, bc, data, env);
         }
@@ -126,6 +130,8 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        println!("555");
+
         let rect = ctx.size().to_rect();
         ctx.fill(rect, &Color::RED);
 
@@ -168,6 +174,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         unsafe {
             SELECTED = 0;
         }
+        ctx.window().request_anim_frame();
         ctx.request_focus();
         ctx.request_paint();
         ctx.request_anim_frame();
@@ -180,6 +187,8 @@ fn build_left<T: Data>() -> impl Widget<T> {
         unsafe {
             SELECTED = 1;
         }
+        ctx.window().request_anim_frame();
+
         ctx.request_focus();
         ctx.request_paint();
         ctx.request_anim_frame();
