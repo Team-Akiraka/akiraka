@@ -132,7 +132,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
 
         let rect = ctx.size().to_rect();
-        ctx.fill(rect, &Color::RED);
+        ctx.fill(rect, &Color::TRANSPARENT);
 
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
@@ -182,6 +182,27 @@ fn build_left<T: Data>() -> impl Widget<T> {
         ctx.request_layout();
     });
 
+    let game_button = game_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            SELECTED = 2;
+        }
+        ctx.request_layout();
+    });
+
+    let multiplayer_button = multiplayer_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            SELECTED = 3;
+        }
+        ctx.request_layout();
+    });
+
+    let about_button = about_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            SELECTED = 4;
+        }
+        ctx.request_layout();
+    });
+
     let common_button = common_button
         .fix_height(32.0)
         .expand_width();
@@ -216,7 +237,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .with_child(about_button)
         .with_spacer(4.0)
         .fix_width(160.0)
-        .padding(Insets::uniform_xy(8.0, 8.0))
+        .padding(Insets::uniform_xy(8.0, 0.0))
         .align_horizontal(UnitPoint::CENTER);
 
     body
