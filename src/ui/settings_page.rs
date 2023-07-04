@@ -62,11 +62,10 @@ impl<T: Data> PagedWidget<T> {
 
 impl<T: Data> Widget<T> for PagedWidget<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
-        println!("111");
-        if self.detect_scene_change() {
-            self.t = 0.0;
-            ctx.request_anim_frame();
-        }
+        // if self.detect_scene_change() {
+        //     self.t = 0.0;
+        //     ctx.request_anim_frame();
+        // }
 
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
@@ -93,11 +92,10 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-        println!("222");
-        if self.detect_scene_change() {
-            self.t = 0.0;
-            ctx.request_anim_frame();
-        }
+        // if self.detect_scene_change() {
+        //     self.t = 0.0;
+        //     ctx.request_anim_frame();
+        // }
 
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.lifecycle(ctx, event, data, env);
@@ -105,18 +103,16 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        println!("333");
-        if self.detect_scene_change() {
-            self.t = 0.0;
-            ctx.request_anim_frame();
-        }
+        // if self.detect_scene_change() {
+        //     self.t = 0.0;
+        //     ctx.request_anim_frame();
+        // }
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.update(ctx, data, env);
         }
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        println!("444");
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.layout(ctx, bc, data, env);
         }
@@ -130,7 +126,10 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        println!("555");
+        if self.detect_scene_change() {
+            self.t = 1.0;
+            ctx.window().request_anim_frame();
+        }
 
         let rect = ctx.size().to_rect();
         ctx.fill(rect, &Color::RED);
@@ -170,29 +169,16 @@ fn build_left<T: Data>() -> impl Widget<T> {
     let mut about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About", 4);
 
     let mut common_button = common_button.on_click(|ctx, data, env| {
-        println!("1145141919");
         unsafe {
             SELECTED = 0;
         }
-        ctx.window().request_anim_frame();
-        ctx.request_focus();
-        ctx.request_paint();
-        ctx.request_anim_frame();
-        ctx.request_update();
         ctx.request_layout();
     });
 
     let mut network_button = network_button.on_click(|ctx, data, env| {
-        println!("114514");
         unsafe {
             SELECTED = 1;
         }
-        ctx.window().request_anim_frame();
-
-        ctx.request_focus();
-        ctx.request_paint();
-        ctx.request_anim_frame();
-        ctx.request_update();
         ctx.request_layout();
     });
 
