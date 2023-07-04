@@ -1,3 +1,4 @@
+
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
 use druid::widget::{Click, ControllerHost, Label, LabelText};
 
@@ -8,7 +9,7 @@ pub struct PrimaryButton<T> {
     label_size: Size
 }
 
-#[allow(unused)]
+
 impl<T: Data> PrimaryButton<T> {
     pub fn new(text: impl Into<LabelText<T>>) -> PrimaryButton<T> {
         PrimaryButton::from_label(Label::new(text)

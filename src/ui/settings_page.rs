@@ -1,11 +1,11 @@
+#[allow(dead_code)]
+
 use std::borrow::ToOwned;
 use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::piet::TextStorage;
-use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, Tabs, TabsEdge, TabsTransition};
-use crate::{animations, AppState, Asset};
+use druid::widget::{Flex, Label};
+use crate::{animations, Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
-use crate::widget::window;
 
 pub const ID: &str = "SETTINGS_PAGE";
 static mut SELECTED: u64 = 0;
@@ -16,7 +16,7 @@ struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
-#[allow(unused)]
+
 impl<T> Child<T> {
     fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
         Child {
@@ -102,7 +102,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
         // if self.detect_scene_change() {
         //     self.t = 0.0;
         //     ctx.request_anim_frame();
@@ -162,20 +162,20 @@ fn build_left<T: Data>() -> impl Widget<T> {
 
     // let mut buttons: HashMap<u64, &SideBarSelection<T>> = HashMap::new();
 
-    let mut common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common", 0);
-    let mut network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download", 1);
-    let mut game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game", 2);
-    let mut multiplayer_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/network.svg").unwrap().data).unwrap().parse().unwrap(), "Multiplayer", 3);
-    let mut about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About", 4);
+    let common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common", 0);
+    let network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download", 1);
+    let game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game", 2);
+    let multiplayer_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/network.svg").unwrap().data).unwrap().parse().unwrap(), "Multiplayer", 3);
+    let about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About", 4);
 
-    let mut common_button = common_button.on_click(|ctx, data, env| {
+    let common_button = common_button.on_click(|ctx, _data, _env| {
         unsafe {
             SELECTED = 0;
         }
         ctx.request_layout();
     });
 
-    let mut network_button = network_button.on_click(|ctx, data, env| {
+    let network_button = network_button.on_click(|ctx, _data, _env| {
         unsafe {
             SELECTED = 1;
         }

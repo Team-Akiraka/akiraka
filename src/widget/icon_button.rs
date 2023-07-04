@@ -1,3 +1,4 @@
+
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, Rect, RenderContext, Size, theme, UpdateCtx, Widget};
 use druid::widget::{Image};
 
@@ -6,7 +7,7 @@ pub struct IconButton {
     size: Size
 }
 
-#[allow(unused)]
+
 impl IconButton {
     pub fn new(image: Image, size: Size) -> Self {
         Self {

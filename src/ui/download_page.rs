@@ -1,5 +1,5 @@
 use druid::{Data, Insets, UnitPoint, Widget, WidgetExt};
-use druid::widget::{Flex, Label, Radio, RadioGroup};
+use druid::widget::{Flex, Label};
 
 pub const ID: &str = "DOWNLOAD_PAGE";
 

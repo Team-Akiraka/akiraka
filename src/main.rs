@@ -1,4 +1,6 @@
 #![windows_subsystem = "windows"]
+#[allow(dead_code)]
+
 mod widget;
 mod theme;
 mod util;
@@ -94,7 +96,7 @@ fn main() {
         .expect("Failed to launch application");
 }
 
-#[allow(unused)]
+
 fn build_empty_widget() -> impl Widget<AppState> {
     Empty {
     }

@@ -1,8 +1,9 @@
+
 use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
 use druid::widget::{Svg, SvgData};
 use crate::util::color_as_hex_string;
 
-#[allow(unused)]
+
 const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
 pub struct IconClearButton {

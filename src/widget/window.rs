@@ -1,3 +1,4 @@
+
 use std::ptr;
 use druid::{BoxConstraints, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetPod};
 use lazy_static::lazy_static;
@@ -25,7 +26,7 @@ impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
         }
     }
 
-    #[allow(unused)]
+
     pub fn set_inner(&mut self, inner: impl Widget<T> + 'static) {
         self.inner = WidgetPod::new(Box::new(inner));
     }

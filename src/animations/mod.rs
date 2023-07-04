@@ -1,4 +1,4 @@
-#[allow(unused)]
+
 pub mod sine {
     use std::f64::consts::PI;
 
@@ -15,7 +15,7 @@ pub mod sine {
     }
 }
 
-#[allow(unused)]
+
 pub mod circ {
     pub fn ease_in(x: f64) -> f64 {
         1.0 - (1.0 - x.powf(2.0))
@@ -34,7 +34,7 @@ pub mod circ {
     }
 }
 
-#[allow(unused)]
+
 pub mod elastic {
     use std::f64::consts::PI;
 
@@ -61,7 +61,7 @@ pub mod elastic {
     }
 }
 
-#[allow(unused)]
+
 pub mod back {
     const C1: f64 = 1.74158;
     const C3: f64 = C1 + 1.0;
@@ -79,7 +79,7 @@ pub mod back {
     }
 }
 
-#[allow(unused)]
+
 pub mod expo {
     const C1: f64 = 1.74158;
     const C3: f64 = C1 + 1.0;

@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use crate::ui::{download_page, hello_page, settings_page};
@@ -7,7 +8,7 @@ struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
-#[allow(unused)]
+
 impl<T> Child<T> {
     fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
         Child {
@@ -26,7 +27,7 @@ impl<T> Child<T> {
 
 const ANIMATION_TIME: f64 = 0.3;
 
-#[allow(unused)]
+
 pub struct PagedWidget<T> {
     children: HashMap<String, Child<T>>,
     current_id: String,

@@ -1,3 +1,4 @@
+
 use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Widget};
 use crate::theme::theme;
 
@@ -5,7 +6,7 @@ pub struct Separator {
     width: f64
 }
 
-#[allow(unused)]
+
 impl Separator {
     pub fn new(width: f64) -> Separator {
         Separator {

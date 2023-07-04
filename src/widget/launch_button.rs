@@ -1,3 +1,4 @@
+
 use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::widget::{Click, ControllerHost, Flex, Label, LabelText, Svg, SvgData};
 use crate::util::color_as_hex_string;
@@ -10,7 +11,7 @@ pub struct LaunchButton<T> {
     layout: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
-#[allow(unused)]
+
 impl<T: Data> LaunchButton<T> {
     pub fn new(icon: String, text: impl Into<LabelText<T>>,) -> LaunchButton<T> {
         let icon_data = icon.replace("{color}", "#000000").parse::<SvgData>().unwrap();
