@@ -245,7 +245,7 @@ fn build_right<T: Data>() -> impl Widget<T> {
 pub fn build<T: Data>() -> impl Widget<T> {
     let body = Flex::row()
         .with_child(build_left())
-        .with_flex_child(build_right(), FlexParams::new(1.0, CrossAxisAlignment::Center));
+        .with_child(build_right());
 
     body
         .align_vertical(UnitPoint::TOP)
