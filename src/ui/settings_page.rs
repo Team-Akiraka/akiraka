@@ -16,7 +16,6 @@ struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
-
 impl<T> Child<T> {
     fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
         Child {
@@ -153,6 +152,20 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 }
 
+fn build_settings<T: Data>() -> impl Widget<T> {
+    let mut body = Flex::column()
+        .with_child(Label::new("114514"))
+        .with_child(Label::new("114514"))
+        .with_child(Label::new("114514"))
+        .with_child(Label::new("114514"))
+        .with_child(Label::new("114514"))
+        // .padding(Insets::uniform(8.0))
+        .background(Color::RED);
+
+    // body.align_vertical(UnitPoint::TOP)
+    body
+}
+
 fn build_left<T: Data>() -> impl Widget<T> {
     let title = Label::new("Settings")
         .with_text_size(24.0)
@@ -247,7 +260,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
 
 fn build_right<T: Data>() -> impl Widget<T> {
     fn test<T: Data>() -> impl Widget<T> {
-        Label::new("114514").expand()
+        build_settings().expand()
     }
     fn test1<T: Data>() -> impl Widget<T> {
         Label::new("1145141919810").expand()
