@@ -164,6 +164,8 @@ fn build_settings<T: Data>() -> impl Widget<T> {
 
     // body.align_vertical(UnitPoint::TOP)
     body
+        .align_left()
+        .expand()
 }
 
 fn build_left<T: Data>() -> impl Widget<T> {

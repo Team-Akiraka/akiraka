@@ -2,7 +2,7 @@ use druid::{Data, Insets, WidgetExt};
 use druid::widget::{Widget, Flex};
 use crate::{Asset};
 use crate::theme::theme;
-use crate::ui::{download_page, settings_page};
+use crate::ui::{download_page, instances_page, settings_page};
 use crate::widget::icon_clear_button::IconClearButton;
 use crate::widget::launch_button::LaunchButton;
 use crate::widget::profile_button::ProfileButton;
@@ -14,19 +14,21 @@ pub fn build<T: Data>() -> impl Widget<T> {
         .fix_width(160.0)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
-    let settings_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    // List
+    let list_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
         .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
-    let settings_button = settings_button.on_click(|ctx, _data, _env| {
+    let list_button = list_button.on_click(|ctx, _data, _env| {
         unsafe {
-            crate::PAGE_ID = settings_page::ID;
+            crate::PAGE_ID = instances_page::ID;
         }
         ctx.request_anim_frame();
     });
 
+    // Download
     let download_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
@@ -40,11 +42,19 @@ pub fn build<T: Data>() -> impl Widget<T> {
         ctx.request_anim_frame();
     });
 
-    let misc_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    // Settings
+    let settings_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
         .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+
+    let settings_button = settings_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            crate::PAGE_ID = settings_page::ID;
+        }
+        ctx.request_anim_frame();
+    });
 
     let launch_button = LaunchButton::new(
         std::str::from_utf8(&Asset::get("icon/play_slim.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
@@ -56,11 +66,11 @@ pub fn build<T: Data>() -> impl Widget<T> {
     let bar = Flex::row()
         .with_child(profile_button)
         .with_flex_spacer(1.0)
-        .with_child(settings_button)
+        .with_child(list_button)
         .with_spacer(8.0)
         .with_child(download_button)
         .with_spacer(8.0)
-        .with_child(misc_button)
+        .with_child(settings_button)
         .with_flex_spacer(1.0)
         .with_child(launch_button)
         .center()

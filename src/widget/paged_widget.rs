@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use druid::piet::ImageFormat;
 use druid::platform_menus::common::undo;
-use crate::ui::{download_page, hello_page, settings_page};
+use crate::ui::{download_page, hello_page, instances_page, settings_page};
 use crate::{animations};
 
 struct Child<T> {
@@ -40,8 +40,9 @@ impl<T: Data> PagedWidget<T> {
         let mut children = HashMap::new();
         // Add Children
         children.insert(hello_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(hello_page::build()))));
-        children.insert(settings_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(settings_page::build()))));
+        children.insert(instances_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(instances_page::build()))));
         children.insert(download_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(download_page::build()))));
+        children.insert(settings_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(settings_page::build()))));
 
         PagedWidget {
             children,
