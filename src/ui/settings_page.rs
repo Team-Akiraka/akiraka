@@ -8,9 +8,9 @@ use crate::{animations, Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
-static mut SELECTED: u64 = 0;
 
 const ANIMATION_TIME: f64 = 0.3;
+static mut SELECTED: u64 = 0;
 
 struct Child<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>
