@@ -3,7 +3,7 @@ use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, L
 use druid::widget::{Widget, Flex, Radio, RadioGroup, Svg, SvgData, LineBreaking};
 use crate::{animations, Asset};
 use crate::theme::theme;
-use crate::ui::{download_page, instances_page, settings_page};
+use crate::ui::{download_page, hello_page, instances_page, settings_page};
 use crate::widget::icon_clear_button::IconClearButton;
 use crate::widget::launch_button::LaunchButton;
 use crate::widget::profile_button::ProfileButton;
@@ -179,9 +179,9 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
     // List
     let list_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
-    )
-        .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
-        .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    );
+        // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+        // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -194,9 +194,9 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
     // Download
     let download_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
-    )
-        .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
-        .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    );
+        // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+        // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let download_button = download_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -209,9 +209,9 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
     // Settings
     let settings_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
-    )
-        .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
-        .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    );
+        // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+        // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -246,12 +246,22 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
 }
 
 pub fn build_nav<T: Data>() -> impl Widget<T> {
+    // Home
+    let home_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/home.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    );
+
+    let home_button = home_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            SELECTED = 0;
+            crate::PAGE_ID = hello_page::ID;
+        }
+        ctx.request_anim_frame();
+    });
     // List
     let list_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
-    )
-        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 0.0)
-        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 0.0);
+    );
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -263,9 +273,7 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     // Download
     let download_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
-    )
-        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 0.0)
-        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 0.0);
+    );
 
     let download_button = download_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -277,9 +285,7 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     // Settings
     let settings_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
-    )
-        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 0.0)
-        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 0.0);
+    );
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -289,6 +295,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     });
 
     let bar = Flex::row()
+        .with_child(home_button)
+        .with_spacer(8.0)
         .with_child(list_button)
         .with_spacer(8.0)
         .with_child(download_button)
@@ -308,8 +316,5 @@ pub fn build<T: Data>() -> impl Widget<T> {
     pages.insert(1, Child::new(WidgetPod::new(Box::new(build_nav())), BOTTOM_BAR_HEIGHT_NAV));
 
     PagedWidget::new(pages)
-        // .background(theme::COLOR_BACKGROUND_DARK)
-        // .border(theme::COLOR_BORDER_LIGHT, 1.0)
         .expand_width()
-        // .fix_height(BOTTOM_BAR_HEIGHT)
 }

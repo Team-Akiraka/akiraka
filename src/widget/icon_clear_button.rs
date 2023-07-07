@@ -51,8 +51,6 @@ impl<T: Data> Widget<T> for IconClearButton {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        // let padding = Size::new(ICON_INSETS.x_value(), ICON_INSETS.y_value());
-
         let icon_size = self.icon.layout(ctx, bc, data, env);
         let button_size =
             bc.constrain(Size::new(
