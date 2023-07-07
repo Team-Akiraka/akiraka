@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
 use druid::widget::{Widget, Flex};
 use crate::{animations, Asset};
 use crate::theme::theme;
@@ -9,18 +9,21 @@ use crate::widget::launch_button::LaunchButton;
 use crate::widget::profile_button::ProfileButton;
 
 pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
+pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 48.0;
 
-const ANIMATION_TIME: f64 = 0.3;
+const ANIMATION_TIME: f64 = 0.5;
 static mut SELECTED: u64 = 0;
 
 struct Child<T> {
-    inner: WidgetPod<T, Box<dyn Widget<T>>>
+    inner: WidgetPod<T, Box<dyn Widget<T>>>,
+    height: f64
 }
 
 impl<T> Child<T> {
-    fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
+    fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>, height: f64) -> Child<T> {
         Child {
-            inner
+            inner,
+            height
         }
     }
 
@@ -36,6 +39,7 @@ impl<T> Child<T> {
 struct PagedWidget<T> {
     pages: HashMap<u64, Child<T>>,
     current_id: u64,
+    last_height: f64,
     inner_size: Size,
     t: f64
 }
@@ -45,6 +49,7 @@ impl<T: Data> PagedWidget<T> {
         PagedWidget {
             pages,
             current_id: unsafe { SELECTED },
+            last_height: 0.0,
             inner_size: Size::ZERO,
             t: 1.0
         }
@@ -62,10 +67,10 @@ impl<T: Data> PagedWidget<T> {
 
 impl<T: Data> Widget<T> for PagedWidget<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
-        // if self.detect_scene_change() {
-        //     self.t = 0.0;
-        //     ctx.request_anim_frame();
-        // }
+        if self.detect_scene_change() {
+            self.t = 0.0;
+            ctx.window().request_anim_frame();
+        }
 
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
@@ -92,10 +97,10 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-        // if self.detect_scene_change() {
-        //     self.t = 0.0;
-        //     ctx.request_anim_frame();
-        // }
+        if self.detect_scene_change() {
+            self.t = 0.0;
+            ctx.window().request_anim_frame();
+        }
 
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.lifecycle(ctx, event, data, env);
@@ -103,16 +108,21 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
-        // if self.detect_scene_change() {
-        //     self.t = 0.0;
-        //     ctx.request_anim_frame();
-        // }
+        if self.detect_scene_change() {
+            self.t = 0.0;
+            ctx.window().request_anim_frame();
+        }
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.update(ctx, data, env);
         }
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        if self.detect_scene_change() {
+            self.t = 0.0;
+            ctx.window().request_anim_frame();
+        }
+
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.layout(ctx, bc, data, env);
         }
@@ -127,15 +137,13 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         if self.detect_scene_change() {
-            self.t = 1.0;
+            self.t = 0.0;
             ctx.window().request_anim_frame();
         }
 
-        let rect = ctx.size().to_rect();
-        ctx.fill(rect, &Color::TRANSPARENT);
-
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
+            let x = x.unwrap();
             let s = if self.t / ANIMATION_TIME < 1.0 {
                 let s = self.t / ANIMATION_TIME;
 
@@ -146,14 +154,18 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             let s = s / 4.0 + 0.75;
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
-            ctx.transform(Affine::scale(s)
-                .then_translate(Vec2::new(w, h)));
-            x.unwrap().inner.paint(ctx, data, env);
+            ctx.transform(Affine::translate(Vec2::new(0.0, (1.0 - s) * x.height + s * self.last_height)));
+
+            let rect = ctx.size().to_rect();
+            ctx.fill(rect, &env.get(theme::COLOR_BACKGROUND_DARK));
+            ctx.stroke(rect, &env.get(theme::COLOR_BORDER_LIGHT), 1.0);
+
+            x.inner.paint(ctx, data, env);
         }
     }
 }
 
-pub fn build<T: Data>() -> impl Widget<T> {
+pub fn build_main<T: Data>() -> impl Widget<T> {
     let profile_button = ProfileButton::new()
         .fix_width(160.0)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
@@ -167,6 +179,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
         unsafe {
+            SELECTED = 1;
             crate::PAGE_ID = instances_page::ID;
         }
         ctx.request_anim_frame();
@@ -181,6 +194,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
 
     let download_button = download_button.on_click(|ctx, _data, _env| {
         unsafe {
+            SELECTED = 1;
             crate::PAGE_ID = download_page::ID;
         }
         ctx.request_anim_frame();
@@ -195,6 +209,7 @@ pub fn build<T: Data>() -> impl Widget<T> {
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
         unsafe {
+            SELECTED = 1;
             crate::PAGE_ID = settings_page::ID;
         }
         ctx.request_anim_frame();
@@ -220,8 +235,75 @@ pub fn build<T: Data>() -> impl Widget<T> {
         .center()
         .padding(Insets::new(12.0, 6.0, 12.0, 6.0))
         .fix_height(BOTTOM_BAR_HEIGHT)
-        .background(theme::COLOR_BACKGROUND_DARK)
-        .border(theme::COLOR_BORDER_LIGHT, 1.0)
         .expand_width();
     bar
+}
+
+pub fn build_nav<T: Data>() -> impl Widget<T> {
+    // List
+    let list_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    )
+        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 4.0)
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 4.0);
+
+    let list_button = list_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            crate::PAGE_ID = instances_page::ID;
+        }
+        ctx.request_anim_frame();
+    });
+
+    // Download
+    let download_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    )
+        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 4.0)
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 4.0);
+
+    let download_button = download_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            crate::PAGE_ID = download_page::ID;
+        }
+        ctx.request_anim_frame();
+    });
+
+    // Settings
+    let settings_button = IconClearButton::new(
+        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+    )
+        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 4.0)
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 4.0);
+
+    let settings_button = settings_button.on_click(|ctx, _data, _env| {
+        unsafe {
+            crate::PAGE_ID = settings_page::ID;
+        }
+        ctx.request_anim_frame();
+    });
+
+    let bar = Flex::row()
+        .with_child(list_button)
+        .with_spacer(8.0)
+        .with_child(download_button)
+        .with_spacer(8.0)
+        .with_child(settings_button)
+        .with_flex_spacer(1.0)
+        .center()
+        .padding(Insets::new(12.0, 6.0, 12.0, 6.0))
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV)
+        .expand_width();
+    bar
+}
+
+pub fn build<T: Data>() -> impl Widget<T> {
+    let mut pages = HashMap::<u64, Child<T>>::new();
+    pages.insert(0, Child::new(WidgetPod::new(Box::new(build_main())), BOTTOM_BAR_HEIGHT));
+    pages.insert(1, Child::new(WidgetPod::new(Box::new(build_nav())), BOTTOM_BAR_HEIGHT_NAV));
+
+    PagedWidget::new(pages)
+        // .background(theme::COLOR_BACKGROUND_DARK)
+        // .border(theme::COLOR_BORDER_LIGHT, 1.0)
+        .expand_width()
+        // .fix_height(BOTTOM_BAR_HEIGHT)
 }
