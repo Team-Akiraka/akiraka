@@ -19,13 +19,17 @@ const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
 struct IconClearButton {
     icon: Svg,
     data: String,
+    id: String,
+    activated: bool
 }
 
 impl IconClearButton {
-    pub fn new(data: String) -> IconClearButton {
+    pub fn new(data: String, id: String) -> IconClearButton {
         Self {
             icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
-            data
+            data,
+            id,
+            activated: false
         }
     }
 }
@@ -71,6 +75,13 @@ impl<T: Data> Widget<T> for IconClearButton {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        unsafe {
+            if crate::PAGE_ID == self.id {
+                self.activated = true;
+            } else {
+                self.activated = false;
+            }
+        }
         let is_active = ctx.is_active() && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
         let size = ctx.size();
@@ -85,6 +96,8 @@ impl<T: Data> Widget<T> for IconClearButton {
             env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else if is_hot {
             env.get(theme::COLOR_CLEAR_BUTTON_HOT)
+        } else if self.activated {
+            env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else {
             env.get(theme::COLOR_CLEAR_BUTTON)
         };
@@ -93,6 +106,8 @@ impl<T: Data> Widget<T> for IconClearButton {
             env.get(theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
         } else if is_hot {
             env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT)
+        } else if self.activated {
+            env.get(theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
         } else {
             env.get(theme::COLOR_CLEAR_BUTTON_BORDER)
         };
@@ -272,7 +287,7 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     // List
-    let list_button = IconClearButton::new(
+    let list_button = crate::widget::icon_clear_button::IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     );
         // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
@@ -287,7 +302,7 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
     });
 
     // Download
-    let download_button = IconClearButton::new(
+    let download_button = crate::widget::icon_clear_button::IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     );
         // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
@@ -302,7 +317,7 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
     });
 
     // Settings
-    let settings_button = IconClearButton::new(
+    let settings_button = crate::widget::icon_clear_button::IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     );
         // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
@@ -343,7 +358,8 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
 pub fn build_nav<T: Data>() -> impl Widget<T> {
     // Home
     let home_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/home.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/home.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
+        hello_page::ID.parse().unwrap()
     );
 
     let home_button = home_button.on_click(|ctx, _data, _env| {
@@ -355,7 +371,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     });
     // List
     let list_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
+        instances_page::ID.parse().unwrap()
     );
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
@@ -367,7 +384,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
 
     // Download
     let download_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
+        download_page::ID.parse().unwrap()
     );
 
     let download_button = download_button.on_click(|ctx, _data, _env| {
@@ -379,7 +397,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
 
     // Settings
     let settings_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
+        settings_page::ID.parse().unwrap()
     );
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
