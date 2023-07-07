@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
-use druid::widget::{Widget, Flex};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
+use druid::widget::{Widget, Flex, Radio, RadioGroup, Svg, SvgData, LineBreaking};
 use crate::{animations, Asset};
 use crate::theme::theme;
 use crate::ui::{download_page, instances_page, settings_page};
@@ -9,7 +9,7 @@ use crate::widget::launch_button::LaunchButton;
 use crate::widget::profile_button::ProfileButton;
 
 pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
-pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 48.0;
+pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 40.0;
 
 const ANIMATION_TIME: f64 = 0.5;
 static mut SELECTED: u64 = 0;
@@ -87,6 +87,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
                 self.t += (*interval as f64) * 1e-9;
                 if self.t <= ANIMATION_TIME {
                     ctx.request_anim_frame();
+                    ctx.request_layout();
                     ctx.request_paint();
                 } else {
                     ctx.request_paint();
@@ -123,7 +124,10 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             ctx.window().request_anim_frame();
         }
 
+        // let h = self.pages.get_mut(&self.current_id);
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
+            // let h = h.unwrap().height;
+            x.set_origin(ctx, Point::new(0.0, self.last_height));
             x.layout(ctx, bc, data, env);
         }
         let size = Size::new(if bc.min().width > ctx.window().get_size().width {
@@ -144,6 +148,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
             let x = x.unwrap();
+            self.last_height = BOTTOM_BAR_HEIGHT - x.height;
             let s = if self.t / ANIMATION_TIME < 1.0 {
                 let s = self.t / ANIMATION_TIME;
 
@@ -154,12 +159,13 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             let s = s / 4.0 + 0.75;
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
-            ctx.transform(Affine::translate(Vec2::new(0.0, (1.0 - s) * x.height + s * self.last_height)));
 
             let rect = ctx.size().to_rect();
+            ctx.transform(Affine::translate(Vec2::new(0.0, (1.0 - s) * x.height + self.last_height)));
             ctx.fill(rect, &env.get(theme::COLOR_BACKGROUND_DARK));
             ctx.stroke(rect, &env.get(theme::COLOR_BORDER_LIGHT), 1.0);
 
+            ctx.transform(Affine::translate(Vec2::new(0.0, -self.last_height)));
             x.inner.paint(ctx, data, env);
         }
     }
@@ -244,8 +250,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     let list_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
-        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 4.0)
-        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 4.0);
+        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 0.0)
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 0.0);
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -258,8 +264,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     let download_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
-        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 4.0)
-        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 4.0);
+        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 0.0)
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 0.0);
 
     let download_button = download_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -272,8 +278,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     let settings_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
     )
-        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 4.0)
-        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 4.0);
+        .fix_width(BOTTOM_BAR_HEIGHT_NAV - 0.0)
+        .fix_height(BOTTOM_BAR_HEIGHT_NAV - 0.0);
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -290,7 +296,7 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
         .with_child(settings_button)
         .with_flex_spacer(1.0)
         .center()
-        .padding(Insets::new(12.0, 6.0, 12.0, 6.0))
+        .padding(Insets::new(12.0, 4.0, 12.0, 4.0))
         .fix_height(BOTTOM_BAR_HEIGHT_NAV)
         .expand_width();
     bar
