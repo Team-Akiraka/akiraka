@@ -3,7 +3,7 @@
 use std::borrow::ToOwned;
 use std::collections::HashMap;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Flex, Label};
+use druid::widget::{Axis, CrossAxisAlignment, Flex, Label};
 use crate::{animations, Asset};
 use crate::widget::side_bar_selection::SideBarSelection;
 
@@ -112,14 +112,25 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        let child_bc = BoxConstraints::new(
+            Size::new(
+                if bc.min().width > ctx.window().get_size().width { ctx.window().get_size().width } else { bc.min().width },
+                bc.max().height),
+            Size::new(
+                if bc.max().width > ctx.window().get_size().width { ctx.window().get_size().width } else { bc.max().width },
+                bc.max().height)
+        );
+
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
-            x.layout(ctx, bc, data, env);
+            x.layout(ctx, &child_bc, data, env);
         }
+
         let size = Size::new(if bc.min().width > ctx.window().get_size().width {
             ctx.window().get_size().width
         } else {
             bc.min().width
         }, ctx.window().get_size().height);
+
         self.inner_size = size;
         self.inner_size
     }
@@ -153,7 +164,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
 }
 
 fn build_settings<T: Data>() -> impl Widget<T> {
-    let mut body = Flex::column()
+    let mut body = Flex::for_axis(Axis::Vertical)
         .with_child(Label::new("114514"))
         .with_child(Label::new("114514"))
         .with_child(Label::new("114514"))
@@ -162,10 +173,7 @@ fn build_settings<T: Data>() -> impl Widget<T> {
         // .padding(Insets::uniform(8.0))
         .background(Color::RED);
 
-    // body.align_vertical(UnitPoint::TOP)
     body
-        .align_left()
-        .expand()
 }
 
 fn build_left<T: Data>() -> impl Widget<T> {
@@ -261,15 +269,12 @@ fn build_left<T: Data>() -> impl Widget<T> {
 }
 
 fn build_right<T: Data>() -> impl Widget<T> {
-    fn test<T: Data>() -> impl Widget<T> {
-        build_settings().expand()
-    }
     fn test1<T: Data>() -> impl Widget<T> {
         Label::new("1145141919810").expand()
     }
 
     let mut children = HashMap::new();
-    children.insert(0, Child::new(WidgetPod::new(Box::new(test()))));
+    children.insert(0, Child::new(WidgetPod::new(Box::new(build_settings()))));
     children.insert(1, Child::new(WidgetPod::new(Box::new(test1()))));
 
     let paged = PagedWidget::new(children)
