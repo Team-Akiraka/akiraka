@@ -2,9 +2,10 @@
 
 use std::borrow::ToOwned;
 use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Axis, CrossAxisAlignment, Flex, Label};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label};
 use crate::{animations, Asset};
+use crate::theme::theme;
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
@@ -36,15 +37,17 @@ struct PagedWidget<T> {
     pages: HashMap<u64, Child<T>>,
     current_id: u64,
     inner_size: Size,
+    offset: f64,
     t: f64
 }
 
 impl<T: Data> PagedWidget<T> {
-    fn new(pages: HashMap<u64, Child<T>>) -> PagedWidget<T> {
+    fn new(pages: HashMap<u64, Child<T>>, offset: f64) -> PagedWidget<T> {
         PagedWidget {
             pages,
             current_id: unsafe { SELECTED },
             inner_size: Size::ZERO,
+            offset,
             t: 1.0
         }
     }
@@ -112,12 +115,15 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        println!("{:?}", bc);
+        let w = ctx.window().get_size().width - self.offset;
+        let h = ctx.window().get_size().height;
         let child_bc = BoxConstraints::new(
             Size::new(
-                if bc.min().width > ctx.window().get_size().width { ctx.window().get_size().width } else { bc.min().width },
+                if bc.min().width > w { w } else { bc.min().width },
                 bc.max().height),
             Size::new(
-                if bc.max().width > ctx.window().get_size().width { ctx.window().get_size().width } else { bc.max().width },
+                if bc.max().width > w { w } else { bc.max().width },
                 bc.max().height)
         );
 
@@ -164,16 +170,28 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
 }
 
 fn build_settings<T: Data>() -> impl Widget<T> {
-    let mut body = Flex::for_axis(Axis::Vertical)
+    let title = Flex::column()
+        .with_child(Label::new(LocalizedString::new("Common")).with_text_size(18.0).align_left())
+        .with_spacer(2.0)
+        .padding(Insets::uniform_xy(14.0, 6.0))
+        .background(theme::COLOR_BACKGROUND_LIGHT)
+        .border(theme::COLOR_BORDER_DARK, 1.0)
+        .rounded(12.0)
+        .expand_width()
+        .align_left();
+
+    let mut body = Flex::column()
+        .with_child(title)
         .with_child(Label::new("114514"))
         .with_child(Label::new("114514"))
         .with_child(Label::new("114514"))
         .with_child(Label::new("114514"))
         .with_child(Label::new("114514"))
-        // .padding(Insets::uniform(8.0))
-        .background(Color::RED);
+        .padding(Insets::new(0.0, 4.0, 32.0, 0.0));
 
     body
+        .align_vertical(UnitPoint::TOP)
+        .align_left()
 }
 
 fn build_left<T: Data>() -> impl Widget<T> {
@@ -277,7 +295,7 @@ fn build_right<T: Data>() -> impl Widget<T> {
     children.insert(0, Child::new(WidgetPod::new(Box::new(build_settings()))));
     children.insert(1, Child::new(WidgetPod::new(Box::new(test1()))));
 
-    let paged = PagedWidget::new(children)
+    let paged = PagedWidget::new(children, 160.0)
         .expand();
 
     paged
