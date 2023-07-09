@@ -277,7 +277,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .with_spacer(4.0)
         .with_child(about_button)
         .with_spacer(4.0)
-        .fix_width(160.0)
+        .fix_width(128.0)
         .padding(Insets::uniform_xy(8.0, 0.0))
         .align_horizontal(UnitPoint::CENTER);
 
@@ -295,7 +295,7 @@ fn build_right<T: Data>() -> impl Widget<T> {
     children.insert(0, Child::new(WidgetPod::new(Box::new(build_settings()))));
     children.insert(1, Child::new(WidgetPod::new(Box::new(test1()))));
 
-    let paged = PagedWidget::new(children, 160.0)
+    let paged = PagedWidget::new(children, 128.0)
         .expand();
 
     paged
