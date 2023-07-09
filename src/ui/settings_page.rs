@@ -173,9 +173,10 @@ fn build_settings<T: Data>() -> impl Widget<T> {
     let title = Flex::column()
         .with_child(Label::new(LocalizedString::new("Common")).with_text_size(18.0).align_left())
         .with_spacer(2.0)
-        .padding(Insets::uniform_xy(14.0, 6.0))
+        .padding(Insets::uniform_xy(14.0, 4.0))
+
         .background(theme::COLOR_BACKGROUND_LIGHT)
-        .border(theme::COLOR_BORDER_DARK, 1.0)
+        .border(theme::COLOR_BORDER_DARK, 1.2)
         .rounded(12.0)
         .expand_width()
         .align_left();
