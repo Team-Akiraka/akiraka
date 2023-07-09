@@ -3,40 +3,40 @@ use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, LayoutCtx
 use druid::piet::ImageFormat;
 use druid::platform_menus::common::undo;
 use crate::ui::{download_page, hello_page, instances_page, settings_page};
-use crate::{animations};
+use crate::{animations, AppState};
 
-struct Child<T> {
-    inner: WidgetPod<T, Box<dyn Widget<T>>>
+struct Child<AppState> {
+    inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>
 }
 
 
-impl<T> Child<T> {
-    fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
+impl Child<AppState> {
+    fn new(inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>) -> Child<AppState> {
         Child {
             inner
         }
     }
 
-    fn widget_mut(&mut self) -> Option<&mut WidgetPod<T, Box<dyn Widget<T>>>> {
+    fn widget_mut(&mut self) -> Option<&mut WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
         Some(&mut self.inner)
     }
 
-    fn widget(&self) -> Option<&WidgetPod<T, Box<dyn Widget<T>>>> {
+    fn widget(&self) -> Option<&WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
         Some(&self.inner)
     }
 }
 
 const ANIMATION_TIME: f64 = 0.5;
 
-pub struct PagedWidget<T> {
-    children: HashMap<String, Child<T>>,
+pub struct PagedWidget<AppState> {
+    children: HashMap<String, Child<AppState>>,
     current_id: String,
     inner_size: Size,
     t: f64
 }
 
-impl<T: Data> PagedWidget<T> {
-    pub fn new() -> PagedWidget<T> {
+impl PagedWidget<AppState> {
+    pub fn new() -> PagedWidget<AppState> {
         let mut children = HashMap::new();
         // Add Children
         children.insert(hello_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(hello_page::build()))));
@@ -62,8 +62,8 @@ impl<T: Data> PagedWidget<T> {
     }
 }
 
-impl<T: Data> Widget<T> for PagedWidget<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+impl Widget<AppState> for PagedWidget<AppState> {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env) {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.request_anim_frame();
@@ -93,7 +93,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
         if self.current_id.as_str() != unsafe { crate::PAGE_ID } {
             self.current_id = String::from(unsafe { crate::PAGE_ID });
         }
@@ -103,13 +103,13 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &AppState, data: &AppState, env: &Env) {
         for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
             x.update(ctx, data, env);
         }
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
             bc.constrain(x.layout(ctx, bc, data, env));
         }
@@ -117,7 +117,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         self.inner_size
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
 
         let x = self.children.get_mut(&self.current_id);
         if x.is_some() {

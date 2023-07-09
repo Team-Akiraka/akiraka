@@ -7,8 +7,10 @@ mod util;
 mod ui;
 mod animations;
 
+use std::ops::Add;
 use rust_embed::RustEmbed;
-use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
+use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, im, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
+use druid::im::Vector;
 use crate::ui::hello_page;
 use crate::widget::{paged_widget};
 use crate::widget::window::WindowWidget;
@@ -65,7 +67,8 @@ impl<T: Data> Widget<T> for Empty {
 #[derive(Clone, Data, Lens)]
 pub struct AppState {
     page_id: String,
-    global_search_bar_input: String
+    global_search_bar_input: String,
+    java: im::Vector<String>
 }
 
 pub static mut PAGE_ID: &str = hello_page::ID;
@@ -80,10 +83,12 @@ fn main() {
         .set_window_state(WindowState::Restored)
         .show_titlebar(false);
 
-    let initial_state = AppState {
+    let mut initial_state = AppState {
         page_id: String::new(),
-        global_search_bar_input: String::new()
+        global_search_bar_input: String::new(),
+        java: im::Vector::<String>::new()
     };
+    initial_state.java.append(Vector::from(vec!["114514".parse::<String>().unwrap()]));
 
     let root = build_root_widget();
     AppLauncher::with_window(main_window)

@@ -6,7 +6,7 @@ use std::ptr::null;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::keyboard_types::Key::Clear;
 use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List};
-use crate::{animations, Asset};
+use crate::{animations, AppState, Asset};
 use crate::theme::theme;
 use crate::widget::button::Button;
 use crate::widget::clear_button::ClearButton;
@@ -17,36 +17,36 @@ pub const ID: &str = "SETTINGS_PAGE";
 const ANIMATION_TIME: f64 = 0.3;
 static mut SELECTED: u64 = 0;
 
-struct Child<T> {
-    inner: WidgetPod<T, Box<dyn Widget<T>>>
+struct Child<AppState> {
+    inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>
 }
 
-impl<T> Child<T> {
-    fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>) -> Child<T> {
+impl Child<AppState> {
+    fn new(inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>) -> Child<AppState> {
         Child {
             inner
         }
     }
 
-    fn widget_mut(&mut self) -> Option<&mut WidgetPod<T, Box<dyn Widget<T>>>> {
+    fn widget_mut(&mut self) -> Option<&mut WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
         Some(&mut self.inner)
     }
 
-    fn widget(&self) -> Option<&WidgetPod<T, Box<dyn Widget<T>>>> {
+    fn widget(&self) -> Option<&WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
         Some(&self.inner)
     }
 }
 
-struct PagedWidget<T> {
-    pages: HashMap<u64, Child<T>>,
+struct PagedWidget<AppState> {
+    pages: HashMap<u64, Child<AppState>>,
     current_id: u64,
     inner_size: Size,
     offset: f64,
     t: f64
 }
 
-impl<T: Data> PagedWidget<T> {
-    fn new(pages: HashMap<u64, Child<T>>, offset: f64) -> PagedWidget<T> {
+impl PagedWidget<AppState> {
+    fn new(pages: HashMap<u64, Child<AppState>>, offset: f64) -> PagedWidget<AppState> {
         PagedWidget {
             pages,
             current_id: unsafe { SELECTED },
@@ -66,8 +66,8 @@ impl<T: Data> PagedWidget<T> {
     }
 }
 
-impl<T: Data> Widget<T> for PagedWidget<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+impl Widget<AppState> for PagedWidget<AppState> {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env) {
         // if self.detect_scene_change() {
         //     self.t = 0.0;
         //     ctx.request_anim_frame();
@@ -97,7 +97,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
         // if self.detect_scene_change() {
         //     self.t = 0.0;
         //     ctx.request_anim_frame();
@@ -108,7 +108,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &AppState, data: &AppState, env: &Env) {
         // if self.detect_scene_change() {
         //     self.t = 0.0;
         //     ctx.request_anim_frame();
@@ -118,7 +118,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         println!("{:?}", bc);
         let w = ctx.window().get_size().width - self.offset;
         let h = ctx.window().get_size().height;
@@ -145,7 +145,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         self.inner_size
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
         if self.detect_scene_change() {
             self.t = 1.0;
             ctx.window().request_anim_frame();
@@ -173,7 +173,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 }
 
-fn build_settings<T: Data>() -> impl Widget<T> {
+fn build_settings() -> impl Widget<AppState> {
     let game = Flex::column()
         .with_child(Label::new(LocalizedString::new("None")).with_text_size(16.0).align_left())
         .padding(Insets::uniform_xy(12.0, 12.0))
@@ -192,13 +192,17 @@ fn build_settings<T: Data>() -> impl Widget<T> {
         .align_left()
 }
 
-fn build_game<T: Data>() -> impl Widget<T> {
+fn build_game() -> impl Widget<AppState> {
     let java = Flex::column()
         .with_child(Label::new(LocalizedString::new("Java Runtime")).with_text_size(16.0).align_left())
         .with_spacer(12.0)
-        // .with_child(List::new(|| {
-        //     Label::new("114514")
-        // }))
+        .with_child(
+            List::new(|| {
+            Label::new("114514").align_left()
+        })
+            .lens(AppState::java)
+        )
+        .with_spacer(12.0)
         .with_child(ClearButton::new("Test").fix_height(28.0).align_left())
 
         .with_spacer(4.0)
@@ -218,14 +222,14 @@ fn build_game<T: Data>() -> impl Widget<T> {
         .align_left()
 }
 
-fn build_left<T: Data>() -> impl Widget<T> {
+fn build_left() -> impl Widget<AppState> {
     let title = Label::new("Settings")
         .with_text_size(24.0)
         .fix_width(32.0)
         .expand_width()
         .padding(Insets::uniform_xy(12.0, 4.0));
 
-    // let mut buttons: HashMap<u64, &SideBarSelection<T>> = HashMap::new();
+    // let mut buttons: HashMap<u64, &SideBarSelection<AppState>> = HashMap::new();
 
     let common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common", 0);
     let game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game", 2);
@@ -310,7 +314,7 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .align_left()
 }
 
-fn build_right<T: Data>() -> impl Widget<T> {
+fn build_right() -> impl Widget<AppState> {
     let mut children = HashMap::new();
     children.insert(0, Child::new(WidgetPod::new(Box::new(build_settings()))));
     children.insert(1, Child::new(WidgetPod::new(Box::new(build_game()))));
@@ -321,7 +325,7 @@ fn build_right<T: Data>() -> impl Widget<T> {
     paged
 }
 
-pub fn build<T: Data>() -> impl Widget<T> {
+pub fn build() -> impl Widget<AppState> {
     let body = Flex::row()
         .with_child(build_left())
         .with_child(build_right());
