@@ -2,10 +2,14 @@
 
 use std::borrow::ToOwned;
 use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label};
+use std::ptr::null;
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::keyboard_types::Key::Clear;
+use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List};
 use crate::{animations, Asset};
 use crate::theme::theme;
+use crate::widget::button::Button;
+use crate::widget::clear_button::ClearButton;
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
@@ -170,25 +174,44 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
 }
 
 fn build_settings<T: Data>() -> impl Widget<T> {
-    let title = Flex::column()
-        .with_child(Label::new(LocalizedString::new("Common")).with_text_size(15.0).align_left())
-        .with_spacer(2.0)
-        .padding(Insets::uniform_xy(14.0, 6.0))
-
+    let game = Flex::column()
+        .with_child(Label::new(LocalizedString::new("None")).with_text_size(16.0).align_left())
+        .padding(Insets::uniform_xy(12.0, 12.0))
         .background(theme::COLOR_BACKGROUND_LIGHT)
         .border(theme::COLOR_BORDER_DARK, 1.0)
-        .rounded(12.0)
+        .rounded(10.0)
         .expand_width()
         .align_left();
 
     let mut body = Flex::column()
-        .with_child(title)
-        .with_child(Label::new("114514"))
-        .with_child(Label::new("114514"))
-        .with_child(Label::new("114514"))
-        .with_child(Label::new("114514"))
-        .with_child(Label::new("114514"))
-        .padding(Insets::new(0.0, 4.0, 32.0, 0.0));
+        .with_child(game)
+        .padding(Insets::new(4.0, 4.0, 32.0, 4.0));
+
+    body
+        .align_vertical(UnitPoint::TOP)
+        .align_left()
+}
+
+fn build_game<T: Data>() -> impl Widget<T> {
+    let java = Flex::column()
+        .with_child(Label::new(LocalizedString::new("Java Runtime")).with_text_size(16.0).align_left())
+        .with_spacer(12.0)
+        // .with_child(List::new(|| {
+        //     Label::new("114514")
+        // }))
+        .with_child(ClearButton::new("Test").fix_height(28.0).align_left())
+
+        .with_spacer(4.0)
+        .padding(Insets::uniform_xy(12.0, 8.0))
+        .background(theme::COLOR_BACKGROUND_LIGHT)
+        .border(theme::COLOR_BORDER_DARK, 1.0)
+        .rounded(10.0)
+        .expand_width()
+        .align_left();
+
+    let mut body = Flex::column()
+        .with_child(java)
+        .padding(Insets::new(4.0, 4.0, 32.0, 4.0));
 
     body
         .align_vertical(UnitPoint::TOP)
@@ -205,8 +228,8 @@ fn build_left<T: Data>() -> impl Widget<T> {
     // let mut buttons: HashMap<u64, &SideBarSelection<T>> = HashMap::new();
 
     let common_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse().unwrap(), "Common", 0);
-    let network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download", 1);
     let game_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/play.svg").unwrap().data).unwrap().parse().unwrap(), "Game", 2);
+    let network_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap(), "Download", 1);
     let multiplayer_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/network.svg").unwrap().data).unwrap().parse().unwrap(), "Multiplayer", 3);
     let about_button = SideBarSelection::new(std::str::from_utf8(&Asset::get("icon/info.svg").unwrap().data).unwrap().parse().unwrap(), "About", 4);
 
@@ -217,14 +240,14 @@ fn build_left<T: Data>() -> impl Widget<T> {
         ctx.request_layout();
     });
 
-    let network_button = network_button.on_click(|ctx, _data, _env| {
+    let game_button = game_button.on_click(|ctx, _data, _env| {
         unsafe {
             SELECTED = 1;
         }
         ctx.request_layout();
     });
 
-    let game_button = game_button.on_click(|ctx, _data, _env| {
+    let network_button = network_button.on_click(|ctx, _data, _env| {
         unsafe {
             SELECTED = 2;
         }
@@ -249,11 +272,11 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .fix_height(32.0)
         .expand_width();
 
-    let network_button = network_button
+    let game_button = game_button
         .fix_height(32.0)
         .expand_width();
 
-    let game_button = game_button
+    let network_button = network_button
         .fix_height(32.0)
         .expand_width();
 
@@ -270,9 +293,9 @@ fn build_left<T: Data>() -> impl Widget<T> {
         .with_spacer(8.0)
         .with_child(common_button)
         .with_spacer(4.0)
-        .with_child(network_button)
-        .with_spacer(4.0)
         .with_child(game_button)
+        .with_spacer(4.0)
+        .with_child(network_button)
         .with_spacer(4.0)
         .with_child(multiplayer_button)
         .with_spacer(4.0)
@@ -288,13 +311,9 @@ fn build_left<T: Data>() -> impl Widget<T> {
 }
 
 fn build_right<T: Data>() -> impl Widget<T> {
-    fn test1<T: Data>() -> impl Widget<T> {
-        Label::new("1145141919810").expand()
-    }
-
     let mut children = HashMap::new();
     children.insert(0, Child::new(WidgetPod::new(Box::new(build_settings()))));
-    children.insert(1, Child::new(WidgetPod::new(Box::new(test1()))));
+    children.insert(1, Child::new(WidgetPod::new(Box::new(build_game()))));
 
     let paged = PagedWidget::new(children, 128.0)
         .expand();
