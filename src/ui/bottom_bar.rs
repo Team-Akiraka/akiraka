@@ -273,7 +273,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             let rect = ctx.size().to_rect();
             ctx.transform(Affine::translate(Vec2::new(0.0, (1.0 - s) * x.height + self.last_height)));
             ctx.stroke(rect, &env.get(theme::COLOR_BORDER_DARK), 1.0);
-            ctx.fill(rect, &env.get(theme::COLOR_BACKGROUND_DARK));
+            ctx.fill(rect, &env.get(theme::COLOR_BACKGROUND_LIGHT));
 
             ctx.transform(Affine::translate(Vec2::new(0.0, -self.last_height)));
             x.inner.paint(ctx, data, env);

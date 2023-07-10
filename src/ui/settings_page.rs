@@ -10,6 +10,7 @@ use crate::{animations, AppState, Asset};
 use crate::theme::theme;
 use crate::widget::button::Button;
 use crate::widget::clear_button::ClearButton;
+use crate::widget::icon_clear_button::IconClearButton;
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
@@ -119,7 +120,6 @@ impl Widget<AppState> for PagedWidget<AppState> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
-        println!("{:?}", bc);
         let w = ctx.window().get_size().width - self.offset;
         let h = ctx.window().get_size().height;
         let child_bc = BoxConstraints::new(
@@ -173,9 +173,57 @@ impl Widget<AppState> for PagedWidget<AppState> {
     }
 }
 
+struct JavaInstance<T> {
+    name: Label<T>,
+    path: Label<T>,
+    open: IconClearButton
+}
+
+impl<T: Data> JavaInstance<T> {
+    pub fn new(path: String) -> JavaInstance<T> {
+        JavaInstance {
+            name: Label::new(path.clone()),
+            path: Label::new(path.clone()),
+            open: IconClearButton::new(std::str::from_utf8(&Asset::get("icon/java.svg").unwrap().data).unwrap().parse().unwrap())
+        }
+    }
+}
+
+impl<T: Data> Widget<T> for JavaInstance<T> {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        self.name.event(ctx, event, data, env);
+        self.path.event(ctx, event, data, env);
+        self.open.event(ctx, event, data, env);
+    }
+
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.name.lifecycle(ctx, event, data, env);
+        self.path.lifecycle(ctx, event, data, env);
+        self.open.lifecycle(ctx, event, data, env);
+    }
+
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.name.update(ctx, old_data, data, env);
+        self.path.update(ctx, old_data, data, env);
+        self.open.update(ctx, old_data, data, env);
+    }
+
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        self.name.layout(ctx, bc, data, env);
+        self.path.layout(ctx, bc, data, env);
+        self.open.layout(ctx, bc, data, env);
+        bc.min()
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        self.name.paint(ctx, data, env);
+        self.path.paint(ctx, data, env);
+        self.open.paint(ctx, data, env);
+    }
+}
+
 fn build_settings() -> impl Widget<AppState> {
     let game = Flex::column()
-        .with_child(Label::new(LocalizedString::new("None")).with_text_size(16.0).align_left())
         .padding(Insets::uniform_xy(12.0, 12.0))
         .background(theme::COLOR_BACKGROUND_LIGHT)
         .border(theme::COLOR_BORDER_DARK, 1.0)
@@ -184,6 +232,8 @@ fn build_settings() -> impl Widget<AppState> {
         .align_left();
 
     let mut body = Flex::column()
+        .with_child(Label::new(LocalizedString::new("None")).with_text_size(14.0).align_left())
+        .with_spacer(8.0)
         .with_child(game)
         .padding(Insets::new(4.0, 4.0, 32.0, 4.0));
 
@@ -194,11 +244,10 @@ fn build_settings() -> impl Widget<AppState> {
 
 fn build_game() -> impl Widget<AppState> {
     let java = Flex::column()
-        .with_child(Label::new(LocalizedString::new("Java Runtime")).with_text_size(16.0).align_left())
-        .with_spacer(12.0)
         .with_child(
             List::new(|| {
-            Label::new("114514").align_left()
+            // Label::new("114514").align_left()
+                JavaInstance::new("114514".parse().unwrap()).expand_width().fix_height(64.0).align_left()
         })
             .lens(AppState::java)
         )
@@ -214,6 +263,8 @@ fn build_game() -> impl Widget<AppState> {
         .align_left();
 
     let mut body = Flex::column()
+        .with_child(Label::new(LocalizedString::new("Java Runtime")).with_text_size(14.0).align_left())
+        .with_spacer(8.0)
         .with_child(java)
         .padding(Insets::new(4.0, 4.0, 32.0, 4.0));
 
