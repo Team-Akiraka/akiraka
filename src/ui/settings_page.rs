@@ -88,11 +88,11 @@ impl<T: Data> Widget<T> for IconClearButton {
                 .to_rounded_rect(env.get(druid::theme::BUTTON_BORDER_RADIUS));
 
         let bg_gradient = if is_active {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
+            env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else if is_hot {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_HOT)
+            env.get(theme::COLOR_CLEAR_BUTTON_HOT)
         } else {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON)
+            env.get(theme::COLOR_CLEAR_BUTTON)
         };
 
         let border_color = if is_active {
