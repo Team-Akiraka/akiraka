@@ -88,12 +88,12 @@ fn main() {
         global_search_bar_input: String::new(),
         java: im::Vector::<String>::new()
     };
-    initial_state.java.append(Vector::from(vec!["114514".parse::<String>().unwrap()]));
+    initial_state.java.append(Vector::from(vec!["114514".parse().unwrap()]));
 
     let root = build_root_widget();
     AppLauncher::with_window(main_window)
         .configure_env(|_env, _state| {
-            // TODO: 环境
+            // TODO: Environment
             theme::theme::init(_env);
         })
         .delegate(Delegate::new(root))

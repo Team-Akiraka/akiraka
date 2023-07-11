@@ -6,12 +6,14 @@ use std::ffi::OsStr;
 use std::ptr::null;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MouseButton, PaintCtx, Point, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::keyboard_types::Key::Clear;
-use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List, Svg, SvgData};
+use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
 use crate::{animations, AppState, Asset};
 use crate::theme::theme;
 use crate::util::color_as_hex_string;
 use crate::widget::button::Button;
 use crate::widget::clear_button::ClearButton;
+use crate::widget::icon::Icon;
+use crate::widget::separator::Separator;
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
@@ -67,8 +69,7 @@ impl<T: Data> Widget<T> for IconClearButton {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        let icon_bc = bc.shrink(Size::new(16.0, 16.0));
-        let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
+        let icon_size = self.icon.layout(ctx, bc, data, env);
         let button_size =
             bc.constrain(Size::new(
                 icon_size.width,
@@ -274,59 +275,75 @@ impl Widget<AppState> for PagedWidget<AppState> {
 struct JavaInstance<T> {
     name: String,
     path: String,
-    name_label: WidgetPod<T, Box<dyn Widget<T>>>,
-    path_label: WidgetPod<T, Box<dyn Widget<T>>>,
-    open: WidgetPod<T, Box<dyn Widget<T>>>
+    layout: WidgetPod<T, Box<dyn Widget<T>>>
+}
+
+fn create<T: Data>(path: String) -> WidgetPod<T, Box<dyn Widget<T>>> {
+    let name_layout = Flex::column()
+        .with_child(Label::new(path.clone()).with_text_size(16.0).align_left())
+        .with_child(Label::new(path.clone()).with_text_size(11.0).align_left())
+        .align_left();
+
+    let path_moved = path.clone();
+    let open_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/folder.svg").unwrap().data).unwrap().parse().unwrap())
+        .fix_size(40.0, 40.0)
+        .on_click(move |ctx, data, env| {
+            if open::that(path_moved.as_str()).is_err() {
+                println!("Could not open directory!");
+            }
+        });
+    let path_moved = path.clone();
+    let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
+        .fix_size(40.0, 40.0)
+        .on_click(|ctx, data: &mut T, env| {
+            ctx.request_update();
+        });
+
+    let layout = Flex::row()
+        .with_child(Icon::new(std::str::from_utf8(&Asset::get("icon/java.svg").unwrap().data).unwrap().parse().unwrap()))
+        .with_flex_child(name_layout, FlexParams::new(1.0, CrossAxisAlignment::Start))
+        .with_child(open_button)
+        .with_child(delete_button)
+        .padding(Insets::uniform(6.0))
+        .align_left();
+    WidgetPod::new(Box::new(layout))
 }
 
 impl<T: Data> JavaInstance<T> {
     pub fn new(path: String) -> JavaInstance<T> {
-
         JavaInstance {
             name: path.clone(),
             path: path.clone(),
-            name_label: WidgetPod::new(Box::new(Label::new(path.clone()))),
-            path_label: WidgetPod::new(Box::new(Label::new(path.clone()))),
-            open: WidgetPod::new(Box::new(
-                IconClearButton::new(std::str::from_utf8(&Asset::get("icon/folder.svg").unwrap().data).unwrap().parse().unwrap())
-                    .align_right()
-                    .fix_size(32.0, 32.0)))
+            layout: create(path)
         }
+    }
+
+    pub fn init_data(&mut self, data: String) {
+        self.name = data.clone();
+        self.path = data.clone();
+        self.layout = create(data);
     }
 }
 
 impl<T: Data> Widget<T> for JavaInstance<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
-        self.name_label.event(ctx, event, data, env);
-        self.path_label.event(ctx, event, data, env);
-        self.open.event(ctx, event, data, env);
+        self.layout.event(ctx, event, data, env);
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.layout.lifecycle(ctx, event, data, env);
+
         if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
             ctx.request_paint();
         }
-
-        self.name_label.lifecycle(ctx, event, data, env);
-        self.path_label.lifecycle(ctx, event, data, env);
-        self.open.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
-        self.name_label.update(ctx, data, env);
-        self.path_label.update(ctx, data, env);
-        self.open.update(ctx, data, env);
+        self.layout.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        let rect = bc.min();
-        self.name_label.set_origin(ctx, Point::new(rect.width / 2.0, rect.height / 2.0));
-        self.name_label.layout(ctx, bc, data, env);
-
-        self.path_label.layout(ctx, bc, data, env);
-
-        self.open.set_origin(ctx, Point::new(-8.0, 0.0));
-        self.open.layout(ctx, bc, data, env);
+        self.layout.layout(ctx, bc, data, env);
         bc.min()
     }
 
@@ -338,16 +355,80 @@ impl<T: Data> Widget<T> for JavaInstance<T> {
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
-            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), 2.0);
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+        } else {
+            ctx.fill(rect, &Color::TRANSPARENT);
         }
 
         if is_hot {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
+        } else {
+            ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
         }
 
-        self.name_label.paint(ctx, data, env);
-        self.path_label.paint(ctx, data, env);
-        self.open.paint(ctx, data, env);
+        self.layout.paint(ctx, data, env);
+    }
+}
+
+struct AddJava<T> {
+    layout: WidgetPod<T, Box<dyn Widget<T>>>
+}
+
+impl<T: Data> AddJava<T> {
+    pub fn new() -> AddJava<T> {
+        let layout = Flex::row()
+            .with_child(Icon::new(std::str::from_utf8(&Asset::get("icon/add.svg").unwrap().data).unwrap().parse().unwrap()))
+            .with_flex_child(Label::new(LocalizedString::new("Add Java Instance")).align_left(), FlexParams::new(1.0, CrossAxisAlignment::Start))
+            .align_left()
+            .padding(Insets::uniform(6.0));
+
+        AddJava {
+            layout: WidgetPod::new(Box::new(layout))
+        }
+    }
+}
+
+impl<T: Data> Widget<T> for AddJava<T> {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        self.layout.event(ctx, event, data, env);
+    }
+
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.layout.lifecycle(ctx, event, data, env);
+
+        if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
+            ctx.request_paint();
+        }
+    }
+
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.layout.update(ctx, data, env);
+    }
+
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        self.layout.layout(ctx, bc, data, env)
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        let is_active = ctx.is_active() && !ctx.is_disabled();
+        let is_hot = ctx.is_hot();
+        let size = ctx.size();
+        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+        let rect = ctx.size().to_rect().to_rounded_rect(12.0);
+
+        if is_hot {
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+        } else {
+            ctx.fill(rect, &Color::TRANSPARENT);
+        }
+
+        if is_hot {
+            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
+        } else {
+            ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
+        }
+
+        self.layout.paint(ctx, data, env);
     }
 }
 
@@ -372,13 +453,34 @@ fn build_settings() -> impl Widget<AppState> {
 }
 
 fn build_game() -> impl Widget<AppState> {
+    let list = List::new(|| {
+        JavaInstance::new(String::new().parse().unwrap())
+            .on_added(|widget, ctx, data, env| {
+                widget.init_data(String::from(data));
+                ctx.request_paint();
+            })
+            .on_click(|ctx, data, env| {
+                println!("{}", data);
+            })
+            .expand_width()
+            .fix_height(56.0)
+            .align_left()
+    })
+        .with_spacing(8.0)
+        .expand_width()
+        .lens(AppState::java);
+
+    let list_layout = Flex::column()
+        .with_child(list)
+        .with_child(AddJava::new().expand_width().fix_height(56.0).align_left());
+
+    let list_scroll = Scroll::new(list_layout)
+        .vertical()
+        .fix_height(70.0)
+        .expand_width();
+
     let java = Flex::column()
-        .with_child(
-            List::new(|| {
-                JavaInstance::new("C:\\Users\\Arrokoth".parse().unwrap()).expand_width().fix_height(56.0).align_left()
-        })
-            .lens(AppState::java)
-        )
+        .with_child(list_scroll)
         .with_spacer(12.0)
         .with_child(ClearButton::new("Test").fix_height(28.0).align_left())
 
