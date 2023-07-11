@@ -2,6 +2,7 @@
 
 use std::borrow::ToOwned;
 use std::collections::HashMap;
+use std::ffi::OsStr;
 use std::ptr::null;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MouseButton, PaintCtx, Point, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::keyboard_types::Key::Clear;
@@ -280,12 +281,16 @@ struct JavaInstance<T> {
 
 impl<T: Data> JavaInstance<T> {
     pub fn new(path: String) -> JavaInstance<T> {
+
         JavaInstance {
             name: path.clone(),
             path: path.clone(),
             name_label: WidgetPod::new(Box::new(Label::new(path.clone()))),
             path_label: WidgetPod::new(Box::new(Label::new(path.clone()))),
-            open: WidgetPod::new(Box::new(IconClearButton::new(std::str::from_utf8(&Asset::get("icon/folder.svg").unwrap().data).unwrap().parse().unwrap()).align_left().fix_size(32.0, 32.0)))
+            open: WidgetPod::new(Box::new(
+                IconClearButton::new(std::str::from_utf8(&Asset::get("icon/folder.svg").unwrap().data).unwrap().parse().unwrap())
+                    .align_right()
+                    .fix_size(32.0, 32.0)))
         }
     }
 }
@@ -320,7 +325,7 @@ impl<T: Data> Widget<T> for JavaInstance<T> {
 
         self.path_label.layout(ctx, bc, data, env);
 
-        self.open.set_origin(ctx, Point::new(rect.width - 48.0 - 6.0, 0.0));
+        self.open.set_origin(ctx, Point::new(-8.0, 0.0));
         self.open.layout(ctx, bc, data, env);
         bc.min()
     }
@@ -370,7 +375,7 @@ fn build_game() -> impl Widget<AppState> {
     let java = Flex::column()
         .with_child(
             List::new(|| {
-                JavaInstance::new("114514".parse().unwrap()).expand_width().fix_height(56.0).align_left()
+                JavaInstance::new("C:\\Users\\Arrokoth".parse().unwrap()).expand_width().fix_height(56.0).align_left()
         })
             .lens(AppState::java)
         )
