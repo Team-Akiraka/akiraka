@@ -3,20 +3,117 @@
 use std::borrow::ToOwned;
 use std::collections::HashMap;
 use std::ptr::null;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MouseButton, PaintCtx, Point, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::keyboard_types::Key::Clear;
-use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List};
+use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List, Svg, SvgData};
 use crate::{animations, AppState, Asset};
 use crate::theme::theme;
+use crate::util::color_as_hex_string;
 use crate::widget::button::Button;
 use crate::widget::clear_button::ClearButton;
-use crate::widget::icon_clear_button::IconClearButton;
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
 
 const ANIMATION_TIME: f64 = 0.3;
 static mut SELECTED: u64 = 0;
+
+
+const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
+
+pub struct IconClearButton {
+    icon: Svg,
+    data: String,
+}
+
+impl IconClearButton {
+    pub fn new(data: String) -> IconClearButton {
+        Self {
+            icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
+            data
+        }
+    }
+}
+
+impl<T: Data> Widget<T> for IconClearButton {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, _data: &mut T, _env: &Env) {
+        match event {
+            Event::MouseDown(event) => {
+                if !ctx.is_disabled() && event.button == MouseButton::Left {
+                    ctx.set_active(true);
+                    ctx.request_paint();
+                }
+            }
+            Event::MouseUp(_) => {
+                if ctx.is_active() && !ctx.is_disabled() {
+                    ctx.request_paint();
+                }
+                ctx.set_active(false);
+            }
+            _ => (),
+        }
+    }
+
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
+            ctx.request_paint();
+        }
+        self.icon.lifecycle(ctx, event, data, env)
+    }
+
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.icon.update(ctx, old_data, data, env)
+    }
+
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        let icon_bc = bc.shrink(Size::new(16.0, 16.0));
+        let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
+        let button_size =
+            bc.constrain(Size::new(
+                icon_size.width,
+                icon_size.height
+            ));
+        button_size
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        let is_active = ctx.is_active() && !ctx.is_disabled();
+        let is_hot = ctx.is_hot();
+        let size = ctx.size();
+        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+
+        let rounded_rect = size
+            .to_rect()
+            .inset(-stroke_width / 2.0)
+                .to_rounded_rect(env.get(druid::theme::BUTTON_BORDER_RADIUS));
+
+        let bg_gradient = if is_active {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
+        } else if is_hot {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_HOT)
+        } else {
+            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON)
+        };
+
+        let border_color = if is_active {
+            env.get(theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
+        } else if is_hot {
+            env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT)
+        } else {
+            env.get(theme::COLOR_CLEAR_BUTTON_BORDER)
+        };
+
+        ctx.fill(rounded_rect, &bg_gradient);
+
+        ctx.stroke(rounded_rect, &border_color, stroke_width);
+
+        ctx.with_save(|ctx| {
+            let svg_data = self.data.replace("{color}", color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap();
+            self.icon = Svg::new(svg_data);
+            self.icon.paint(ctx, data, env);
+        });
+    }
+}
 
 struct Child<AppState> {
     inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>
@@ -174,50 +271,77 @@ impl Widget<AppState> for PagedWidget<AppState> {
 }
 
 struct JavaInstance<T> {
-    name: Label<T>,
-    path: Label<T>,
-    open: IconClearButton
+    name: String,
+    path: String,
+    name_label: WidgetPod<T, Box<dyn Widget<T>>>,
+    path_label: WidgetPod<T, Box<dyn Widget<T>>>,
+    open: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> JavaInstance<T> {
     pub fn new(path: String) -> JavaInstance<T> {
         JavaInstance {
-            name: Label::new(path.clone()),
-            path: Label::new(path.clone()),
-            open: IconClearButton::new(std::str::from_utf8(&Asset::get("icon/java.svg").unwrap().data).unwrap().parse().unwrap())
+            name: path.clone(),
+            path: path.clone(),
+            name_label: WidgetPod::new(Box::new(Label::new(path.clone()))),
+            path_label: WidgetPod::new(Box::new(Label::new(path.clone()))),
+            open: WidgetPod::new(Box::new(IconClearButton::new(std::str::from_utf8(&Asset::get("icon/folder.svg").unwrap().data).unwrap().parse().unwrap()).align_left().fix_size(32.0, 32.0)))
         }
     }
 }
 
 impl<T: Data> Widget<T> for JavaInstance<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
-        self.name.event(ctx, event, data, env);
-        self.path.event(ctx, event, data, env);
+        self.name_label.event(ctx, event, data, env);
+        self.path_label.event(ctx, event, data, env);
         self.open.event(ctx, event, data, env);
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-        self.name.lifecycle(ctx, event, data, env);
-        self.path.lifecycle(ctx, event, data, env);
+        if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
+            ctx.request_paint();
+        }
+
+        self.name_label.lifecycle(ctx, event, data, env);
+        self.path_label.lifecycle(ctx, event, data, env);
         self.open.lifecycle(ctx, event, data, env);
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-        self.name.update(ctx, old_data, data, env);
-        self.path.update(ctx, old_data, data, env);
-        self.open.update(ctx, old_data, data, env);
+        self.name_label.update(ctx, data, env);
+        self.path_label.update(ctx, data, env);
+        self.open.update(ctx, data, env);
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        self.name.layout(ctx, bc, data, env);
-        self.path.layout(ctx, bc, data, env);
+        let rect = bc.min();
+        self.name_label.set_origin(ctx, Point::new(rect.width / 2.0, rect.height / 2.0));
+        self.name_label.layout(ctx, bc, data, env);
+
+        self.path_label.layout(ctx, bc, data, env);
+
+        self.open.set_origin(ctx, Point::new(rect.width - 48.0 - 6.0, 0.0));
         self.open.layout(ctx, bc, data, env);
         bc.min()
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        self.name.paint(ctx, data, env);
-        self.path.paint(ctx, data, env);
+        let is_active = ctx.is_active() && !ctx.is_disabled();
+        let is_hot = ctx.is_hot();
+        let size = ctx.size();
+        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+        let rect = ctx.size().to_rect().to_rounded_rect(12.0);
+
+        if is_hot {
+            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), 2.0);
+        }
+
+        if is_hot {
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+        }
+
+        self.name_label.paint(ctx, data, env);
+        self.path_label.paint(ctx, data, env);
         self.open.paint(ctx, data, env);
     }
 }
@@ -246,8 +370,7 @@ fn build_game() -> impl Widget<AppState> {
     let java = Flex::column()
         .with_child(
             List::new(|| {
-            // Label::new("114514").align_left()
-                JavaInstance::new("114514".parse().unwrap()).expand_width().fix_height(64.0).align_left()
+                JavaInstance::new("114514".parse().unwrap()).expand_width().fix_height(56.0).align_left()
         })
             .lens(AppState::java)
         )
@@ -255,7 +378,7 @@ fn build_game() -> impl Widget<AppState> {
         .with_child(ClearButton::new("Test").fix_height(28.0).align_left())
 
         .with_spacer(4.0)
-        .padding(Insets::uniform_xy(12.0, 8.0))
+        .padding(Insets::uniform_xy(12.0, 12.0))
         .background(theme::COLOR_BACKGROUND_LIGHT)
         .border(theme::COLOR_BORDER_DARK, 1.0)
         .rounded(10.0)
