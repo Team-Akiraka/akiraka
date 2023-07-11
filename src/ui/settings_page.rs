@@ -108,7 +108,7 @@ impl<T: Data> Widget<T> for IconClearButton {
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
         ctx.with_save(|ctx| {
-            let svg_data = self.data.replace("{color}", color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap();
+            let svg_data = self.data.replace("{color}", color_as_hex_string(Color::from(env.get(theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap();
             self.icon = Svg::new(svg_data);
             self.icon.paint(ctx, data, env);
         });
@@ -218,7 +218,7 @@ impl Widget<AppState> for PagedWidget<AppState> {
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         let w = ctx.window().get_size().width - self.offset;
-        let h = ctx.window().get_size().height;
+        // let h = ctx.window().get_size().height;
         let child_bc = BoxConstraints::new(
             Size::new(
                 if bc.min().width > w { w } else { bc.min().width },
@@ -307,7 +307,7 @@ impl<T: Data> Widget<T> for JavaInstance<T> {
         self.open.lifecycle(ctx, event, data, env);
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
         self.name_label.update(ctx, data, env);
         self.path_label.update(ctx, data, env);
         self.open.update(ctx, data, env);
