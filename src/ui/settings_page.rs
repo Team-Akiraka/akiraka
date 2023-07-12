@@ -295,7 +295,7 @@ fn create<T: Data>(path: String) -> WidgetPod<T, Box<dyn Widget<T>>> {
     let path_moved = path.clone();
     let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
         .fix_size(40.0, 40.0)
-        .on_click(|ctx, data: &mut T, env| {
+        .on_click(|ctx, data, env| {
             ctx.request_update();
         });
 
