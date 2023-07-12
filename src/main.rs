@@ -88,7 +88,7 @@ fn main() {
         global_search_bar_input: String::new(),
         java: im::Vector::<String>::new()
     };
-    initial_state.java.append(Vector::from(vec!["114514".parse().unwrap()]));
+    initial_state.java.append(Vector::new());
 
     let root = build_root_widget();
     AppLauncher::with_window(main_window)

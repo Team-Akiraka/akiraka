@@ -4,7 +4,7 @@ use std::borrow::ToOwned;
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::ptr::null;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MouseButton, PaintCtx, Point, RenderContext, Size, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::{Affine, BoxConstraints, Color, commands, Data, Env, Event, EventCtx, FileDialogOptions, FileSpec, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MenuItem, MouseButton, PaintCtx, Point, RenderContext, Size, SysMods, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::keyboard_types::Key::Clear;
 use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
 use crate::{animations, AppState, Asset};
@@ -21,8 +21,8 @@ pub const ID: &str = "SETTINGS_PAGE";
 const ANIMATION_TIME: f64 = 0.3;
 static mut SELECTED: u64 = 0;
 
-
 const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
+static mut SCHEDULED_TASKS: Vec<Box<dyn Fn(&mut AppState, &Env)>> = Vec::new();
 
 pub struct IconClearButton {
     icon: Svg,
@@ -173,6 +173,12 @@ impl Widget<AppState> for PagedWidget<AppState> {
         //     ctx.request_anim_frame();
         // }
 
+        unsafe {
+            for x in SCHEDULED_TASKS.pop() {
+                x(data, env);
+            }
+        }
+
         let x = self.pages.get_mut(&self.current_id);
         if x.is_some() {
             x.unwrap().inner.event(ctx, event, data, env);
@@ -213,6 +219,7 @@ impl Widget<AppState> for PagedWidget<AppState> {
         //     self.t = 0.0;
         //     ctx.request_anim_frame();
         // }
+
         for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.update(ctx, data, env);
         }
@@ -272,13 +279,13 @@ impl Widget<AppState> for PagedWidget<AppState> {
     }
 }
 
-struct JavaInstance<T> {
+struct JavaInstance {
     name: String,
     path: String,
-    layout: WidgetPod<T, Box<dyn Widget<T>>>
+    layout: WidgetPod<String, Box<dyn Widget<String>>>
 }
 
-fn create<T: Data>(path: String) -> WidgetPod<T, Box<dyn Widget<T>>> {
+fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
     let name_layout = Flex::column()
         .with_child(Label::new(path.clone()).with_text_size(16.0).align_left())
         .with_child(Label::new(path.clone()).with_text_size(11.0).align_left())
@@ -292,10 +299,20 @@ fn create<T: Data>(path: String) -> WidgetPod<T, Box<dyn Widget<T>>> {
                 println!("Could not open directory!");
             }
         });
-    let path_moved = path.clone();
+    // let path_moved = path.clone();
     let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
         .fix_size(40.0, 40.0)
-        .on_click(|ctx, data, env| {
+        .on_click(|ctx, data: &mut String, env| {
+            unsafe {
+                let data_0: String = data.clone();
+                SCHEDULED_TASKS.push(Box::new(move |data_app: &mut AppState, env: &Env| {
+                    for i in 0..data_app.java.len() {
+                        if &data_app.java.get(i).unwrap().clone() == &data_0 {
+                            data_app.java.remove(i);
+                        }
+                    }
+                }));
+            }
             ctx.request_update();
         });
 
@@ -309,8 +326,8 @@ fn create<T: Data>(path: String) -> WidgetPod<T, Box<dyn Widget<T>>> {
     WidgetPod::new(Box::new(layout))
 }
 
-impl<T: Data> JavaInstance<T> {
-    pub fn new(path: String) -> JavaInstance<T> {
+impl JavaInstance {
+    pub fn new(path: String) -> JavaInstance {
         JavaInstance {
             name: path.clone(),
             path: path.clone(),
@@ -325,12 +342,12 @@ impl<T: Data> JavaInstance<T> {
     }
 }
 
-impl<T: Data> Widget<T> for JavaInstance<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+impl Widget<String> for JavaInstance {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut String, env: &Env) {
         self.layout.event(ctx, event, data, env);
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &String, env: &Env) {
         self.layout.lifecycle(ctx, event, data, env);
 
         if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
@@ -338,16 +355,16 @@ impl<T: Data> Widget<T> for JavaInstance<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &String, data: &String, env: &Env) {
         self.layout.update(ctx, data, env);
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &String, env: &Env) -> Size {
         self.layout.layout(ctx, bc, data, env);
         bc.min()
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &String, env: &Env) {
         let is_active = ctx.is_active() && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
         let size = ctx.size();
@@ -452,27 +469,39 @@ fn build_settings() -> impl Widget<AppState> {
         .align_left()
 }
 
+
 fn build_game() -> impl Widget<AppState> {
-    let list = List::new(|| {
+    let list = List::<String>::new(|| {
         JavaInstance::new(String::new().parse().unwrap())
-            .on_added(|widget, ctx, data, env| {
+            .on_added(|widget, ctx, data: &String, env| {
                 widget.init_data(String::from(data));
                 ctx.request_paint();
-            })
-            .on_click(|ctx, data, env| {
-                println!("{}", data);
             })
             .expand_width()
             .fix_height(56.0)
             .align_left()
     })
-        .with_spacing(8.0)
+        .with_spacing(0.0)
         .expand_width()
         .lens(AppState::java);
 
+    let open_cmd = commands::SHOW_OPEN_PANEL.with(
+        FileDialogOptions::new()
+            .default_type(FileSpec::new("java.exe", &["exe"]))
+            .allowed_types(vec![FileSpec::new("java.exe", &["exe"])])
+    );
+
+    let add_java = AddJava::<AppState>::new()
+        .expand_width()
+        .fix_height(56.0)
+        .align_left()
+        .on_click(|ctx, data, env| {
+            ctx.submit_command(open_cmd);
+        });
+
     let list_layout = Flex::column()
         .with_child(list)
-        .with_child(AddJava::new().expand_width().fix_height(56.0).align_left());
+        .with_child(add_java);
 
     let list_scroll = Scroll::new(list_layout)
         .vertical()
@@ -481,10 +510,7 @@ fn build_game() -> impl Widget<AppState> {
 
     let java = Flex::column()
         .with_child(list_scroll)
-        .with_spacer(12.0)
-        .with_child(ClearButton::new("Test").fix_height(28.0).align_left())
-
-        .with_spacer(4.0)
+        // .with_spacer(4.0)
         .padding(Insets::uniform_xy(12.0, 12.0))
         .background(theme::COLOR_BACKGROUND_LIGHT)
         .border(theme::COLOR_BORDER_DARK, 1.0)
