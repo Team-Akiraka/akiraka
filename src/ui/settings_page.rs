@@ -4,7 +4,7 @@ use std::borrow::ToOwned;
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::ptr::null;
-use druid::{Affine, BoxConstraints, Color, commands, Data, Env, Event, EventCtx, FileDialogOptions, FileSpec, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MenuItem, MouseButton, PaintCtx, Point, RenderContext, Size, SysMods, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::{Affine, BoxConstraints, Color, Command, commands, Data, Env, Event, EventCtx, FileDialogOptions, FileSpec, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MenuItem, MouseButton, PaintCtx, Point, RenderContext, Selector, Size, SysMods, Target, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
 use druid::keyboard_types::Key::Clear;
 use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
 use crate::{animations, AppState, Asset};
@@ -174,7 +174,7 @@ impl Widget<AppState> for PagedWidget<AppState> {
         // }
 
         unsafe {
-            for x in SCHEDULED_TASKS.pop() {
+            if let Some(x) = SCHEDULED_TASKS.pop() {
                 x(data, env);
             }
         }
@@ -307,8 +307,12 @@ fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
                 let data_0: String = data.clone();
                 SCHEDULED_TASKS.push(Box::new(move |data_app: &mut AppState, env: &Env| {
                     for i in 0..data_app.java.len() {
-                        if &data_app.java.get(i).unwrap().clone() == &data_0 {
-                            data_app.java.remove(i);
+                        let cache = &data_app.java.get(i);
+                        if cache.is_some() {
+                            let cache = cache.unwrap();
+                            if cache == &data_0 {
+                                data_app.java.remove(i);
+                            }
                         }
                     }
                 }));
@@ -469,7 +473,6 @@ fn build_settings() -> impl Widget<AppState> {
         .align_left()
 }
 
-
 fn build_game() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {
         JavaInstance::new(String::new().parse().unwrap())
@@ -485,18 +488,20 @@ fn build_game() -> impl Widget<AppState> {
         .expand_width()
         .lens(AppState::java);
 
-    let open_cmd = commands::SHOW_OPEN_PANEL.with(
-        FileDialogOptions::new()
-            .default_type(FileSpec::new("java.exe", &["exe"]))
-            .allowed_types(vec![FileSpec::new("java.exe", &["exe"])])
-    );
-
     let add_java = AddJava::<AppState>::new()
         .expand_width()
         .fix_height(56.0)
         .align_left()
         .on_click(|ctx, data, env| {
-            ctx.submit_command(open_cmd);
+            data.file_open_type = "JAVA_FILE_OPEN".parse().unwrap();
+            let cmd = commands::SHOW_OPEN_PANEL.with(
+                FileDialogOptions::new()
+                    .default_type(FileSpec::new("java.exe", &["exe"]))
+                    .allowed_types(vec![FileSpec::new("java.exe", &["exe"])])
+            )
+                .to(Target::Auto);
+            ctx.submit_command(cmd.clone());
+            println!("{:?}", cmd.target())
         });
 
     let list_layout = Flex::column()

@@ -9,7 +9,7 @@ mod animations;
 
 use std::ops::Add;
 use rust_embed::RustEmbed;
-use druid::{AppDelegate, AppLauncher, BoxConstraints, Data, DelegateCtx, Env, Event, EventCtx, im, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
+use druid::{AppDelegate, AppLauncher, BoxConstraints, Command, Data, DelegateCtx, Env, Event, EventCtx, Handled, im, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, Target, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
 use druid::im::Vector;
 use crate::ui::hello_page;
 use crate::widget::{paged_widget};
@@ -21,25 +21,40 @@ const WINDOW_TITLE: LocalizedString<AppState> = LocalizedString::new("Akiraka - 
 #[folder = "assets"]
 pub struct Asset;
 
-pub struct Delegate<T> {
-    page: WidgetPod<T, Box<dyn Widget<T>>>
+pub struct Delegate {
+    page: WidgetPod<AppState, Box<dyn Widget<AppState>>>
 }
 
-impl<T> Delegate<T> {
-    pub fn new(root: impl Widget<T> + 'static) -> Delegate<T> {
+impl Delegate {
+    pub fn new(root: impl Widget<AppState> + 'static) -> Delegate {
         Delegate {
             page: WidgetPod::new(Box::new(root))
         }
     }
 
-    pub fn switch_page(&mut self, page: impl Widget<T> + 'static) {
+    pub fn switch_page(&mut self, page: impl Widget<AppState> + 'static) {
         self.page = WidgetPod::new(Box::new(page));
     }
 }
 
-impl<T: Data> AppDelegate<T> for Delegate<T> {
-    fn event(&mut self, _ctx: &mut DelegateCtx, _window_id: WindowId, event: Event, _data: &mut T, _env: &Env) -> Option<Event> {
+impl AppDelegate<AppState> for Delegate {
+    fn event(&mut self, _ctx: &mut DelegateCtx, _window_id: WindowId, event: Event, _data: &mut AppState, _env: &Env) -> Option<Event> {
         Some(event)
+    }
+
+    fn command(&mut self, ctx: &mut DelegateCtx, target: Target, cmd: &Command, data: &mut AppState, env: &Env) -> Handled {
+        if let Some(file_info) = cmd.get(druid::commands::OPEN_FILE) {
+            if data.file_open_type == "JAVA_FILE_OPEN" {
+                let path = file_info.path.as_path();
+                data.java.push_back(path.to_str().unwrap().parse().unwrap());
+
+                Handled::Yes
+            } else {
+                Handled::No
+            }
+        } else {
+            Handled::No
+        }
     }
 }
 
@@ -68,7 +83,8 @@ impl<T: Data> Widget<T> for Empty {
 pub struct AppState {
     page_id: String,
     global_search_bar_input: String,
-    java: im::Vector<String>
+    java: im::Vector<String>,
+    file_open_type: String
 }
 
 pub static mut PAGE_ID: &str = hello_page::ID;
@@ -86,7 +102,8 @@ fn main() {
     let mut initial_state = AppState {
         page_id: String::new(),
         global_search_bar_input: String::new(),
-        java: im::Vector::<String>::new()
+        java: im::Vector::<String>::new(),
+        file_open_type: String::new()
     };
     initial_state.java.append(Vector::new());
 
