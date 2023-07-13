@@ -501,7 +501,6 @@ fn build_game() -> impl Widget<AppState> {
             )
                 .to(Target::Auto);
             ctx.submit_command(cmd.clone());
-            println!("{:?}", cmd.target())
         });
 
     let list_layout = Flex::column()
@@ -510,7 +509,6 @@ fn build_game() -> impl Widget<AppState> {
 
     let java = Flex::column()
         .with_child(list_layout)
-        // .with_spacer(4.0)
         .padding(Insets::uniform_xy(12.0, 12.0))
         .background(theme::COLOR_BACKGROUND_LIGHT)
         .border(theme::COLOR_BORDER_DARK, 1.0)
