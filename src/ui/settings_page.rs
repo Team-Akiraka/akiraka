@@ -287,8 +287,8 @@ struct JavaInstance {
 
 fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
     let name_layout = Flex::column()
-        .with_child(Label::new(path.clone()).with_text_size(16.0).align_left())
-        .with_child(Label::new(path.clone()).with_text_size(11.0).align_left())
+        .with_child(Label::new(path.clone()).with_text_size(16.0).align_left().expand_width())
+        .with_child(Label::new(path.clone()).with_text_size(11.0).align_left().expand_width())
         .align_left();
 
     let path_moved = path.clone();
@@ -299,7 +299,7 @@ fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
                 println!("Could not open directory!");
             }
         });
-    // let path_moved = path.clone();
+
     let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
         .fix_size(40.0, 40.0)
         .on_click(|ctx, data: &mut String, env| {
@@ -322,7 +322,7 @@ fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
 
     let layout = Flex::row()
         .with_child(Icon::new(std::str::from_utf8(&Asset::get("icon/java.svg").unwrap().data).unwrap().parse().unwrap()))
-        .with_flex_child(name_layout, FlexParams::new(1.0, CrossAxisAlignment::Start))
+        .with_flex_child(name_layout, FlexParams::new(1.0, CrossAxisAlignment::End))
         .with_child(open_button)
         .with_child(delete_button)
         .padding(Insets::uniform(6.0))
