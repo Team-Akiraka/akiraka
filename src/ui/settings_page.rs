@@ -508,13 +508,8 @@ fn build_game() -> impl Widget<AppState> {
         .with_child(list)
         .with_child(add_java);
 
-    let list_scroll = Scroll::new(list_layout)
-        .vertical()
-        // .fix_height(70.0)
-        .expand_width();
-
     let java = Flex::column()
-        .with_child(list_scroll)
+        .with_child(list_layout)
         // .with_spacer(4.0)
         .padding(Insets::uniform_xy(12.0, 12.0))
         .background(theme::COLOR_BACKGROUND_LIGHT)
@@ -527,9 +522,16 @@ fn build_game() -> impl Widget<AppState> {
         .with_child(Label::new(LocalizedString::new("Java Runtime")).with_text_size(14.0).align_left())
         .with_spacer(8.0)
         .with_child(java)
-        .padding(Insets::new(4.0, 4.0, 32.0, 4.0));
+        .padding(Insets::new(4.0, 4.0, 32.0, 4.0))
+        .align_vertical(UnitPoint::TOP)
+        .align_left();
 
-    body
+    let scroll = Scroll::new(body)
+        .vertical()
+        .expand()
+        .padding(Insets::new(0.0, 0.0, 0.0, 84.0));
+
+    scroll
         .align_vertical(UnitPoint::TOP)
         .align_left()
 }
