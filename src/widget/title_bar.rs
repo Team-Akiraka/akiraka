@@ -135,6 +135,8 @@ impl<T: Data> Widget<T> for TitleBarButton {
     }
 }
 
+pub static mut SEARCH_ALLOWED: bool = true;
+
 pub struct TitleBar<T> {
     height: f64,
     draggable_area: WidgetPod<T, Box<dyn Widget<T>>>,
@@ -182,7 +184,11 @@ impl<T: Data> Widget<T> for TitleBar<T> {
     fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
         self.exit_button.event(ctx, event, data, env);
         self.minimize_button.event(ctx, event, data, env);
-        self.search_bar.event(ctx, event, data, env);
+        unsafe {
+            if SEARCH_ALLOWED {
+                self.search_bar.event(ctx, event, data, env);
+            }
+        }
 
         if !(self.exit_button.is_hot() || self.minimize_button.is_hot() || self.search_bar.is_hot()) {
             self.draggable_area.event(ctx, event, data, env);
