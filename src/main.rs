@@ -31,10 +31,6 @@ impl Delegate {
             page: WidgetPod::new(Box::new(root))
         }
     }
-
-    pub fn switch_page(&mut self, page: impl Widget<AppState> + 'static) {
-        self.page = WidgetPod::new(Box::new(page));
-    }
 }
 
 impl AppDelegate<AppState> for Delegate {

@@ -510,7 +510,7 @@ fn build_game() -> impl Widget<AppState> {
 
     let list_scroll = Scroll::new(list_layout)
         .vertical()
-        .fix_height(70.0)
+        // .fix_height(70.0)
         .expand_width();
 
     let java = Flex::column()
