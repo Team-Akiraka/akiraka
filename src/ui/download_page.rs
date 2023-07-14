@@ -5,12 +5,12 @@ use crate::{AppState, Empty};
 pub const ID: &str = "DOWNLOAD_PAGE";
 
 fn build_selection(name: LocalizedString<AppState>) -> impl Widget<AppState> {
-    Empty {}
+    Label::new(name)
 }
 
 fn build_center() -> impl Widget<AppState> {
     let layout = Flex::row()
-        .with_child(build_selection());
+        .with_child(build_selection(LocalizedString::new("Minecraft")));
 
     layout
 }
