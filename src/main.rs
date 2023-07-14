@@ -34,7 +34,13 @@ impl Delegate {
 }
 
 impl AppDelegate<AppState> for Delegate {
-    fn event(&mut self, _ctx: &mut DelegateCtx, _window_id: WindowId, event: Event, _data: &mut AppState, _env: &Env) -> Option<Event> {
+    fn event(&mut self, _ctx: &mut DelegateCtx, _window_id: WindowId, event: Event, data: &mut AppState, _env: &Env) -> Option<Event> {
+        match event {
+            Event::WindowConnected => {
+                data.java.push_back("java.exe".parse().unwrap());
+            }
+            _ => {}
+        }
         Some(event)
     }
 

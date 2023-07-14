@@ -57,7 +57,7 @@ pub fn init(env: &mut Env) {
     env.set(COLOR_WINDOW_BACKGROUND, Color::rgba8(0xf3, 0xf3, 0xf3, 0xff));
     env.set(COLOR_WINDOW_BORDER, Color::rgba8(0x00, 0x00,0x00, 0x3f));
 
-    env.set(COLOR_PRIMARY_TITLE_BAR, Color::rgba8(0x94, 0xfc, 0xb2, 0x00));
+    env.set(COLOR_PRIMARY_TITLE_BAR, Color::rgba8(0x00, 0x7f, 0x00, 0x00));
     env.set(COLOR_PRIMARY_LIGHT, Color::rgba8(0x1d, 0x9b, 0x30, 0xff));
     env.set(COLOR_PRIMARY_DARK, Color::rgba8(0x18, 0x81, 0x28, 0xff));
 
