@@ -11,3 +11,4 @@ pub mod paged_widget;
 pub mod separator;
 pub mod side_bar_selection;
 pub mod icon;
+pub mod tabs;
