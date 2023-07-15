@@ -300,6 +300,7 @@ fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
             }
         });
 
+    // let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
     let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
         .fix_size(40.0, 40.0)
         .on_click(|ctx, data: &mut String, env| {
@@ -453,6 +454,68 @@ impl<T: Data> Widget<T> for AddJava<T> {
     }
 }
 
+struct InstallJava<T> {
+    layout: WidgetPod<T, Box<dyn Widget<T>>>
+}
+
+impl<T: Data> InstallJava<T> {
+    pub fn new() -> InstallJava<T> {
+        let layout = Flex::row()
+            .with_child(Icon::new(std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse().unwrap()))
+            .with_flex_child(Label::new(LocalizedString::new("Install Java Instance")).align_left(), FlexParams::new(1.0, CrossAxisAlignment::Start))
+            .align_left()
+            .padding(Insets::uniform(6.0));
+
+        InstallJava {
+            layout: WidgetPod::new(Box::new(layout))
+        }
+    }
+}
+
+impl<T: Data> Widget<T> for InstallJava<T> {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        self.layout.event(ctx, event, data, env);
+    }
+
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.layout.lifecycle(ctx, event, data, env);
+
+        if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
+            ctx.request_paint();
+        }
+    }
+
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.layout.update(ctx, data, env);
+    }
+
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        self.layout.layout(ctx, bc, data, env)
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        let is_active = ctx.is_active() && !ctx.is_disabled();
+        let is_hot = ctx.is_hot();
+        let size = ctx.size();
+        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+        let rect = ctx.size().to_rect().to_rounded_rect(12.0);
+
+        if is_hot {
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+        } else {
+            ctx.fill(rect, &Color::TRANSPARENT);
+        }
+
+        if is_hot {
+            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
+        } else {
+            ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
+        }
+
+        self.layout.paint(ctx, data, env);
+    }
+}
+
 fn build_settings() -> impl Widget<AppState> {
     let game = Flex::column()
         .padding(Insets::uniform_xy(12.0, 12.0))
@@ -503,9 +566,15 @@ fn build_game() -> impl Widget<AppState> {
             ctx.submit_command(cmd.clone());
         });
 
+    let install_java = InstallJava::<AppState>::new()
+        .expand_width()
+        .fix_height(56.0)
+        .align_left();
+
     let list_layout = Flex::column()
         .with_child(list)
-        .with_child(add_java);
+        .with_child(add_java)
+        .with_child(install_java);
 
     let java = Flex::column()
         .with_child(list_layout)

@@ -148,13 +148,13 @@ pub struct TitleBar<T> {
 #[allow(unused_variables)]
 impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_input, TextBox<String>>: Widget<T> {
     pub fn new(height: f64) -> Self {
-        let svg = std::str::from_utf8(&Asset::get("icon/close.svg").unwrap().data).unwrap().parse::<String>().unwrap();
+        let svg = std::str::from_utf8(&Asset::get("icon/title_bar/close.svg").unwrap().data).unwrap().parse::<String>().unwrap();
         let exit_button = TitleBarButton::new(height, svg.clone())
             .on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().close();
             });
 
-        let svg = std::str::from_utf8(&Asset::get("icon/minimize.svg").unwrap().data).unwrap().parse::<String>().unwrap();
+        let svg = std::str::from_utf8(&Asset::get("icon/title_bar/minimize.svg").unwrap().data).unwrap().parse::<String>().unwrap();
         let minimize_button = TitleBarButton::new(height, svg.clone())
             .on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().set_window_state(WindowState::Minimized);
