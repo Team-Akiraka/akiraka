@@ -11,8 +11,8 @@ fn build_selection(name: LocalizedString<AppState>) -> impl Widget<AppState> {
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_child("114514", Label::new("1145141919810"))
-        .with_selected("114514");
+        .with_child("114514".parse().unwrap(), Label::new("1145141919810"))
+        .with_selected("114514".parse().unwrap());
 
     tabs
 }
