@@ -1,6 +1,7 @@
 use druid::{Data, Insets, LocalizedString, UnitPoint, Widget, WidgetExt};
-use druid::widget::{Axis, Flex, Label, Tabs, TabsTransition};
+use druid::widget::{Axis, Flex, Label};
 use crate::{AppState, Empty};
+use crate::widget::tabs::Tabs;
 
 pub const ID: &str = "DOWNLOAD_PAGE";
 
@@ -10,24 +11,10 @@ fn build_selection(name: LocalizedString<AppState>) -> impl Widget<AppState> {
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_transition(TabsTransition::Instant)
-        .with_axis(Axis::Horizontal)
-        .with_tab("114514", Label::new("114514"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .with_tab("1412", Label::new("123413123"))
-        .expand_width();
-    // let layout = Flex::row()
-        // .with_child(build_selection(LocalizedString::new("Minecraft")));
+        .with_child("114514", Label::new("1145141919810"))
+        .with_selected("114514");
 
     tabs
-    // tabs.expand_width()
 }
 
 pub fn build() -> impl Widget<AppState> {
