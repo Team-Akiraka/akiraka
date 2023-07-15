@@ -237,9 +237,7 @@ impl Widget<AppState> for PagedWidget<AppState> {
                 bc.max().height)
         );
 
-        let x = self.pages.get_mut(&self.current_id);
-        if x.is_some() {
-            let x = x.unwrap().widget_mut().unwrap();
+        for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.layout(ctx, &child_bc, data, env);
         }
 
