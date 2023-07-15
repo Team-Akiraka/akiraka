@@ -9,7 +9,7 @@ mod animations;
 
 use std::ops::Add;
 use rust_embed::RustEmbed;
-use druid::{AppDelegate, AppLauncher, BoxConstraints, Command, Data, DelegateCtx, Env, Event, EventCtx, Handled, im, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, Target, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
+use druid::{AppDelegate, AppLauncher, BoxConstraints, Command, Data, DelegateCtx, Env, Event, EventCtx, Handled, LayoutCtx, Lens, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Screen, Size, Target, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState};
 use druid::im::Vector;
 use crate::ui::hello_page;
 use crate::widget::{paged_widget};
@@ -44,7 +44,7 @@ impl AppDelegate<AppState> for Delegate {
         Some(event)
     }
 
-    fn command(&mut self, ctx: &mut DelegateCtx, target: Target, cmd: &Command, data: &mut AppState, env: &Env) -> Handled {
+    fn command(&mut self, _ctx: &mut DelegateCtx, _target: Target, cmd: &Command, data: &mut AppState, _env: &Env) -> Handled {
         if let Some(file_info) = cmd.get(druid::commands::OPEN_FILE) {
             if data.file_open_type == "JAVA_FILE_OPEN" {
                 let path = file_info.path.as_path();
@@ -85,7 +85,7 @@ impl<T: Data> Widget<T> for Empty {
 pub struct AppState {
     page_id: String,
     global_search_bar_input: String,
-    java: im::Vector<String>,
+    java: Vector<String>,
     file_open_type: String
 }
 
@@ -104,7 +104,7 @@ fn main() {
     let mut initial_state = AppState {
         page_id: String::new(),
         global_search_bar_input: String::new(),
-        java: im::Vector::<String>::new(),
+        java: Vector::<String>::new(),
         file_open_type: String::new()
     };
     initial_state.java.append(Vector::new());
