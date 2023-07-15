@@ -82,7 +82,7 @@ pub struct Tabs<T> {
     children: HashMap<String, Child<T>>,
     selected: String,
     inner_size: Size,
-    buttons: Vec<WidgetPod<T, Box<dyn Widget<T>>>>
+    buttons: HashMap<String, Child<T>>
 }
 
 impl<T: Data> Tabs<T> {
@@ -91,19 +91,19 @@ impl<T: Data> Tabs<T> {
             children: HashMap::new(),
             selected: String::new(),
             inner_size: Size::ZERO,
-            buttons: Vec::new()
+            buttons: HashMap::new()
         }
     }
 
     pub fn with_child(mut self, name: String, body: impl Widget<T> + 'static) -> Tabs<T> {
         self.children.insert(name.clone(), Child::new(body));
 
-        let button = SelectionButton::new(name.clone())
-            .fix_width(128.0)
-            .on_click(|ctx, data, env| {
-                println!("114514");
-            });
-        self.buttons.push(WidgetPod::new(Box::new(button)));
+        // let button = SelectionButton::new(name.clone())
+        //     .fix_width(128.0)
+        //     .on_click(|ctx, data, env| {
+        //         println!("114514");
+        //     });
+        // self.buttons.insert(name.clone(), Child::new(button));
 
         self
     }
@@ -122,9 +122,9 @@ impl<T: Data> Widget<T> for Tabs<T> {
             x.event(ctx, event, data, env);
         }
 
-        for x in self.buttons.iter_mut() {
-            x.event(ctx, event, data, env);
-        }
+        // for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
+        //     x.event(ctx, event, data, env);
+        // }
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
@@ -132,9 +132,9 @@ impl<T: Data> Widget<T> for Tabs<T> {
             x.lifecycle(ctx, event, data, env);
         }
 
-        for x in self.buttons.iter_mut() {
-            x.lifecycle(ctx, event, data, env);
-        }
+        // for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
+        //     x.lifecycle(ctx, event, data, env);
+        // }
     }
 
     fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
@@ -144,9 +144,9 @@ impl<T: Data> Widget<T> for Tabs<T> {
             x.update(ctx, data, env);
         }
 
-        for x in self.buttons.iter_mut() {
-            x.update(ctx, data, env);
-        }
+        // for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
+        //     x.update(ctx, data, env);
+        // }
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
@@ -158,9 +158,9 @@ impl<T: Data> Widget<T> for Tabs<T> {
             x.layout(ctx, &child_bc, data, env);
         }
 
-        for x in self.buttons.iter_mut() {
-            x.layout(ctx, bc, data, env);
-        }
+        // for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
+        //     x.layout(ctx, bc, data, env);
+        // }
 
         self.inner_size = bc.shrink_max_height_to(bc.max().height - 24.0).max();
         self.inner_size
@@ -173,8 +173,8 @@ impl<T: Data> Widget<T> for Tabs<T> {
             x.paint(ctx, data, env);
         }
 
-        for x in self.buttons.iter_mut() {
-            x.paint(ctx, data, env);
-        }
+        // for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
+        //     x.paint(ctx, data, env);
+        // }
     }
 }

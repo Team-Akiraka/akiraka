@@ -128,32 +128,5 @@ fn build_empty_widget() -> impl Widget<AppState> {
 
 #[allow(unused_variables)]
 fn build_root_widget() -> impl Widget<AppState> {
-    // fn test<T: Widget<AppState>>(_: impl Fn() -> T) {
-    // }
-    //
-    // let x = build_empty_widget;
-    // // test(build_empty_widget);
-    // test(|| {
-    //     Empty {
-    //     }
-    // });
-
-    // let label = Label::new(|data: &AppState, env: &Env| format!("Hello {}!", data.global_search_bar_input));
-
-    // let text_box = TextBox::new()
-    //     .with_placeholder("Who are we greeting?")
-    //     .fix_width(TEXT_BOX_WIDTH)
-    //     .lens(AppState::name);
-
-    // let layout = Flex::column()
-    //     .with_child(main_page::build());
-    // .with_spacer(VERTICAL_WIDGET_SPACING)
-    // .with_child(label)
-    // .with_child(text_box);
-    // .with_spacer(window::TITLE_BAR_HEIGHT);
-    // .expand();
-
-    // layout
-    // .center()
     hello_page::build()
 }

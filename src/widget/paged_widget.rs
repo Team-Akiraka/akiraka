@@ -111,10 +111,14 @@ impl Widget<AppState> for PagedWidget<AppState> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
-        let x = self.children.get_mut(&self.current_id);
-        if x.is_some() {
-            bc.constrain(x.unwrap().inner.layout(ctx, bc, data, env));
+        // let x = self.children.get_mut(&self.current_id);
+        // if x.is_some() {
+        //     bc.constrain(x.unwrap().inner.layout(ctx, bc, data, env));
+        // }
+        for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
+            bc.constrain(x.layout(ctx, bc, data, env));
         }
+
         self.inner_size = bc.max();
         self.inner_size
     }

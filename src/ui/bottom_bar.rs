@@ -236,9 +236,14 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             ctx.window().request_anim_frame();
         }
 
-        let x = self.pages.get_mut(&self.current_id);
-        if x.is_some() {
-            let x = x.unwrap().widget_mut().unwrap();
+        // let x = self.pages.get_mut(&self.current_id);
+        // if x.is_some() {
+        //     let x = x.unwrap().widget_mut().unwrap();
+        //     x.set_origin(ctx, Point::new(0.0, self.last_height));
+        //     x.layout(ctx, bc, data, env);
+        // }
+
+        for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
             x.set_origin(ctx, Point::new(0.0, self.last_height));
             x.layout(ctx, bc, data, env);
         }
