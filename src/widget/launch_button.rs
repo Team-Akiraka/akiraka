@@ -97,17 +97,17 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
             .to_rounded_rect(env.get(theme::BUTTON_BORDER_RADIUS));
 
         let bg_gradient = if is_active {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_ACTIVE)
+            env.get(crate::theme::theme::COLOR_BUTTON_ACTIVE)
         } else if is_hot {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_HOT)
+            env.get(crate::theme::theme::COLOR_BUTTON_HOT)
         } else {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON)
         };
 
         let border_color = if is_active {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_ACTIVE)
+            env.get(crate::theme::theme::COLOR_BUTTON_BORDER_ACTIVE)
         } else if is_hot {
-            env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER_HOT)
+            env.get(crate::theme::theme::COLOR_BUTTON_BORDER_HOT)
         } else {
             env.get(crate::theme::theme::COLOR_CLEAR_BUTTON_BORDER)
         };

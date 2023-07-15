@@ -219,15 +219,15 @@ impl Widget<AppState> for PagedWidget<AppState> {
         //     self.t = 0.0;
         //     ctx.request_anim_frame();
         // }
-
-        for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
+        let x = self.pages.get_mut(&self.current_id);
+        if x.is_some() {
+            let x = x.unwrap().widget_mut().unwrap();
             x.update(ctx, data, env);
         }
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         let w = ctx.window().get_size().width - self.offset;
-        // let h = ctx.window().get_size().height;
         let child_bc = BoxConstraints::new(
             Size::new(
                 if bc.min().width > w { w } else { bc.min().width },
@@ -237,7 +237,9 @@ impl Widget<AppState> for PagedWidget<AppState> {
                 bc.max().height)
         );
 
-        for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
+        let x = self.pages.get_mut(&self.current_id);
+        if x.is_some() {
+            let x = x.unwrap().widget_mut().unwrap();
             x.layout(ctx, &child_bc, data, env);
         }
 
@@ -300,7 +302,6 @@ fn create(path: String) -> WidgetPod<String, Box<dyn Widget<String>>> {
             }
         });
 
-    // let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
     let delete_button = IconClearButton::new(std::str::from_utf8(&Asset::get("icon/trash.svg").unwrap().data).unwrap().parse().unwrap())
         .fix_size(40.0, 40.0)
         .on_click(|ctx, data: &mut String, env| {
@@ -382,11 +383,11 @@ impl Widget<String> for JavaInstance {
             ctx.fill(rect, &Color::TRANSPARENT);
         }
 
-        if is_hot {
-            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
-        } else {
-            ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
-        }
+        // if is_hot {
+        //     ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
+        // } else {
+        //     ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
+        // }
 
         self.layout.paint(ctx, data, env);
     }
@@ -444,11 +445,11 @@ impl<T: Data> Widget<T> for AddJava<T> {
             ctx.fill(rect, &Color::TRANSPARENT);
         }
 
-        if is_hot {
-            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
-        } else {
-            ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
-        }
+        // if is_hot {
+        //     ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
+        // } else {
+        //     ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
+        // }
 
         self.layout.paint(ctx, data, env);
     }
@@ -506,11 +507,11 @@ impl<T: Data> Widget<T> for InstallJava<T> {
             ctx.fill(rect, &Color::TRANSPARENT);
         }
 
-        if is_hot {
-            ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
-        } else {
-            ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
-        }
+        // if is_hot {
+        //     ctx.stroke(rect, &env.get(theme::COLOR_CLEAR_BUTTON_BORDER_HOT), stroke_width);
+        // } else {
+        //     ctx.stroke(rect, &Color::TRANSPARENT, stroke_width);
+        // }
 
         self.layout.paint(ctx, data, env);
     }

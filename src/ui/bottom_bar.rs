@@ -223,7 +223,9 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             self.t = 0.0;
             ctx.window().request_anim_frame();
         }
-        for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
+        let x = self.pages.get_mut(&self.current_id);
+        if x.is_some() {
+            let x = x.unwrap().widget_mut().unwrap();
             x.update(ctx, data, env);
         }
     }
@@ -234,12 +236,13 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
             ctx.window().request_anim_frame();
         }
 
-        // let h = self.pages.get_mut(&self.current_id);
-        for x in self.pages.values_mut().filter_map(|x| x.widget_mut()) {
-            // let h = h.unwrap().height;
+        let x = self.pages.get_mut(&self.current_id);
+        if x.is_some() {
+            let x = x.unwrap().widget_mut().unwrap();
             x.set_origin(ctx, Point::new(0.0, self.last_height));
             x.layout(ctx, bc, data, env);
         }
+
         let size = Size::new(if bc.min().width > ctx.window().get_size().width {
             ctx.window().get_size().width
         } else {
