@@ -74,7 +74,7 @@ impl<T: Data> Widget<T> for SelectionButton<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        self.paint(ctx, data, env);
+        self.label.paint(ctx, data, env);
     }
 }
 
@@ -97,7 +97,7 @@ impl<T: Data> Tabs<T> {
 
     pub fn with_child(mut self, name: String, body: impl Widget<T> + 'static) -> Tabs<T> {
         self.children.insert(name.clone(), Child::new(body));
-        self.tabs.push(Child::new(Label::new(name.clone())));
+        self.tabs.push(Child::new(SelectionButton::new(name.clone())));
         self
     }
 
