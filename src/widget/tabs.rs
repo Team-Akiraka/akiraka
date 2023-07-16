@@ -263,7 +263,7 @@ impl<T: Data> Widget<T> for Tabs<T> {
             if i == j {
                 // println!("id: {:?}", x.0.inner.id());
                 // println!("{j}");
-                // I didn't figured out how it works, so plz don't change anything
+                // I didn't figure out how it works, so plz don't change anything
                 let offset = (len - j - 1) as f64 * 104.0;
                 let rect = Rect::new(12.0 + offset, 30.0, 84.0 + offset, 32.0)
                     .to_rounded_rect(2.0);
