@@ -11,22 +11,28 @@ fn build_selection(name: LocalizedString<AppState>) -> impl Widget<AppState> {
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_child("114514".parse().unwrap(), Label::new("1145141919810"))
-        .with_selected("114514".parse().unwrap());
+        .with_child("Minecraft".parse().unwrap(), Label::new("Minecraft"))
+        .with_child("Resources".parse().unwrap(), Label::new("Resources"))
+        // .with_child("3".parse().unwrap(), Label::new("1145141919810"))
+        // .with_child("4".parse().unwrap(), Label::new("1145141919810"))
+        // .with_child("5".parse().unwrap(), Label::new("1145141919810"))
+        // .with_child("6".parse().unwrap(), Label::new("1145141919810"))
+        .with_selected("Minecraft".parse().unwrap())
+        .padding(Insets::uniform(8.0));
 
     tabs
 }
 
 pub fn build() -> impl Widget<AppState> {
-    let title = Label::new("Download")
-        .with_text_size(24.0)
-        .fix_width(32.0)
-        .expand_width()
-        .padding(Insets::uniform_xy(16.0, 4.0));
+    // let title = Label::new("Download")
+    //     .with_text_size(24.0)
+    //     .fix_width(32.0)
+    //     .expand_width()
+    //     .padding(Insets::uniform_xy(16.0, 4.0));
 
     let body = Flex::column()
-        .with_child(title)
-        .with_spacer(4.0)
+        // .with_child(title)
+        // .with_spacer(4.0)
         .with_child(build_center())
         .fix_width(160.0)
         .padding(Insets::uniform_xy(0.0, 0.0));
