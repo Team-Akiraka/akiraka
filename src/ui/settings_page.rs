@@ -1,19 +1,10 @@
-#[allow(dead_code)]
-
-use std::borrow::ToOwned;
 use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::ptr::null;
-use druid::{Affine, BoxConstraints, Color, Command, commands, Data, Env, Event, EventCtx, FileDialogOptions, FileSpec, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, LocalizedString, Menu, MenuItem, MouseButton, PaintCtx, Point, RenderContext, Selector, Size, SysMods, Target, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::keyboard_types::Key::Clear;
-use druid::widget::{Axis, CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
+use druid::{Affine, BoxConstraints, Color, commands, Data, Env, Event, EventCtx, FileDialogOptions, FileSpec, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, RenderContext, Size, Target, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
+use druid::widget::{CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
 use crate::{animations, AppState, Asset};
 use crate::theme::theme;
 use crate::util::color_as_hex_string;
-use crate::widget::button::Button;
-use crate::widget::clear_button::ClearButton;
 use crate::widget::icon::Icon;
-use crate::widget::separator::Separator;
 use crate::widget::side_bar_selection::SideBarSelection;
 
 pub const ID: &str = "SETTINGS_PAGE";
@@ -369,10 +360,10 @@ impl Widget<String> for JavaInstance {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &String, env: &Env) {
-        let is_active = ctx.is_active() && !ctx.is_disabled();
+        // let is_active = ctx.is_active() && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
-        let size = ctx.size();
-        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+        // let size = ctx.size();
+        // let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
@@ -422,7 +413,7 @@ impl<T: Data> Widget<T> for AddJava<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
         self.layout.update(ctx, data, env);
     }
 
@@ -431,10 +422,10 @@ impl<T: Data> Widget<T> for AddJava<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        let is_active = ctx.is_active() && !ctx.is_disabled();
+        // let is_active = ctx.is_active() && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
-        let size = ctx.size();
-        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+        // let size = ctx.size();
+        // let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
@@ -484,7 +475,7 @@ impl<T: Data> Widget<T> for InstallJava<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
         self.layout.update(ctx, data, env);
     }
 
@@ -493,10 +484,10 @@ impl<T: Data> Widget<T> for InstallJava<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        let is_active = ctx.is_active() && !ctx.is_disabled();
+        // let is_active = ctx.is_active() && !ctx.is_disabled();
         let is_hot = ctx.is_hot();
-        let size = ctx.size();
-        let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
+        // let size = ctx.size();
+        // let stroke_width = env.get(druid::theme::BUTTON_BORDER_WIDTH);
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
@@ -584,7 +575,7 @@ fn build_game() -> impl Widget<AppState> {
         .expand_width()
         .align_left();
 
-    let mut body = Flex::column()
+    let body = Flex::column()
         .with_child(Label::new(LocalizedString::new("Java Runtime")).with_text_size(14.0).align_left())
         .with_spacer(8.0)
         .with_child(java)

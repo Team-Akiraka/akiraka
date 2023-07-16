@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, Rect, RenderContext, Size, theme, UpdateCtx, Widget, WidgetExt, WidgetPod};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, Rect, RenderContext, Size, theme, UpdateCtx, Widget, WidgetExt, WidgetPod};
 use druid::widget::Label;
 
 pub struct Child<T> {
@@ -178,7 +178,7 @@ impl<T: Data> Widget<T> for Tabs<T> {
 
         let mut i = 0;
         for x in self.tabs.iter_mut() {
-            &x.0.widget_mut().unwrap().event(ctx, event, data, env);
+            x.0.widget_mut().unwrap().event(ctx, event, data, env);
             match event {
                 Event::MouseUp(_) => {
                     if x.0.inner.is_hot() {

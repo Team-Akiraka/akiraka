@@ -1,7 +1,5 @@
 use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
-use druid::piet::ImageFormat;
-use druid::platform_menus::common::undo;
+use druid::{Affine, BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use crate::ui::{download_page, hello_page, instances_page, settings_page};
 use crate::{animations, AppState};
 
@@ -130,7 +128,7 @@ impl Widget<AppState> for PagedWidget<AppState> {
             } else {
                 1.0
             };
-            let s0 = s.clone();
+            // let s0 = s.clone();
             let s = s / 4.0 + 0.75;
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
