@@ -528,7 +528,7 @@ fn build_settings() -> impl Widget<AppState> {
 
 fn build_game() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {
-        JavaInstance::new(String::new().parse().unwrap())
+        JavaInstance::new(String::new())
             .on_added(|widget, ctx, data: &String, env| {
                 widget.init_data(String::from(data));
                 ctx.request_paint();

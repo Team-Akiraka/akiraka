@@ -102,12 +102,15 @@ fn main() {
         .set_window_state(WindowState::Restored)
         .show_titlebar(false);
 
+    let mut x = Vector::<String>::new();
+    x.push_back("114514".parse().unwrap());
+
     let mut initial_state = AppState {
         page_id: String::new(),
         global_search_bar_input: String::new(),
         java: Vector::<String>::new(),
         file_open_type: String::new(),
-        minecraft_versions: Vector::<String>::new()
+        minecraft_versions: x
     };
     initial_state.java.append(Vector::new());
 

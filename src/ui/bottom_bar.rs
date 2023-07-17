@@ -324,9 +324,7 @@ pub fn build_main() -> impl Widget<AppState> {
             SELECTED = 1;
             crate::PAGE_ID = download_page::ID;
             data.minecraft_versions.push_back("114514".parse().unwrap());
-            ctx.request_update();
-            ctx.request_layout();
-            ctx.request_paint();
+            println!("{:?}", data.minecraft_versions);
         }
         ctx.request_anim_frame();
     });
@@ -403,9 +401,11 @@ pub fn build_nav() -> impl Widget<AppState> {
         download_page::ID.parse().unwrap()
     );
 
-    let download_button = download_button.on_click(|ctx, _data, _env| {
+    let download_button = download_button.on_click(|ctx, data, _env| {
         unsafe {
             crate::PAGE_ID = download_page::ID;
+            data.minecraft_versions.push_back("1145141919810".parse().unwrap());
+            println!("{:?}", data.minecraft_versions);
         }
         ctx.request_anim_frame();
     });
