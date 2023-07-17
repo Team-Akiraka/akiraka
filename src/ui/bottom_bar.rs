@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ops::{Deref, DerefMut};
 use std::thread;
 use std::thread::Thread;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
@@ -318,13 +319,14 @@ pub fn build_main() -> impl Widget<AppState> {
         // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
         // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
-    let download_button = download_button.on_click(|ctx, _data, _env| {
+    let download_button = download_button.on_click(|ctx, data: &mut AppState, _env| {
         unsafe {
             SELECTED = 1;
             crate::PAGE_ID = download_page::ID;
-            // thread::spawn(move || {
-            //     // data
-            // })
+            data.minecraft_versions.push_back("114514".parse().unwrap());
+            ctx.request_update();
+            ctx.request_layout();
+            ctx.request_paint();
         }
         ctx.request_anim_frame();
     });

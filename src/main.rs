@@ -122,7 +122,6 @@ fn main() {
         .expect("Failed to launch application");
 }
 
-
 fn build_empty_widget() -> impl Widget<AppState> {
     Empty {
     }

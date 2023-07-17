@@ -49,14 +49,14 @@ fn build_minecraft() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {
         Label::new("")
             .on_added(|widget, ctx, data: &String, env| {
+                println!("{data}");
                 widget.set_text(data.clone());
+                ctx.request_paint();
             })
     })
         .with_spacing(0.0)
         .expand_width()
-        .lens(AppState::minecraft_versions)
-        .on_added(|widget, ctx, data, env| {
-        });
+        .lens(AppState::minecraft_versions);
 
     let layout = Flex::column()
         .with_child(list);
