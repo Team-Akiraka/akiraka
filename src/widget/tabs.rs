@@ -185,7 +185,7 @@ impl<T: Data> Widget<T> for Tabs<T> {
                         // println!("{i}");
                         // println!("{}", self.tabs.get(i).unwrap().0);
                         let x = &x.1;
-                        self.selected = x.clone();
+                        self.selected = String::from(x.clone());
                         ctx.request_anim_frame();
                     }
                 }

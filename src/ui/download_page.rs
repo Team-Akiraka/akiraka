@@ -1,17 +1,33 @@
 use druid::{Data, Insets, LocalizedString, UnitPoint, Widget, WidgetExt};
-use druid::widget::{Axis, Flex, Label};
+use druid::widget::{Axis, Flex, Label, List};
 use crate::{AppState, Empty};
 use crate::widget::tabs::Tabs;
 
 pub const ID: &str = "DOWNLOAD_PAGE";
 
-fn build_selection(name: LocalizedString<AppState>) -> impl Widget<AppState> {
-    Label::new(name)
+fn build_minecraft() -> impl Widget<AppState> {
+    let list = List::<String>::new(|| {
+        Label::new("")
+            .on_added(|widget, ctx, data: &String, env| {
+                widget.set_text(data.clone());
+            })
+    })
+        .with_spacing(0.0)
+        .expand_width()
+        .lens(AppState::minecraft_versions)
+        .on_added(|widget, ctx, data, env| {
+        });
+
+    let layout = Flex::column()
+        .with_child(list);
+
+    layout
+        .padding(Insets::uniform(8.0))
 }
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_child("Minecraft".parse().unwrap(), Label::new("Minecraft"))
+        .with_child("Minecraft".parse().unwrap(), build_minecraft())
         .with_child("Resources".parse().unwrap(), Label::new("Resources"))
         // .with_child("3".parse().unwrap(), Label::new("1145141919810"))
         // .with_child("4".parse().unwrap(), Label::new("1145141919810"))

@@ -86,7 +86,8 @@ pub struct AppState {
     page_id: String,
     global_search_bar_input: String,
     java: Vector<String>,
-    file_open_type: String
+    file_open_type: String,
+    minecraft_versions: Vector<String>
 }
 
 pub static mut PAGE_ID: &str = hello_page::ID;
@@ -105,7 +106,8 @@ fn main() {
         page_id: String::new(),
         global_search_bar_input: String::new(),
         java: Vector::<String>::new(),
-        file_open_type: String::new()
+        file_open_type: String::new(),
+        minecraft_versions: Vector::<String>::new()
     };
     initial_state.java.append(Vector::new());
 
