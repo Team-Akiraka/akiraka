@@ -1,9 +1,49 @@
-use druid::{Data, Insets, LocalizedString, UnitPoint, Widget, WidgetExt};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod};
 use druid::widget::{Axis, Flex, Label, List};
 use crate::{AppState, Empty};
 use crate::widget::tabs::Tabs;
 
 pub const ID: &str = "DOWNLOAD_PAGE";
+pub static mut IS_LOADING: bool = false;
+
+struct GameInstance<T> {
+    version_name: String,
+    version_type: String,
+    layout: WidgetPod<T, Box<dyn Widget<T>>>
+}
+
+impl<T: Data> GameInstance<T> {
+    pub fn new(version_name: String, version_type: String) -> GameInstance<T> {
+        let layout = Flex::row();
+        GameInstance {
+            version_name,
+            version_type,
+            layout: WidgetPod::new(Box::new(layout))
+        }
+    }
+}
+
+impl<T: Data> Widget<T> for GameInstance<T> {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+        self.layout.event(ctx, event, data, env);
+    }
+
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        self.layout.lifecycle(ctx, event, data, env);
+    }
+
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+        self.layout.update(ctx, data, env);
+    }
+
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+        self.layout.layout(ctx, bc, data, env)
+    }
+
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        self.layout.paint(ctx, data, env);
+    }
+}
 
 fn build_minecraft() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {

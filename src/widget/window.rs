@@ -9,50 +9,50 @@ use crate::widget::title_bar::TitleBar;
 
 pub const TITLE_BAR_HEIGHT: f64 = 44.0;
 
-struct Overlay<T> {
-    child: WidgetPod<T, Box<dyn Widget<T>>>
+struct Overlay {
+    child: WidgetPod<AppState, Box<dyn Widget<AppState>>>
 }
 
-impl<T: Data> Overlay<T> {
-    fn new() -> Overlay<T> {
+impl Overlay {
+    fn new() -> Overlay {
         Overlay {
             child: WidgetPod::new(Box::new(Empty {}))
         }
     }
 }
 
-impl<T: Data> Widget<T> for Overlay<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+impl Widget<AppState> for Overlay {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env) {
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, env: &Env) {
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         ctx.window().get_size()
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
         let rect = ctx.size().to_rect();
         ctx.fill(rect, &Color::rgba8(0, 0, 0, 127));
     }
 }
 
-pub struct WindowWidget<T> {
-    title_bar: WidgetPod<T, Box<dyn Widget<T>>>,
-    inner: WidgetPod<T, Box<dyn Widget<T>>>,
-    bottom_bar: WidgetPod<T, Box<dyn Widget<T>>>,
+pub struct WindowWidget {
+    title_bar: WidgetPod<AppState, Box<dyn Widget<AppState>>>,
+    inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>,
+    bottom_bar: WidgetPod<AppState, Box<dyn Widget<AppState>>>,
     is_overlay_showing: bool,
-    overlay: WidgetPod<T, Box<dyn Widget<T>>>
+    overlay: WidgetPod<AppState, Box<dyn Widget<AppState>>>
 }
 
-impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
-    pub fn new(inner: impl Widget<T> + 'static) -> Self {
+impl WindowWidget {
+    pub fn new(inner: impl Widget<AppState> + 'static) -> Self {
         let bottom_bar = bottom_bar::build();
-        let inner = WidgetPod::<T, Box<dyn Widget<T>>>::new(Box::new(inner));
+        let inner = WidgetPod::<AppState, Box<dyn Widget<AppState>>>::new(Box::new(inner));
         Self {
             title_bar: WidgetPod::new(Box::new(TitleBar::new(TITLE_BAR_HEIGHT))),
             inner,
@@ -63,14 +63,14 @@ impl<T: Data> WindowWidget<T> where TitleBar<AppState>: Widget<T> {
     }
 
 
-    pub fn set_inner(&mut self, inner: impl Widget<T> + 'static) {
+    pub fn set_inner(&mut self, inner: impl Widget<AppState> + 'static) {
         self.inner = WidgetPod::new(Box::new(inner));
     }
 }
 
 #[allow(unused_variables)]
-impl<T: Data> Widget<T> for WindowWidget<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+impl Widget<AppState> for WindowWidget {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env) {
         match event {
             Event::WindowConnected => {
                 // TODO: Multiplatform
@@ -132,7 +132,7 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
         unsafe { crate::widget::title_bar::SEARCH_ALLOWED = !self.is_overlay_showing; }
         self.title_bar.lifecycle(ctx, event, data, env);
         self.inner.lifecycle(ctx, event, data, env);
@@ -140,14 +140,14 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
         self.overlay.lifecycle(ctx, event, data, env);
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, env: &Env) {
         self.title_bar.update(ctx, data, env);
         self.inner.update(ctx, data, env);
         self.bottom_bar.update(ctx, data, env);
         self.overlay.update(ctx, data, env);
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         let title_bar_bc = bc.loosen();
         self.title_bar.layout(ctx, &title_bar_bc, data, env);
 
@@ -164,7 +164,7 @@ impl<T: Data> Widget<T> for WindowWidget<T> {
         bc.constrain(size)
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
         self.title_bar.paint(ctx, data, env);
         self.inner.paint(ctx, data, env);
         self.bottom_bar.paint(ctx, data, env);

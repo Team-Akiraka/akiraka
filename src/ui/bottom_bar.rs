@@ -1,7 +1,9 @@
 use std::collections::HashMap;
+use std::thread;
+use std::thread::Thread;
 use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
 use druid::widget::{Widget, Flex, Radio, RadioGroup, Svg, SvgData, LineBreaking};
-use crate::{animations, Asset};
+use crate::{animations, AppState, Asset};
 use crate::theme::theme;
 use crate::ui::{download_page, hello_page, instances_page, settings_page};
 use crate::util::color_as_hex_string;
@@ -34,8 +36,8 @@ impl IconClearButton {
     }
 }
 
-impl<T: Data> Widget<T> for IconClearButton {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, _data: &mut T, _env: &Env) {
+impl Widget<AppState> for IconClearButton {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, _data: &mut AppState, _env: &Env) {
         match event {
             Event::MouseDown(event) => {
                 if !ctx.is_disabled() && event.button == MouseButton::Left {
@@ -53,18 +55,18 @@ impl<T: Data> Widget<T> for IconClearButton {
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
         if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
             ctx.request_paint();
         }
         self.icon.lifecycle(ctx, event, data, env)
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, env: &Env) {
         self.icon.update(ctx, old_data, data, env)
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         let icon_size = self.icon.layout(ctx, bc, data, env);
         let button_size =
             bc.constrain(Size::new(
@@ -74,7 +76,7 @@ impl<T: Data> Widget<T> for IconClearButton {
         button_size
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
         unsafe {
             if crate::PAGE_ID == self.id {
                 self.activated = true;
@@ -124,38 +126,38 @@ impl<T: Data> Widget<T> for IconClearButton {
     }
 }
 
-struct Child<T> {
-    inner: WidgetPod<T, Box<dyn Widget<T>>>,
+struct Child {
+    inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>,
     height: f64
 }
 
-impl<T> Child<T> {
-    fn new(inner: WidgetPod<T, Box<dyn Widget<T>>>, height: f64) -> Child<T> {
+impl Child {
+    fn new(inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>, height: f64) -> Child {
         Child {
             inner,
             height
         }
     }
 
-    fn widget_mut(&mut self) -> Option<&mut WidgetPod<T, Box<dyn Widget<T>>>> {
+    fn widget_mut(&mut self) -> Option<&mut WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
         Some(&mut self.inner)
     }
 
-    fn widget(&self) -> Option<&WidgetPod<T, Box<dyn Widget<T>>>> {
+    fn widget(&self) -> Option<&WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
         Some(&self.inner)
     }
 }
 
-struct PagedWidget<T> {
-    pages: HashMap<u64, Child<T>>,
+struct PagedWidget {
+    pages: HashMap<u64, Child>,
     current_id: u64,
     last_height: f64,
     inner_size: Size,
     t: f64
 }
 
-impl<T: Data> PagedWidget<T> {
-    fn new(pages: HashMap<u64, Child<T>>) -> PagedWidget<T> {
+impl PagedWidget {
+    fn new(pages: HashMap<u64, Child>) -> PagedWidget {
         PagedWidget {
             pages,
             current_id: unsafe { SELECTED },
@@ -175,8 +177,8 @@ impl<T: Data> PagedWidget<T> {
     }
 }
 
-impl<T: Data> Widget<T> for PagedWidget<T> {
-    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut T, env: &Env) {
+impl Widget<AppState> for PagedWidget {
+    fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env) {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.window().request_anim_frame();
@@ -207,7 +209,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.window().request_anim_frame();
@@ -218,7 +220,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &T, data: &T, env: &Env) {
+    fn update(&mut self, ctx: &mut UpdateCtx, _old_data: &AppState, data: &AppState, env: &Env) {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.window().request_anim_frame();
@@ -230,7 +232,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         }
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
+    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.window().request_anim_frame();
@@ -257,7 +259,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
         self.inner_size
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.window().request_anim_frame();
@@ -289,7 +291,7 @@ impl<T: Data> Widget<T> for PagedWidget<T> {
     }
 }
 
-pub fn build_main<T: Data>() -> impl Widget<T> {
+pub fn build_main() -> impl Widget<AppState> {
     let profile_button = ProfileButton::new()
         .fix_width(160.0)
         .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
@@ -320,6 +322,9 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
         unsafe {
             SELECTED = 1;
             crate::PAGE_ID = download_page::ID;
+            // thread::spawn(move || {
+            //     // data
+            // })
         }
         ctx.request_anim_frame();
     });
@@ -363,7 +368,7 @@ pub fn build_main<T: Data>() -> impl Widget<T> {
     bar
 }
 
-pub fn build_nav<T: Data>() -> impl Widget<T> {
+pub fn build_nav() -> impl Widget<AppState> {
     // Home
     let home_button = IconClearButton::new(
         std::str::from_utf8(&Asset::get("icon/home.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
@@ -432,8 +437,8 @@ pub fn build_nav<T: Data>() -> impl Widget<T> {
     bar
 }
 
-pub fn build<T: Data>() -> impl Widget<T> {
-    let mut pages = HashMap::<u64, Child<T>>::new();
+pub fn build() -> impl Widget<AppState> {
+    let mut pages = HashMap::<u64, Child>::new();
     pages.insert(0, Child::new(WidgetPod::new(Box::new(build_main())), BOTTOM_BAR_HEIGHT));
     pages.insert(1, Child::new(WidgetPod::new(Box::new(build_nav())), BOTTOM_BAR_HEIGHT_NAV));
 
