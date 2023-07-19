@@ -22,9 +22,11 @@ impl<T: Data> GameInstance<T> {
     }
 
     pub fn init_data(&mut self, version_name: String, version_type: String) {
-        let layout = Flex::row()
-            .with_child(Label::new(version_name))
-            .with_child(Label::new(version_type));
+        let layout = Flex::column()
+            .with_child(Label::new(version_name).with_text_size(14.0).align_left())
+            .with_child(Label::new(version_type).with_text_size(12.0).align_left())
+            .center()
+            .align_left();
 
         self.layout = WidgetPod::new(Box::new(layout));
     }
