@@ -7,19 +7,26 @@ pub const ID: &str = "DOWNLOAD_PAGE";
 pub static mut IS_LOADING: bool = false;
 
 struct GameInstance<T> {
-    version_name: String,
-    version_type: String,
+    pub(crate) version_name: String,
+    pub(crate) version_type: String,
     layout: WidgetPod<T, Box<dyn Widget<T>>>
 }
 
 impl<T: Data> GameInstance<T> {
     pub fn new(version_name: String, version_type: String) -> GameInstance<T> {
-        let layout = Flex::row();
         GameInstance {
             version_name,
             version_type,
-            layout: WidgetPod::new(Box::new(layout))
+            layout: WidgetPod::new(Box::new(Empty {}))
         }
+    }
+
+    pub fn init_data(&mut self, version_name: String, version_type: String) {
+        let layout = Flex::row()
+            .with_child(Label::new(version_name))
+            .with_child(Label::new(version_type));
+
+        self.layout = WidgetPod::new(Box::new(layout));
     }
 }
 
@@ -47,14 +54,14 @@ impl<T: Data> Widget<T> for GameInstance<T> {
 
 fn build_minecraft() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {
-        Label::new(String::new())
+        GameInstance::new(String::new(), String::new())
             .on_added(|widget, ctx, data: &String, env| {
-                println!("{data}");
-                widget.set_text(String::from(data));
+                // widget.set_text(String::from(data));
+                widget.init_data(String::from(data), String::from(data));
                 ctx.request_paint();
             })
             .expand_width()
-            .fix_height(56.0)
+            .fix_height(48.0)
             .align_left()
     })
         .with_spacing(0.0)
