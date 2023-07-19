@@ -2,6 +2,7 @@ use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeC
 use druid::widget::{Axis, Flex, Label, List, Scroll};
 use crate::{AppState, Empty};
 use crate::theme::theme;
+use crate::widget::bounded_widget::BoundedWidget;
 use crate::widget::tabs::Tabs;
 
 pub const ID: &str = "DOWNLOAD_PAGE";
@@ -77,7 +78,7 @@ fn build_minecraft() -> impl Widget<AppState> {
             .align_left()
     })
         .with_spacing(0.0)
-        .expand_width()
+        // .expand_width()
         .lens(AppState::minecraft_versions);
 
     let layout = Flex::column()
@@ -89,7 +90,7 @@ fn build_minecraft() -> impl Widget<AppState> {
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_child("Minecraft".parse().unwrap(), Scroll::new(build_minecraft()).vertical().expand_height())
+        .with_child("Minecraft".parse().unwrap(), BoundedWidget::new(Scroll::new(build_minecraft()).vertical()))
         .with_child("Resources".parse().unwrap(), Label::new("Resources"))
         .with_selected("Minecraft".parse().unwrap())
         .padding(Insets::uniform(8.0));
@@ -103,7 +104,7 @@ pub fn build() -> impl Widget<AppState> {
         .padding(Insets::uniform_xy(0.0, 0.0));
 
     body
-        .expand_width()
+        .expand()
         .align_vertical(UnitPoint::TOP)
         .align_left()
 }

@@ -216,13 +216,14 @@ impl<T: Data> Widget<T> for Tabs<T> {
     }
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
-        let x = self.children.get_mut(self.selected.as_str());
-        if x.is_some() {
-            let x = x.unwrap().widget_mut().unwrap();
+        for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
             let child_bc = bc.shrink_max_height_to(bc.max().height - 32.0);
             x.set_origin(ctx, Point::new(0.0, 32.0));
             x.layout(ctx, &child_bc, data, env);
         }
+        // let x = self.children.get_mut(self.selected.as_str());
+        // if x.is_some() {
+        // }
         let mut i = 0.0;
         for x in self.tabs.iter_mut() {
             let x = x.0.widget_mut().unwrap();
@@ -232,15 +233,11 @@ impl<T: Data> Widget<T> for Tabs<T> {
         }
 
         let size = bc.shrink_max_height_to(bc.max().height - 32.0).max();
-        let size = Size::new(if size.width > ctx.window().get_size().width {
+        let size = Size::new(if bc.max().width > ctx.window().get_size().width {
             ctx.window().get_size().width
         } else {
             size.width
-        }, if size.height > ctx.window().get_size().height {
-            ctx.window().get_size().height
-        } else {
-            size.height
-        });
+        }, ctx.window().get_size().height);
         self.inner_size = size;
         self.inner_size
     }
