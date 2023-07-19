@@ -227,11 +227,21 @@ impl<T: Data> Widget<T> for Tabs<T> {
         for x in self.tabs.iter_mut() {
             let x = x.0.widget_mut().unwrap();
             x.set_origin(ctx, Point::new(104.0 * i, 0.0));
-            x.layout(ctx, bc, data, env);
+            x.layout(ctx, bc, data, env).width;
             i += 1.0;
         }
 
-        self.inner_size = bc.shrink_max_height_to(bc.max().height - 32.0).max();
+        let size = bc.shrink_max_height_to(bc.max().height - 32.0).max();
+        let size = Size::new(if size.width > ctx.window().get_size().width {
+            ctx.window().get_size().width
+        } else {
+            size.width
+        }, if size.height > ctx.window().get_size().height {
+            ctx.window().get_size().height
+        } else {
+            size.height
+        });
+        self.inner_size = size;
         self.inner_size
     }
 

@@ -1,5 +1,5 @@
 use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Axis, Flex, Label, List};
+use druid::widget::{Axis, Flex, Label, List, Scroll};
 use crate::{AppState, Empty};
 use crate::theme::theme;
 use crate::widget::tabs::Tabs;
@@ -69,7 +69,6 @@ fn build_minecraft() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {
         GameInstance::new(String::new(), String::new())
             .on_added(|widget, ctx, data: &String, env| {
-                // widget.set_text(String::from(data));
                 widget.init_data(String::from(data), String::from(data));
                 ctx.request_paint();
             })
@@ -82,15 +81,15 @@ fn build_minecraft() -> impl Widget<AppState> {
         .lens(AppState::minecraft_versions);
 
     let layout = Flex::column()
-        .with_child(list);
+        .with_child(list)
+        .padding(Insets::uniform(8.0));
 
     layout
-        .padding(Insets::uniform(8.0))
 }
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_child("Minecraft".parse().unwrap(), build_minecraft())
+        .with_child("Minecraft".parse().unwrap(), Scroll::new(build_minecraft()).vertical().expand_height())
         .with_child("Resources".parse().unwrap(), Label::new("Resources"))
         .with_selected("Minecraft".parse().unwrap())
         .padding(Insets::uniform(8.0));
