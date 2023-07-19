@@ -82,15 +82,14 @@ fn build_minecraft() -> impl Widget<AppState> {
         .lens(AppState::minecraft_versions);
 
     let layout = Flex::column()
-        .with_child(list)
-        .padding(Insets::uniform(8.0));
+        .with_child(list);
 
     layout
 }
 
 fn build_center() -> impl Widget<AppState> {
     let tabs = Tabs::new()
-        .with_child("Minecraft".parse().unwrap(), BoundedWidget::new(Scroll::new(build_minecraft()).vertical()))
+        .with_child("Minecraft".parse().unwrap(), BoundedWidget::new(Scroll::new(build_minecraft()).vertical().expand_height().padding(Insets::new(8.0, 8.0, 8.0, 124.0))))
         .with_child("Resources".parse().unwrap(), Label::new("Resources"))
         .with_selected("Minecraft".parse().unwrap())
         .padding(Insets::uniform(8.0));

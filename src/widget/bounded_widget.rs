@@ -29,7 +29,10 @@ impl<T: Data> Widget<T> for BoundedWidget<T> {
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
         let wnd_size = ctx.window().get_size();
-        self.inner_size = self.inner.layout(ctx, bc, data, env);
+        self.inner_size = self.inner.layout(ctx, &BoxConstraints::new(
+            Size::new(bc.min().width.min(wnd_size.width), bc.min().height.min(wnd_size.height)),
+            Size::new(bc.max().width.min(wnd_size.width), bc.max().height.min(wnd_size.height))
+        ), data, env);
         self.inner_size = Size::new(self.inner_size.width.min(wnd_size.width), self.inner_size.height.min(wnd_size.height));
         self.inner_size
     }
