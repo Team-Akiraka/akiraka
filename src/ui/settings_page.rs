@@ -83,7 +83,7 @@ impl<T: Data> Widget<T> for IconClearButton {
         let bg_gradient = if is_active {
             env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else if is_hot {
-            env.get(theme::COLOR_CLEAR_BUTTON_HOT)
+            env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE)
         } else {
             env.get(theme::COLOR_CLEAR_BUTTON)
         };
@@ -367,7 +367,7 @@ impl Widget<String> for JavaInstance {
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE));
         } else {
             ctx.fill(rect, &Color::TRANSPARENT);
         }
@@ -429,7 +429,7 @@ impl<T: Data> Widget<T> for AddJava<T> {
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE));
         } else {
             ctx.fill(rect, &Color::TRANSPARENT);
         }
@@ -491,7 +491,7 @@ impl<T: Data> Widget<T> for InstallJava<T> {
         let rect = ctx.size().to_rect().to_rounded_rect(12.0);
 
         if is_hot {
-            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_HOT));
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE));
         } else {
             ctx.fill(rect, &Color::TRANSPARENT);
         }

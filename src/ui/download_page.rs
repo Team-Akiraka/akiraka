@@ -1,6 +1,7 @@
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod};
+use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod};
 use druid::widget::{Axis, Flex, Label, List};
 use crate::{AppState, Empty};
+use crate::theme::theme;
 use crate::widget::tabs::Tabs;
 
 pub const ID: &str = "DOWNLOAD_PAGE";
@@ -38,6 +39,9 @@ impl<T: Data> Widget<T> for GameInstance<T> {
     }
 
     fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
+        if let LifeCycle::HotChanged(_) | LifeCycle::DisabledChanged(_) = event {
+            ctx.request_paint();
+        }
         self.layout.lifecycle(ctx, event, data, env);
     }
 
@@ -50,6 +54,13 @@ impl<T: Data> Widget<T> for GameInstance<T> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
+        let is_hot = ctx.is_hot();
+        let rect = ctx.size().to_rect().to_rounded_rect(12.0);
+
+        if is_hot {
+            ctx.fill(rect, &env.get(theme::COLOR_CLEAR_BUTTON_ACTIVE));
+        }
+
         self.layout.paint(ctx, data, env);
     }
 }
