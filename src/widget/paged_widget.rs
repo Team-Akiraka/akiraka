@@ -83,8 +83,12 @@ impl Widget<AppState> for PagedWidget<AppState> {
                 if self.t <= ANIMATION_TIME {
                     ctx.request_anim_frame();
                     ctx.request_paint();
+                    ctx.request_layout();
+                    ctx.request_update();
                 } else {
                     ctx.request_paint();
+                    ctx.request_layout();
+                    ctx.request_update();
                 }
             }
             _ => {}

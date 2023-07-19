@@ -83,11 +83,11 @@ impl<T: Data> Widget<T> for Empty {
 
 #[derive(Clone, Data, Lens)]
 pub struct AppState {
-    page_id: String,
-    global_search_bar_input: String,
-    java: Vector<String>,
-    file_open_type: String,
-    minecraft_versions: Vector<String>
+    pub page_id: String,
+    pub global_search_bar_input: String,
+    pub java: Vector<String>,
+    pub file_open_type: String,
+    pub minecraft_versions: Vector<String>
 }
 
 pub static mut PAGE_ID: &str = hello_page::ID;
