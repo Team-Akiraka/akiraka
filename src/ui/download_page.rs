@@ -2,11 +2,10 @@ use crate::theme::theme;
 use crate::widget::bounded_widget::BoundedWidget;
 use crate::widget::tabs::Tabs;
 use crate::{AppState, Empty};
-use druid::widget::{Axis, Flex, Label, List, Scroll};
+use druid::widget::{Flex, Label, List, Scroll};
 use druid::{
     BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx,
-    LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt,
-    WidgetPod,
+    PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod,
 };
 
 pub const ID: &str = "DOWNLOAD_PAGE";
@@ -90,7 +89,7 @@ fn build_minecraft() -> impl Widget<AppState> {
 }
 
 fn build_center() -> impl Widget<AppState> {
-    rust_embed::RustEmbed
+    // rust_embed::RustEmbed
     let tabs = Tabs::new()
         .with_child(
             "Minecraft".parse().unwrap(),

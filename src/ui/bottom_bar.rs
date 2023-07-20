@@ -4,16 +4,14 @@ use crate::util::color_as_hex_string;
 use crate::widget::launch_button::LaunchButton;
 use crate::widget::profile_button::ProfileButton;
 use crate::{animations, AppState, Asset};
-use druid::widget::{Flex, LineBreaking, Radio, RadioGroup, Svg, SvgData, Widget};
+use druid::widget::{Flex, Svg, SvgData, Widget};
 use druid::{
-    Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt,
-    LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2,
-    WidgetExt, WidgetPod,
+    Affine, BoxConstraints, Color, Env, Event, EventCtx, Insets, LayoutCtx
+    , LifeCycle,
+    LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, WidgetExt,
+    WidgetPod,
 };
 use std::collections::HashMap;
-use std::ops::{Deref, DerefMut};
-use std::thread;
-use std::thread::Thread;
 
 pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
 pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 40.0;

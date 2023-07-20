@@ -10,7 +10,7 @@ pub mod sine {
     }
 
     pub fn ease_both(x: f64) -> f64 {
-        0.0
+        x
     }
 }
 
@@ -38,7 +38,7 @@ pub mod elastic {
     const C4: f64 = (0.4 * PI) / 6.0;
 
     pub fn ease_in(x: f64) -> f64 {
-        0.0
+        x
     }
 
     pub fn ease_out(x: f64) -> f64 {
@@ -63,7 +63,7 @@ pub mod back {
     const C3: f64 = C1 + 1.0;
 
     pub fn ease_in(x: f64) -> f64 {
-        0.0
+        x
     }
 
     pub fn ease_out(x: f64) -> f64 {
@@ -71,7 +71,7 @@ pub mod back {
     }
 
     pub fn ease_both(x: f64) -> f64 {
-        0.0
+        x
     }
 }
 
@@ -80,7 +80,7 @@ pub mod expo {
     const C3: f64 = C1 + 1.0;
 
     pub fn ease_in(x: f64) -> f64 {
-        0.0
+        x
     }
 
     pub fn ease_out(x: f64) -> f64 {
@@ -92,6 +92,6 @@ pub mod expo {
     }
 
     pub fn ease_both(x: f64) -> f64 {
-        0.0
+        x
     }
 }

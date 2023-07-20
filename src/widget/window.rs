@@ -3,7 +3,7 @@ use crate::ui::bottom_bar;
 use crate::widget::title_bar::TitleBar;
 use crate::{AppState, Empty};
 use druid::{
-    BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle,
+    BoxConstraints, Color, Env, Event, EventCtx, HasRawWindowHandle, LayoutCtx, LifeCycle,
     LifeCycleCtx, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, UpdateCtx, Widget,
     WidgetPod,
 };

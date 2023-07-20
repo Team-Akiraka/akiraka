@@ -16,7 +16,6 @@ use druid::{
     Target, UpdateCtx, Widget, WidgetPod, WindowDesc, WindowId, WindowState,
 };
 use rust_embed::RustEmbed;
-use std::ops::Add;
 
 const WINDOW_TITLE: LocalizedString<AppState> = LocalizedString::new("Akiraka - Internal build");
 

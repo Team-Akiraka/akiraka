@@ -1,11 +1,10 @@
 use crate::util::color_as_hex_string;
-use druid::widget::{Label, LabelText, Svg, SvgData, TextBox};
+use druid::widget::{Label, LabelText, Svg, SvgData};
 use druid::{
-    lens, theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle,
-    LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, Widget,
-    WidgetExt, WidgetPod,
+    theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx,
+    MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, Widget,
+    WidgetPod,
 };
-use std::collections::HashMap;
 
 pub struct SideBarSelection<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,

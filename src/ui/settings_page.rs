@@ -6,7 +6,7 @@ use crate::{animations, AppState, Asset};
 use druid::widget::{CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
 use druid::{
     commands, Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, FileDialogOptions,
-    FileSpec, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton,
+    FileSpec, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton,
     PaintCtx, RenderContext, Size, Target, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt,
     WidgetPod,
 };
@@ -591,7 +591,7 @@ fn build_settings() -> impl Widget<AppState> {
         .expand_width()
         .align_left();
 
-    let mut body = Flex::column()
+    let body = Flex::column()
         .with_child(
             Label::new(LocalizedString::new("None"))
                 .with_text_size(14.0)
