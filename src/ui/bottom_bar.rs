@@ -11,6 +11,7 @@ use druid::{
     WidgetPod,
 };
 use std::collections::HashMap;
+use akiraka_core::VersionInfo;
 
 pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
 pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 40.0;
@@ -354,8 +355,7 @@ pub fn build_main() -> impl Widget<AppState> {
         unsafe {
             SELECTED = 1;
             crate::PAGE_ID = download_page::ID;
-            data.minecraft_versions.push_back("114514".parse().unwrap());
-            println!("{:?}", data.minecraft_versions);
+            // data.minecraft_versions.push_back(VersionInfo::empty());
         }
         ctx.request_anim_frame();
     });
@@ -450,9 +450,6 @@ pub fn build_nav() -> impl Widget<AppState> {
     let download_button = download_button.on_click(|ctx, data, _env| {
         unsafe {
             crate::PAGE_ID = download_page::ID;
-            data.minecraft_versions
-                .push_back("1145141919810".parse().unwrap());
-            println!("{:?}", data.minecraft_versions);
         }
         ctx.request_anim_frame();
     });

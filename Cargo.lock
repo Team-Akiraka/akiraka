@@ -25,7 +25,7 @@ dependencies = [
 [[package]]
 name = "akiraka-core"
 version = "0.1.0"
-source = "git+https://github.com/Team-Akiraka/akiraka-core.git#b9c5dae760dda148853d484ae5f0307a72cf8012"
+source = "git+https://github.com/Team-Akiraka/akiraka-core.git#ef2c547c248ac888d74c3774da19a0259029d5af"
 
 [[package]]
 name = "anyhow"

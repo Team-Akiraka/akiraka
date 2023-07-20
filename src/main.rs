@@ -104,7 +104,7 @@ pub struct AppState {
     pub global_search_bar_input: String,
     pub java: Vector<String>,
     pub file_open_type: String,
-    pub minecraft_versions: Vector<String>,
+    pub minecraft_versions: Vector<(String, String)>,
 }
 
 pub static mut PAGE_ID: &str = hello_page::ID;
@@ -122,8 +122,8 @@ fn main() {
         .set_window_state(WindowState::Restored)
         .show_titlebar(false);
 
-    let mut x = Vector::<String>::new();
-    x.push_back("114514".parse().unwrap());
+    let mut x = Vector::<(String, String)>::new();
+    x.push_back(("114514".parse().unwrap(), "1919810".parse().unwrap()));
 
     let mut initial_state = AppState {
         page_id: String::new(),
