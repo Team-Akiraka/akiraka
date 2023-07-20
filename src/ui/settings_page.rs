@@ -6,9 +6,8 @@ use crate::{animations, AppState, Asset};
 use druid::widget::{CrossAxisAlignment, Flex, FlexParams, Label, List, Scroll, Svg, SvgData};
 use druid::{
     commands, Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, FileDialogOptions,
-    FileSpec, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton,
-    PaintCtx, RenderContext, Size, Target, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt,
-    WidgetPod,
+    FileSpec, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx,
+    RenderContext, Size, Target, UnitPoint, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod,
 };
 use std::collections::HashMap;
 

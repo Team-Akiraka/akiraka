@@ -6,8 +6,7 @@ use crate::widget::profile_button::ProfileButton;
 use crate::{animations, AppState, Asset};
 use druid::widget::{Flex, Svg, SvgData, Widget};
 use druid::{
-    Affine, BoxConstraints, Color, Env, Event, EventCtx, Insets, LayoutCtx
-    , LifeCycle,
+    Affine, BoxConstraints, Color, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle,
     LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, WidgetExt,
     WidgetPod,
 };
@@ -19,7 +18,7 @@ pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 40.0;
 const ANIMATION_TIME: f64 = 0.5;
 static mut SELECTED: u64 = 0;
 
-const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
+// const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
 struct IconClearButton {
     icon: Svg,
@@ -158,9 +157,9 @@ impl Child {
         Some(&mut self.inner)
     }
 
-    fn widget(&self) -> Option<&WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
-        Some(&self.inner)
-    }
+    // fn widget(&self) -> Option<&WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
+    //     Some(&self.inner)
+    // }
 }
 
 struct PagedWidget {
@@ -301,8 +300,8 @@ impl Widget<AppState> for PagedWidget {
                 1.0
             };
             let s = s / 4.0 + 0.75;
-            let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
-            let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
+            // let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
+            // let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
 
             let rect = ctx.size().to_rect();
             ctx.transform(Affine::translate(Vec2::new(

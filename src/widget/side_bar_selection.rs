@@ -2,8 +2,7 @@ use crate::util::color_as_hex_string;
 use druid::widget::{Label, LabelText, Svg, SvgData};
 use druid::{
     theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx,
-    MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, Widget,
-    WidgetPod,
+    MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod,
 };
 
 pub struct SideBarSelection<T> {

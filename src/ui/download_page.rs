@@ -9,7 +9,7 @@ use druid::{
 };
 
 pub const ID: &str = "DOWNLOAD_PAGE";
-pub static mut IS_LOADING: bool = false;
+// pub static mut IS_LOADING: bool = false;
 
 struct GameInstance<T> {
     pub(crate) version_name: String,
@@ -72,7 +72,7 @@ impl<T: Data> Widget<T> for GameInstance<T> {
 fn build_minecraft() -> impl Widget<AppState> {
     let list = List::<String>::new(|| {
         GameInstance::new(String::new(), String::new())
-            .on_added(|widget, ctx, data: &String, env| {
+            .on_added(|widget, ctx, data: &String, _env| {
                 widget.init_data(String::from(data), String::from(data));
                 ctx.request_paint();
             })

@@ -5,7 +5,7 @@ edition = "2021"
 build = "build.rs"
 
 [dependencies]
-akiraka-core = { git = "https://github.com/Team-Akiraka/akiraka-core.git", version = "0.1.0" }
+akiraka-core = { git = "https://github.com/Team-Akiraka/akiraka-core.git" }
 rust-embed = "6.6.1"
 druid = { git = "https://github.com/linebender/druid.git", version = "0.8.3", features = ["raw-win-handle", "svg", "resvg", "usvg", "im"] }
 image = "0.24.6"
