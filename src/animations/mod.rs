@@ -54,7 +54,7 @@ pub mod elastic {
     }
 
     pub fn ease_both(x: f64) -> f64 {
-        0.0
+        x
     }
 }
 
