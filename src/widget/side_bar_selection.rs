@@ -1,8 +1,11 @@
-
-use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, lens, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Label, LabelText, Svg, SvgData, TextBox};
 use crate::util::color_as_hex_string;
+use druid::widget::{Label, LabelText, Svg, SvgData, TextBox};
+use druid::{
+    lens, theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle,
+    LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, Widget,
+    WidgetExt, WidgetPod,
+};
+use std::collections::HashMap;
 
 pub struct SideBarSelection<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,
@@ -10,18 +13,22 @@ pub struct SideBarSelection<T> {
     icon_data: String,
     pub id: u64,
     pub click_event: fn(&SideBarSelection<T>),
-    pressing: bool
+    pressing: bool,
 }
 
 impl<T: Data> SideBarSelection<T> {
     pub fn new(icon: String, text: impl Into<LabelText<T>>, id: u64) -> SideBarSelection<T> {
         let this = SideBarSelection {
             label: WidgetPod::new(Box::new(Label::new(text).with_text_size(14.0))),
-            icon: Svg::new(icon.replace("{color}", "#000000").parse::<SvgData>().unwrap()),
+            icon: Svg::new(
+                icon.replace("{color}", "#000000")
+                    .parse::<SvgData>()
+                    .unwrap(),
+            ),
             icon_data: icon,
             id,
             click_event: |_| {},
-            pressing: false
+            pressing: false,
         };
         this
     }
@@ -84,7 +91,8 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
         let icon_bc = bc.shrink(padding).loosen();
         let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
 
-        self.label.set_origin(ctx, Point::new(icon_size.width + 4.0, 5.5));
+        self.label
+            .set_origin(ctx, Point::new(icon_size.width + 4.0, 5.5));
         let _label_size = self.label.layout(ctx, bc, data, env);
         bc.min()
     }
@@ -127,7 +135,14 @@ impl<T: Data> Widget<T> for SideBarSelection<T> {
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
         ctx.with_save(|ctx| {
-            let svg_data = self.icon_data.replace("{color}", color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str()).parse::<SvgData>().unwrap();
+            let svg_data = self
+                .icon_data
+                .replace(
+                    "{color}",
+                    color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str(),
+                )
+                .parse::<SvgData>()
+                .unwrap();
             self.icon = Svg::new(svg_data);
             ctx.transform(Affine::scale(1.0).then_translate(Vec2::new(0.5, 0.0)));
             self.icon.paint(ctx, data, env)

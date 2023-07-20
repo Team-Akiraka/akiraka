@@ -1,15 +1,18 @@
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetPod};
+use druid::{
+    BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size,
+    UpdateCtx, Widget, WidgetPod,
+};
 
 pub struct BoundedWidget<T> {
     inner: WidgetPod<T, Box<dyn Widget<T>>>,
-    inner_size: Size
+    inner_size: Size,
 }
 
 impl<T: Data> BoundedWidget<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> BoundedWidget<T> {
         BoundedWidget {
             inner: WidgetPod::new(Box::new(inner)),
-            inner_size: Size::ZERO
+            inner_size: Size::ZERO,
         }
     }
 }
@@ -29,11 +32,25 @@ impl<T: Data> Widget<T> for BoundedWidget<T> {
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
         let wnd_size = ctx.window().get_size();
-        self.inner_size = self.inner.layout(ctx, &BoxConstraints::new(
-            Size::new(bc.min().width.min(wnd_size.width), bc.min().height.min(wnd_size.height)),
-            Size::new(bc.max().width.min(wnd_size.width), bc.max().height.min(wnd_size.height))
-        ), data, env);
-        self.inner_size = Size::new(self.inner_size.width.min(wnd_size.width), self.inner_size.height.min(wnd_size.height));
+        self.inner_size = self.inner.layout(
+            ctx,
+            &BoxConstraints::new(
+                Size::new(
+                    bc.min().width.min(wnd_size.width),
+                    bc.min().height.min(wnd_size.height),
+                ),
+                Size::new(
+                    bc.max().width.min(wnd_size.width),
+                    bc.max().height.min(wnd_size.height),
+                ),
+            ),
+            data,
+            env,
+        );
+        self.inner_size = Size::new(
+            self.inner_size.width.min(wnd_size.width),
+            self.inner_size.height.min(wnd_size.height),
+        );
         self.inner_size
     }
 

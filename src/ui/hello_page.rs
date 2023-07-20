@@ -1,7 +1,7 @@
+use crate::ui::bottom_bar;
+use crate::widget::window;
+use druid::widget::{Flex, Label, Widget};
 use druid::{Data, Insets, UnitPoint, WidgetExt};
-use druid::widget::{Widget, Flex, Label};
-use crate::widget::{window};
-use crate::ui::{bottom_bar};
 
 pub const ID: &str = "HELLO_PAGE";
 
@@ -24,6 +24,5 @@ pub fn build<T: Data>() -> impl Widget<T> {
         .with_spacer(window::TITLE_BAR_HEIGHT)
         .expand_width();
 
-    body
-        .align_vertical(UnitPoint::TOP)
+    body.align_vertical(UnitPoint::TOP)
 }

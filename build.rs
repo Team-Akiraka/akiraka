@@ -1,7 +1,7 @@
-#[cfg(target_os="windows")]
+#[cfg(target_os = "windows")]
 extern crate winres;
 
-#[cfg(target_os="windows")]
+#[cfg(target_os = "windows")]
 fn main() {
     // https://learn.microsoft.com/zh-cn/windows/apps/design/style/iconography/app-icon-construction
     let mut res = winres::WindowsResource::new();

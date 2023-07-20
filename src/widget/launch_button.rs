@@ -1,30 +1,45 @@
-
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Click, ControllerHost, Flex, Label, LabelText, Svg, SvgData};
 use crate::util::color_as_hex_string;
+use druid::widget::{Click, ControllerHost, Flex, Label, LabelText, Svg, SvgData};
+use druid::{
+    theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle,
+    LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, UpdateCtx,
+    Vec2, Widget, WidgetExt, WidgetPod,
+};
 
 const LABEL_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
 pub struct LaunchButton<T> {
     icon: Svg,
     icon_data: String,
-    layout: WidgetPod<T, Box<dyn Widget<T>>>
+    layout: WidgetPod<T, Box<dyn Widget<T>>>,
 }
 
-
 impl<T: Data> LaunchButton<T> {
-    pub fn new(icon: String, text: impl Into<LabelText<T>>,) -> LaunchButton<T> {
-        let icon_data = icon.replace("{color}", "#000000").parse::<SvgData>().unwrap();
-        let label = Label::new(text).with_text_size(15.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(18.0);
-        let subtitle = Label::new("Unknown Instance").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);
+    pub fn new(icon: String, text: impl Into<LabelText<T>>) -> LaunchButton<T> {
+        let icon_data = icon
+            .replace("{color}", "#000000")
+            .parse::<SvgData>()
+            .unwrap();
+        let label = Label::new(text)
+            .with_text_size(15.0)
+            .with_text_alignment(TextAlignment::Start)
+            .expand_width()
+            .fix_height(18.0);
+        let subtitle = Label::new("Unknown Instance")
+            .with_text_size(12.0)
+            .with_text_alignment(TextAlignment::Start)
+            .expand_width()
+            .fix_height(13.0);
 
         LaunchButton {
             icon: Svg::new(icon_data.clone()),
             icon_data: icon,
-            layout: WidgetPod::new(Box::new(Flex::column()
-                .with_child(label)
-                .with_child(subtitle)
-                .align_left()))
+            layout: WidgetPod::new(Box::new(
+                Flex::column()
+                    .with_child(label)
+                    .with_child(subtitle)
+                    .align_left(),
+            )),
         }
     }
 
@@ -34,7 +49,6 @@ impl<T: Data> LaunchButton<T> {
     ) -> ControllerHost<Self, Click<T>> {
         ControllerHost::new(self, Click::new(f))
     }
-
 }
 
 impl<T: Data> Widget<T> for LaunchButton<T> {
@@ -79,8 +93,12 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
         let icon_bc = bc.loosen();
         let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
 
-        let layout_bc = bc.shrink(padding).shrink_max_width_to(bc.min().width - icon_size.width).loosen();
-        self.layout.set_origin(ctx, Point::new(icon_size.width - 4.0, 0.0));
+        let layout_bc = bc
+            .shrink(padding)
+            .shrink_max_width_to(bc.min().width - icon_size.width)
+            .loosen();
+        self.layout
+            .set_origin(ctx, Point::new(icon_size.width - 4.0, 0.0));
         self.layout.layout(ctx, &layout_bc, data, env);
         bc.min()
     }
@@ -117,7 +135,14 @@ impl<T: Data> Widget<T> for LaunchButton<T> {
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
         ctx.with_save(|ctx| {
-            let svg_data = self.icon_data.replace("{color}", color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str()).parse::<SvgData>().unwrap();
+            let svg_data = self
+                .icon_data
+                .replace(
+                    "{color}",
+                    color_as_hex_string(env.get(theme::TEXT_COLOR)).as_str(),
+                )
+                .parse::<SvgData>()
+                .unwrap();
             self.icon = Svg::new(svg_data);
             ctx.transform(Affine::scale(1.0).then_translate(Vec2::new(0.5, 0.0)));
             self.icon.paint(ctx, data, env)

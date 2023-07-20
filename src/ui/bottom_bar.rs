@@ -1,15 +1,19 @@
-use std::collections::HashMap;
-use std::ops::{Deref, DerefMut};
-use std::thread;
-use std::thread::Thread;
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2, WidgetExt, WidgetPod};
-use druid::widget::{Widget, Flex, Radio, RadioGroup, Svg, SvgData, LineBreaking};
-use crate::{animations, AppState, Asset};
 use crate::theme::theme;
 use crate::ui::{download_page, hello_page, instances_page, settings_page};
 use crate::util::color_as_hex_string;
 use crate::widget::launch_button::LaunchButton;
 use crate::widget::profile_button::ProfileButton;
+use crate::{animations, AppState, Asset};
+use druid::widget::{Flex, LineBreaking, Radio, RadioGroup, Svg, SvgData, Widget};
+use druid::{
+    Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LensExt,
+    LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, UpdateCtx, Vec2,
+    WidgetExt, WidgetPod,
+};
+use std::collections::HashMap;
+use std::ops::{Deref, DerefMut};
+use std::thread;
+use std::thread::Thread;
 
 pub const BOTTOM_BAR_HEIGHT: f64 = 56.0;
 pub const BOTTOM_BAR_HEIGHT_NAV: f64 = 40.0;
@@ -23,16 +27,21 @@ struct IconClearButton {
     icon: Svg,
     data: String,
     id: String,
-    activated: bool
+    activated: bool,
 }
 
 impl IconClearButton {
     pub fn new(data: String, id: String) -> IconClearButton {
         Self {
-            icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
+            icon: Svg::new(
+                data.clone()
+                    .replace("{color}", "#000000")
+                    .parse::<SvgData>()
+                    .unwrap(),
+            ),
             data,
             id,
-            activated: false
+            activated: false,
         }
     }
 }
@@ -67,13 +76,15 @@ impl Widget<AppState> for IconClearButton {
         self.icon.update(ctx, old_data, data, env)
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
+    fn layout(
+        &mut self,
+        ctx: &mut LayoutCtx,
+        bc: &BoxConstraints,
+        data: &AppState,
+        env: &Env,
+    ) -> Size {
         let icon_size = self.icon.layout(ctx, bc, data, env);
-        let button_size =
-            bc.constrain(Size::new(
-                icon_size.width,
-                icon_size.height
-            ));
+        let button_size = bc.constrain(Size::new(icon_size.width, icon_size.height));
         button_size
     }
 
@@ -120,7 +131,15 @@ impl Widget<AppState> for IconClearButton {
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
         ctx.with_save(|ctx| {
-            let svg_data = self.data.replace("{color}", color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap();
+            let svg_data = self
+                .data
+                .replace(
+                    "{color}",
+                    color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT)))
+                        .as_str(),
+                )
+                .parse::<SvgData>()
+                .unwrap();
             self.icon = Svg::new(svg_data);
             self.icon.paint(ctx, data, env);
         });
@@ -129,15 +148,12 @@ impl Widget<AppState> for IconClearButton {
 
 struct Child {
     inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>,
-    height: f64
+    height: f64,
 }
 
 impl Child {
     fn new(inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>, height: f64) -> Child {
-        Child {
-            inner,
-            height
-        }
+        Child { inner, height }
     }
 
     fn widget_mut(&mut self) -> Option<&mut WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
@@ -154,7 +170,7 @@ struct PagedWidget {
     current_id: u64,
     last_height: f64,
     inner_size: Size,
-    t: f64
+    t: f64,
 }
 
 impl PagedWidget {
@@ -164,7 +180,7 @@ impl PagedWidget {
             current_id: unsafe { SELECTED },
             last_height: 0.0,
             inner_size: Size::ZERO,
-            t: 1.0
+            t: 1.0,
         }
     }
 
@@ -233,7 +249,13 @@ impl Widget<AppState> for PagedWidget {
         }
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
+    fn layout(
+        &mut self,
+        ctx: &mut LayoutCtx,
+        bc: &BoxConstraints,
+        data: &AppState,
+        env: &Env,
+    ) -> Size {
         if self.detect_scene_change() {
             self.t = 0.0;
             ctx.window().request_anim_frame();
@@ -251,11 +273,14 @@ impl Widget<AppState> for PagedWidget {
             x.layout(ctx, bc, data, env);
         }
 
-        let size = Size::new(if bc.min().width > ctx.window().get_size().width {
-            ctx.window().get_size().width
-        } else {
-            bc.min().width
-        }, ctx.window().get_size().height);
+        let size = Size::new(
+            if bc.min().width > ctx.window().get_size().width {
+                ctx.window().get_size().width
+            } else {
+                bc.min().width
+            },
+            ctx.window().get_size().height,
+        );
         self.inner_size = size;
         self.inner_size
     }
@@ -282,7 +307,10 @@ impl Widget<AppState> for PagedWidget {
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
 
             let rect = ctx.size().to_rect();
-            ctx.transform(Affine::translate(Vec2::new(0.0, (1.0 - s) * x.height + self.last_height)));
+            ctx.transform(Affine::translate(Vec2::new(
+                0.0,
+                (1.0 - s) * x.height + self.last_height,
+            )));
             ctx.stroke(rect, &env.get(theme::COLOR_BORDER_DARK), 1.0);
             ctx.fill(rect, &env.get(theme::COLOR_BACKGROUND_LIGHT));
 
@@ -299,10 +327,13 @@ pub fn build_main() -> impl Widget<AppState> {
 
     // List
     let list_button = crate::widget::icon_clear_button::IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
     );
-        // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
-        // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+    // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -314,10 +345,13 @@ pub fn build_main() -> impl Widget<AppState> {
 
     // Download
     let download_button = crate::widget::icon_clear_button::IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
     );
-        // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
-        // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+    // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let download_button = download_button.on_click(|ctx, data: &mut AppState, _env| {
         unsafe {
@@ -331,10 +365,13 @@ pub fn build_main() -> impl Widget<AppState> {
 
     // Settings
     let settings_button = crate::widget::icon_clear_button::IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap()
+        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
     );
-        // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
-        // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    // .fix_width(crate::widget::window::TITLE_BAR_HEIGHT)
+    // .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
         unsafe {
@@ -345,11 +382,14 @@ pub fn build_main() -> impl Widget<AppState> {
     });
 
     let launch_button = LaunchButton::new(
-        std::str::from_utf8(&Asset::get("icon/play_slim.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
-        "Launch"
+        std::str::from_utf8(&Asset::get("icon/play_slim.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
+        "Launch",
     )
-        .fix_width(160.0)
-        .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
+    .fix_width(160.0)
+    .fix_height(crate::widget::window::TITLE_BAR_HEIGHT);
 
     let bar = Flex::row()
         .with_child(profile_button)
@@ -371,8 +411,11 @@ pub fn build_main() -> impl Widget<AppState> {
 pub fn build_nav() -> impl Widget<AppState> {
     // Home
     let home_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/home.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
-        hello_page::ID.parse().unwrap()
+        std::str::from_utf8(&Asset::get("icon/home.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
+        hello_page::ID.parse().unwrap(),
     );
 
     let home_button = home_button.on_click(|ctx, _data, _env| {
@@ -384,8 +427,11 @@ pub fn build_nav() -> impl Widget<AppState> {
     });
     // List
     let list_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
-        instances_page::ID.parse().unwrap()
+        std::str::from_utf8(&Asset::get("icon/list.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
+        instances_page::ID.parse().unwrap(),
     );
 
     let list_button = list_button.on_click(|ctx, _data, _env| {
@@ -397,14 +443,18 @@ pub fn build_nav() -> impl Widget<AppState> {
 
     // Download
     let download_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
-        download_page::ID.parse().unwrap()
+        std::str::from_utf8(&Asset::get("icon/download.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
+        download_page::ID.parse().unwrap(),
     );
 
     let download_button = download_button.on_click(|ctx, data, _env| {
         unsafe {
             crate::PAGE_ID = download_page::ID;
-            data.minecraft_versions.push_back("1145141919810".parse().unwrap());
+            data.minecraft_versions
+                .push_back("1145141919810".parse().unwrap());
             println!("{:?}", data.minecraft_versions);
         }
         ctx.request_anim_frame();
@@ -412,8 +462,11 @@ pub fn build_nav() -> impl Widget<AppState> {
 
     // Settings
     let settings_button = IconClearButton::new(
-        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data).unwrap().parse::<String>().unwrap(),
-        settings_page::ID.parse().unwrap()
+        std::str::from_utf8(&Asset::get("icon/settings.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap(),
+        settings_page::ID.parse().unwrap(),
     );
 
     let settings_button = settings_button.on_click(|ctx, _data, _env| {
@@ -441,9 +494,14 @@ pub fn build_nav() -> impl Widget<AppState> {
 
 pub fn build() -> impl Widget<AppState> {
     let mut pages = HashMap::<u64, Child>::new();
-    pages.insert(0, Child::new(WidgetPod::new(Box::new(build_main())), BOTTOM_BAR_HEIGHT));
-    pages.insert(1, Child::new(WidgetPod::new(Box::new(build_nav())), BOTTOM_BAR_HEIGHT_NAV));
+    pages.insert(
+        0,
+        Child::new(WidgetPod::new(Box::new(build_main())), BOTTOM_BAR_HEIGHT),
+    );
+    pages.insert(
+        1,
+        Child::new(WidgetPod::new(Box::new(build_nav())), BOTTOM_BAR_HEIGHT_NAV),
+    );
 
-    PagedWidget::new(pages)
-        .expand_width()
+    PagedWidget::new(pages).expand_width()
 }

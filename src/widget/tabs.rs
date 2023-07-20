@@ -1,15 +1,18 @@
-use std::collections::HashMap;
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, Rect, RenderContext, Size, theme, UpdateCtx, Widget, WidgetExt, WidgetPod};
 use druid::widget::Label;
+use druid::{
+    theme, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx,
+    PaintCtx, Point, Rect, RenderContext, Size, UpdateCtx, Widget, WidgetExt, WidgetPod,
+};
+use std::collections::HashMap;
 
 pub struct Child<T> {
-    inner: WidgetPod<T, Box<dyn Widget<T>>>
+    inner: WidgetPod<T, Box<dyn Widget<T>>>,
 }
 
 impl<T> Child<T> {
     pub fn new(inner: impl Widget<T> + 'static) -> Child<T> {
         Child {
-            inner: WidgetPod::new(Box::new(inner))
+            inner: WidgetPod::new(Box::new(inner)),
         }
     }
 
@@ -46,14 +49,14 @@ impl<T: Data> Widget<T> for Child<T> {
 
 struct SelectionButton<T> {
     label: WidgetPod<T, Box<dyn Widget<T>>>,
-    selected: bool
+    selected: bool,
 }
 
 impl<T: Data> SelectionButton<T> {
     pub fn new(name: String) -> SelectionButton<T> {
         SelectionButton {
-            label: WidgetPod::new(Box::new( Label::new(name).with_text_size(16.0).center())),
-            selected: false
+            label: WidgetPod::new(Box::new(Label::new(name).with_text_size(16.0).center())),
+            selected: false,
         }
     }
 
@@ -138,7 +141,7 @@ pub struct Tabs<T> {
     children: HashMap<String, Child<T>>,
     selected: String,
     inner_size: Size,
-    tabs: Vec<(Child<T>, String)>
+    tabs: Vec<(Child<T>, String)>,
 }
 
 impl<T: Data> Tabs<T> {
@@ -147,7 +150,7 @@ impl<T: Data> Tabs<T> {
             children: HashMap::new(),
             selected: String::new(),
             inner_size: Size::ZERO,
-            tabs: Vec::new()
+            tabs: Vec::new(),
         }
     }
 
@@ -233,11 +236,14 @@ impl<T: Data> Widget<T> for Tabs<T> {
         }
 
         let size = bc.shrink_max_height_to(bc.max().height - 32.0).max();
-        let size = Size::new(if bc.max().width > ctx.window().get_size().width {
-            ctx.window().get_size().width
-        } else {
-            size.width
-        }, ctx.window().get_size().height);
+        let size = Size::new(
+            if bc.max().width > ctx.window().get_size().width {
+                ctx.window().get_size().width
+            } else {
+                size.width
+            },
+            ctx.window().get_size().height,
+        );
         self.inner_size = size;
         self.inner_size
     }
@@ -272,8 +278,7 @@ impl<T: Data> Widget<T> for Tabs<T> {
                 // println!("{j}");
                 // I didn't figure out how it works, so plz don't change anything
                 let offset = (j) as f64 * 104.0;
-                let rect = Rect::new(12.0 + offset, 30.0, 84.0 + offset, 32.0)
-                    .to_rounded_rect(2.0);
+                let rect = Rect::new(12.0 + offset, 30.0, 84.0 + offset, 32.0).to_rounded_rect(2.0);
                 ctx.fill(rect, &env.get(crate::theme::theme::COLOR_PRIMARY_LIGHT));
             }
             x.0.widget_mut().unwrap().paint(ctx, data, env);

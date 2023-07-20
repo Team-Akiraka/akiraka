@@ -1,18 +1,18 @@
-use std::collections::HashMap;
-use druid::{Affine, BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod};
 use crate::ui::{download_page, hello_page, instances_page, settings_page};
 use crate::{animations, AppState};
+use druid::{
+    Affine, BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx,
+    RenderContext, Size, UpdateCtx, Vec2, Widget, WidgetPod,
+};
+use std::collections::HashMap;
 
 struct Child<AppState> {
-    inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>
+    inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>,
 }
-
 
 impl Child<AppState> {
     fn new(inner: WidgetPod<AppState, Box<dyn Widget<AppState>>>) -> Child<AppState> {
-        Child {
-            inner
-        }
+        Child { inner }
     }
 
     fn widget_mut(&mut self) -> Option<&mut WidgetPod<AppState, Box<dyn Widget<AppState>>>> {
@@ -30,23 +30,35 @@ pub struct PagedWidget<AppState> {
     children: HashMap<String, Child<AppState>>,
     current_id: String,
     inner_size: Size,
-    t: f64
+    t: f64,
 }
 
 impl PagedWidget<AppState> {
     pub fn new() -> PagedWidget<AppState> {
         let mut children = HashMap::new();
         // Add Children
-        children.insert(hello_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(hello_page::build()))));
-        children.insert(instances_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(instances_page::build()))));
-        children.insert(download_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(download_page::build()))));
-        children.insert(settings_page::ID.parse().unwrap(), Child::new(WidgetPod::new(Box::new(settings_page::build()))));
+        children.insert(
+            hello_page::ID.parse().unwrap(),
+            Child::new(WidgetPod::new(Box::new(hello_page::build()))),
+        );
+        children.insert(
+            instances_page::ID.parse().unwrap(),
+            Child::new(WidgetPod::new(Box::new(instances_page::build()))),
+        );
+        children.insert(
+            download_page::ID.parse().unwrap(),
+            Child::new(WidgetPod::new(Box::new(download_page::build()))),
+        );
+        children.insert(
+            settings_page::ID.parse().unwrap(),
+            Child::new(WidgetPod::new(Box::new(settings_page::build()))),
+        );
 
         PagedWidget {
             children,
             current_id: hello_page::ID.parse().unwrap(),
             inner_size: Size::ZERO,
-            t: 1.0
+            t: 1.0,
         }
     }
 
@@ -112,7 +124,13 @@ impl Widget<AppState> for PagedWidget<AppState> {
         }
     }
 
-    fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size {
+    fn layout(
+        &mut self,
+        ctx: &mut LayoutCtx,
+        bc: &BoxConstraints,
+        data: &AppState,
+        env: &Env,
+    ) -> Size {
         for x in self.children.values_mut().filter_map(|x| x.widget_mut()) {
             bc.constrain(x.layout(ctx, bc, data, env));
         }
@@ -122,7 +140,6 @@ impl Widget<AppState> for PagedWidget<AppState> {
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env) {
-
         let x = self.children.get_mut(&self.current_id);
         if x.is_some() {
             let s = if self.t / ANIMATION_TIME < 1.0 {
@@ -136,8 +153,7 @@ impl Widget<AppState> for PagedWidget<AppState> {
             let s = s / 4.0 + 0.75;
             let w = ctx.window().get_size().width / 2.0 - self.inner_size.width * s / 2.0;
             let h = ctx.window().get_size().height / 2.0 - self.inner_size.height * s / 2.0;
-            ctx.transform(Affine::scale(s)
-                .then_translate(Vec2::new(w, h)));
+            ctx.transform(Affine::scale(s).then_translate(Vec2::new(w, h)));
 
             x.unwrap().inner.paint(ctx, data, env);
             // ctx.render_ctx.fill(self.inner_size.to_rect(), &Color::rgba(1.0,1.0, 1.0, 1.0 - s0.powf(8.0)));

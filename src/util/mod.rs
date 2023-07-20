@@ -1,13 +1,19 @@
-#[allow(dead_code)]
-
-use std::time::{SystemTime, UNIX_EPOCH};
-use druid::{Color, ImageBuf, Size};
-use druid::piet::ImageFormat;
-use image::imageops::FilterType;
 use crate::Asset;
+use druid::piet::ImageFormat;
+use druid::{Color, ImageBuf, Size};
+use image::imageops::FilterType;
+#[allow(dead_code)]
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub fn color_as_hex_string(color: Color) -> String {
-    format!("#{:02X}{:02X}{:02X}", color.as_rgba8().0, color.as_rgba8().1, color.as_rgba8().2).parse().unwrap()
+    format!(
+        "#{:02X}{:02X}{:02X}",
+        color.as_rgba8().0,
+        color.as_rgba8().1,
+        color.as_rgba8().2
+    )
+    .parse()
+    .unwrap()
 }
 
 pub fn load_image(path: &str, size: Size, filter: FilterType) -> ImageBuf {
@@ -20,12 +26,14 @@ pub fn load_image(path: &str, size: Size, filter: FilterType) -> ImageBuf {
         rgb_img.to_vec(),
         ImageFormat::RgbaPremul,
         img_size.0 as usize,
-        img_size.1 as usize
+        img_size.1 as usize,
     );
     img_buf
 }
 
-
 pub fn get_time() -> u128 {
-    SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis()
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis()
 }

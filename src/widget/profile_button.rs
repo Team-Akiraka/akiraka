@@ -1,27 +1,44 @@
-
-use druid::widget::{Flex, Image, Label};
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, theme, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod};
-use image::imageops::FilterType;
 use crate::util;
+use druid::widget::{Flex, Image, Label};
+use druid::{
+    theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle,
+    LifeCycleCtx, MouseButton, PaintCtx, Point, RenderContext, Size, TextAlignment, UpdateCtx,
+    Vec2, Widget, WidgetExt, WidgetPod,
+};
+use image::imageops::FilterType;
 
 const LABEL_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
 pub struct ProfileButton<T> {
     icon: Image,
-    layout: WidgetPod<T, Box<dyn Widget<T>>>
+    layout: WidgetPod<T, Box<dyn Widget<T>>>,
 }
 
 impl<T: Data> ProfileButton<T> {
     pub fn new() -> ProfileButton<T> {
-        let user_name = Label::new("Unknown User").with_text_size(15.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(18.0);
-        let user_type = Label::new("Unknown Type").with_text_size(12.0).with_text_alignment(TextAlignment::Start).expand_width().fix_height(13.0);
+        let user_name = Label::new("Unknown User")
+            .with_text_size(15.0)
+            .with_text_alignment(TextAlignment::Start)
+            .expand_width()
+            .fix_height(18.0);
+        let user_type = Label::new("Unknown Type")
+            .with_text_size(12.0)
+            .with_text_alignment(TextAlignment::Start)
+            .expand_width()
+            .fix_height(13.0);
 
         ProfileButton {
-            icon: Image::new(util::load_image("icon/steve_head.png", Size::new(64.0, 64.0), FilterType::Nearest)),
-            layout: WidgetPod::new(Box::new(Flex::column()
-                .with_child(user_name)
-                .with_child(user_type)
-                .align_left()))
+            icon: Image::new(util::load_image(
+                "icon/steve_head.png",
+                Size::new(64.0, 64.0),
+                FilterType::Nearest,
+            )),
+            layout: WidgetPod::new(Box::new(
+                Flex::column()
+                    .with_child(user_name)
+                    .with_child(user_type)
+                    .align_left(),
+            )),
         }
     }
 }
@@ -63,8 +80,12 @@ impl<T: Data> Widget<T> for ProfileButton<T> {
         let icon_bc = bc.loosen();
         let icon_size = self.icon.layout(ctx, &icon_bc, data, env);
 
-        let layout_bc = bc.shrink(padding).shrink_max_width_to(bc.min().width - icon_size.width).loosen();
-        self.layout.set_origin(ctx, Point::new(icon_size.width + 20.0, 0.0));
+        let layout_bc = bc
+            .shrink(padding)
+            .shrink_max_width_to(bc.min().width - icon_size.width)
+            .loosen();
+        self.layout
+            .set_origin(ctx, Point::new(icon_size.width + 20.0, 0.0));
         self.layout.layout(ctx, &layout_bc, data, env);
         bc.min()
     }
@@ -106,7 +127,7 @@ impl<T: Data> Widget<T> for ProfileButton<T> {
         });
 
         ctx.with_save(|ctx| {
-            ctx.transform(Affine::translate(Vec2::new( -40.0, 0.0)));
+            ctx.transform(Affine::translate(Vec2::new(-40.0, 0.0)));
             self.layout.paint(ctx, data, env);
         });
     }

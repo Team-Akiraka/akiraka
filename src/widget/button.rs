@@ -1,19 +1,19 @@
-
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
 use druid::widget::{Click, ControllerHost, Label, LabelText};
+use druid::{
+    theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle,
+    LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, UpdateCtx, Widget,
+};
 
 const LABEL_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
 pub struct Button<T> {
     label: Label<T>,
-    label_size: Size
+    label_size: Size,
 }
-
 
 impl<T: Data> Button<T> {
     pub fn new(text: impl Into<LabelText<T>>) -> Button<T> {
-        Self::from_label(Label::new(text)
-            .with_text_size(13.0))
+        Self::from_label(Label::new(text).with_text_size(13.0))
     }
 
     pub fn from_label(label: Label<T>) -> Button<T> {
@@ -34,7 +34,6 @@ impl<T: Data> Button<T> {
     ) -> ControllerHost<Self, Click<T>> {
         ControllerHost::new(self, Click::new(f))
     }
-
 }
 
 impl<T: Data> Widget<T> for Button<T> {

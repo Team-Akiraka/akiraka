@@ -1,8 +1,9 @@
-
-use druid::{BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, theme, UpdateCtx, Widget};
-use druid::widget::{Svg, SvgData};
 use crate::util::color_as_hex_string;
-
+use druid::widget::{Svg, SvgData};
+use druid::{
+    theme, BoxConstraints, Color, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle,
+    LifeCycleCtx, MouseButton, PaintCtx, RenderContext, Size, UpdateCtx, Widget,
+};
 
 const ICON_INSETS: Insets = Insets::uniform_xy(8., 2.);
 
@@ -14,8 +15,13 @@ pub struct IconClearButton {
 impl IconClearButton {
     pub fn new(data: String) -> IconClearButton {
         Self {
-            icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
-            data
+            icon: Svg::new(
+                data.clone()
+                    .replace("{color}", "#000000")
+                    .parse::<SvgData>()
+                    .unwrap(),
+            ),
+            data,
         }
     }
 }
@@ -52,11 +58,7 @@ impl<T: Data> Widget<T> for IconClearButton {
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
         let icon_size = self.icon.layout(ctx, bc, data, env);
-        let button_size =
-            bc.constrain(Size::new(
-                icon_size.width,
-                icon_size.height
-            ));
+        let button_size = bc.constrain(Size::new(icon_size.width, icon_size.height));
         button_size
     }
 
@@ -92,7 +94,15 @@ impl<T: Data> Widget<T> for IconClearButton {
         ctx.stroke(rounded_rect, &border_color, stroke_width);
 
         ctx.with_save(|ctx| {
-            let svg_data = self.data.replace("{color}", color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap();
+            let svg_data = self
+                .data
+                .replace(
+                    "{color}",
+                    color_as_hex_string(Color::from(env.get(crate::theme::theme::COLOR_TEXT)))
+                        .as_str(),
+                )
+                .parse::<SvgData>()
+                .unwrap();
             self.icon = Svg::new(svg_data);
             self.icon.paint(ctx, data, env);
         });

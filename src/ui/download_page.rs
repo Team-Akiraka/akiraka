@@ -1,9 +1,13 @@
-use druid::{BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt, WidgetPod};
-use druid::widget::{Axis, Flex, Label, List, Scroll};
-use crate::{AppState, Empty};
 use crate::theme::theme;
 use crate::widget::bounded_widget::BoundedWidget;
 use crate::widget::tabs::Tabs;
+use crate::{AppState, Empty};
+use druid::widget::{Axis, Flex, Label, List, Scroll};
+use druid::{
+    BoxConstraints, Data, Env, Event, EventCtx, Insets, LayoutCtx, LifeCycle, LifeCycleCtx,
+    LocalizedString, PaintCtx, RenderContext, Size, UnitPoint, UpdateCtx, Widget, WidgetExt,
+    WidgetPod,
+};
 
 pub const ID: &str = "DOWNLOAD_PAGE";
 pub static mut IS_LOADING: bool = false;
@@ -11,7 +15,7 @@ pub static mut IS_LOADING: bool = false;
 struct GameInstance<T> {
     pub(crate) version_name: String,
     pub(crate) version_type: String,
-    layout: WidgetPod<T, Box<dyn Widget<T>>>
+    layout: WidgetPod<T, Box<dyn Widget<T>>>,
 }
 
 impl<T: Data> GameInstance<T> {
@@ -19,7 +23,7 @@ impl<T: Data> GameInstance<T> {
         GameInstance {
             version_name,
             version_type,
-            layout: WidgetPod::new(Box::new(Empty {}))
+            layout: WidgetPod::new(Box::new(Empty {})),
         }
     }
 
@@ -77,19 +81,26 @@ fn build_minecraft() -> impl Widget<AppState> {
             .fix_height(48.0)
             .align_left()
     })
-        .with_spacing(0.0)
-        // .expand_width()
-        .lens(AppState::minecraft_versions);
+    .with_spacing(0.0)
+    .lens(AppState::minecraft_versions);
 
-    let layout = Flex::column()
-        .with_child(list);
+    let layout = Flex::column().with_child(list);
 
     layout
 }
 
 fn build_center() -> impl Widget<AppState> {
+    rust_embed::RustEmbed
     let tabs = Tabs::new()
-        .with_child("Minecraft".parse().unwrap(), BoundedWidget::new(Scroll::new(build_minecraft()).vertical().expand_height().padding(Insets::new(8.0, 8.0, 8.0, 124.0))))
+        .with_child(
+            "Minecraft".parse().unwrap(),
+            BoundedWidget::new(
+                Scroll::new(build_minecraft())
+                    .vertical()
+                    .expand_height()
+                    .padding(Insets::new(8.0, 8.0, 8.0, 124.0)),
+            ),
+        )
         .with_child("Resources".parse().unwrap(), Label::new("Resources"))
         .with_selected("Minecraft".parse().unwrap())
         .padding(Insets::uniform(8.0));
@@ -102,8 +113,5 @@ pub fn build() -> impl Widget<AppState> {
         .with_child(build_center())
         .padding(Insets::uniform_xy(0.0, 0.0));
 
-    body
-        .expand()
-        .align_vertical(UnitPoint::TOP)
-        .align_left()
+    body.expand().align_vertical(UnitPoint::TOP).align_left()
 }

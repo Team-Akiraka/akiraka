@@ -1,19 +1,17 @@
-
-use druid::{Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Point, Rect, RenderContext, Size, theme, UpdateCtx, Widget};
-use druid::widget::{Image};
+use druid::widget::Image;
+use druid::{
+    theme, Affine, BoxConstraints, Data, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx,
+    PaintCtx, Point, Rect, RenderContext, Size, UpdateCtx, Widget,
+};
 
 pub struct IconButton {
     image: Image,
-    size: Size
+    size: Size,
 }
-
 
 impl IconButton {
     pub fn new(image: Image, size: Size) -> Self {
-        Self {
-            image,
-            size
-        }
+        Self { image, size }
     }
 }
 
@@ -56,13 +54,15 @@ impl<T: Data> Widget<T> for IconButton {
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let is_active = ctx.is_active() && !ctx.is_disabled();
         let rect = Rect::from_origin_size(Point::ORIGIN, self.size);
-        ctx.fill(rect, &env.get(if is_active {
-            theme::BACKGROUND_DARK
-        } else {
-            theme::PLACEHOLDER_COLOR
-        }));
+        ctx.fill(
+            rect,
+            &env.get(if is_active {
+                theme::BACKGROUND_DARK
+            } else {
+                theme::PLACEHOLDER_COLOR
+            }),
+        );
         ctx.with_save(move |ctx| {
-
             ctx.transform(Affine::scale(0.75));
             self.image.paint(ctx, data, env);
         })

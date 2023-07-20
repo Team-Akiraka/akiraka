@@ -1,24 +1,26 @@
-
-use druid::{Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets, LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point, RawWindowHandle, Rect, RenderContext, Size, TextAlignment, UpdateCtx, Vec2, Widget, WidgetExt, WidgetPod, WindowState};
+use crate::app_state_derived_lenses::global_search_bar_input;
+use crate::theme::theme;
+use crate::util::color_as_hex_string;
+use crate::{AppState, Asset};
 use druid::widget::{LensWrap, Svg, SvgData, TextBox};
+use druid::{
+    Affine, BoxConstraints, Color, Data, Env, Event, EventCtx, HasRawWindowHandle, Insets,
+    LayoutCtx, LifeCycle, LifeCycleCtx, LocalizedString, MouseButton, PaintCtx, Point,
+    RawWindowHandle, Rect, RenderContext, Size, TextAlignment, UpdateCtx, Vec2, Widget, WidgetExt,
+    WidgetPod, WindowState,
+};
 #[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
 #[cfg(target_os = "windows")]
-use winapi::um::winuser::{HTCAPTION, ReleaseCapture, SC_MOVE, SendMessageA, WM_SYSCOMMAND};
-use crate::app_state_derived_lenses::{global_search_bar_input};
-use crate::{AppState, Asset};
-use crate::theme::theme;
-use crate::util::color_as_hex_string;
+use winapi::um::winuser::{ReleaseCapture, SendMessageA, HTCAPTION, SC_MOVE, WM_SYSCOMMAND};
 
 struct DraggableArea {
-    height: f64
+    height: f64,
 }
 
 impl DraggableArea {
     pub fn new(height: f64) -> Self {
-        Self {
-            height
-        }
+        Self { height }
     }
 }
 
@@ -34,25 +36,26 @@ impl<T> Widget<T> for DraggableArea {
                     if let RawWindowHandle::Win32(handle) = ctx.window().raw_window_handle() {
                         unsafe {
                             ReleaseCapture();
-                            SendMessageA(handle.hwnd as HWND, WM_SYSCOMMAND, SC_MOVE + (HTCAPTION as usize), 0);
+                            SendMessageA(
+                                handle.hwnd as HWND,
+                                WM_SYSCOMMAND,
+                                SC_MOVE + (HTCAPTION as usize),
+                                0,
+                            );
                         }
                     }
                 }
                 ctx.request_paint();
             }
-            Event::MouseUp(mouse_event) => {
-            }
-            Event::MouseMove(mouse_event) => {
-            }
+            Event::MouseUp(mouse_event) => {}
+            Event::MouseMove(mouse_event) => {}
             _ => {}
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {
-    }
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &T, env: &Env) {}
 
-    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {
-    }
+    fn update(&mut self, ctx: &mut UpdateCtx, old_data: &T, data: &T, env: &Env) {}
 
     fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &T, env: &Env) -> Size {
         Size::new(bc.max().width, self.height)
@@ -60,7 +63,7 @@ impl<T> Widget<T> for DraggableArea {
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
         let rect = Rect::from_origin_size(Point::ORIGIN, ctx.size());
-        ctx.fill(rect, &Color::rgba8(255, 255,255, 0));
+        ctx.fill(rect, &Color::rgba8(255, 255, 255, 0));
     }
 }
 
@@ -74,7 +77,12 @@ impl TitleBarButton {
     pub fn new(size: f64, data: String) -> Self {
         Self {
             size,
-            icon: Svg::new(data.clone().replace("{color}", "#000000").parse::<SvgData>().unwrap()),
+            icon: Svg::new(
+                data.clone()
+                    .replace("{color}", "#000000")
+                    .parse::<SvgData>()
+                    .unwrap(),
+            ),
             data,
         }
     }
@@ -129,7 +137,15 @@ impl<T: Data> Widget<T> for TitleBarButton {
 
         ctx.with_save(|ctx| {
             ctx.transform(Affine::scale(0.5).then_translate(Vec2::new(12.0 - 1.0, 12.0 - 1.0)));
-            self.icon = Svg::new(self.data.replace("{color}", color_as_hex_string(Color::from(env.get(theme::COLOR_TEXT))).as_str()).parse::<SvgData>().unwrap());
+            self.icon = Svg::new(
+                self.data
+                    .replace(
+                        "{color}",
+                        color_as_hex_string(Color::from(env.get(theme::COLOR_TEXT))).as_str(),
+                    )
+                    .parse::<SvgData>()
+                    .unwrap(),
+            );
             self.icon.paint(ctx, data, env);
         });
     }
@@ -142,22 +158,33 @@ pub struct TitleBar<T> {
     draggable_area: WidgetPod<T, Box<dyn Widget<T>>>,
     exit_button: WidgetPod<T, Box<dyn Widget<T>>>,
     minimize_button: WidgetPod<T, Box<dyn Widget<T>>>,
-    search_bar: WidgetPod<T, Box<dyn Widget<T>>>
+    search_bar: WidgetPod<T, Box<dyn Widget<T>>>,
 }
 
 #[allow(unused_variables)]
-impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_input, TextBox<String>>: Widget<T> {
+impl<T: Data> TitleBar<T>
+where
+    LensWrap<AppState, String, global_search_bar_input, TextBox<String>>: Widget<T>,
+{
     pub fn new(height: f64) -> Self {
-        let svg = std::str::from_utf8(&Asset::get("icon/title_bar/close.svg").unwrap().data).unwrap().parse::<String>().unwrap();
-        let exit_button = TitleBarButton::new(height, svg.clone())
-            .on_click(|ctx, t: &mut T, env| {
+        let svg = std::str::from_utf8(&Asset::get("icon/title_bar/close.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap();
+        let exit_button =
+            TitleBarButton::new(height, svg.clone()).on_click(|ctx, t: &mut T, env| {
                 ctx.window().clone().close();
             });
 
-        let svg = std::str::from_utf8(&Asset::get("icon/title_bar/minimize.svg").unwrap().data).unwrap().parse::<String>().unwrap();
-        let minimize_button = TitleBarButton::new(height, svg.clone())
-            .on_click(|ctx, t: &mut T, env| {
-                ctx.window().clone().set_window_state(WindowState::Minimized);
+        let svg = std::str::from_utf8(&Asset::get("icon/title_bar/minimize.svg").unwrap().data)
+            .unwrap()
+            .parse::<String>()
+            .unwrap();
+        let minimize_button =
+            TitleBarButton::new(height, svg.clone()).on_click(|ctx, t: &mut T, env| {
+                ctx.window()
+                    .clone()
+                    .set_window_state(WindowState::Minimized);
             });
 
         // TODO: Search bar
@@ -174,7 +201,7 @@ impl<T: Data> TitleBar<T> where LensWrap<AppState, String, global_search_bar_inp
             draggable_area: WidgetPod::new(Box::new(DraggableArea::new(height))),
             exit_button: WidgetPod::new(Box::new(exit_button)),
             minimize_button: WidgetPod::new(Box::new(minimize_button)),
-            search_bar: WidgetPod::new(Box::new(search_bar))
+            search_bar: WidgetPod::new(Box::new(search_bar)),
         }
     }
 }
@@ -190,7 +217,8 @@ impl<T: Data> Widget<T> for TitleBar<T> {
             }
         }
 
-        if !(self.exit_button.is_hot() || self.minimize_button.is_hot() || self.search_bar.is_hot()) {
+        if !(self.exit_button.is_hot() || self.minimize_button.is_hot() || self.search_bar.is_hot())
+        {
             self.draggable_area.event(ctx, event, data, env);
         }
     }
@@ -213,22 +241,29 @@ impl<T: Data> Widget<T> for TitleBar<T> {
         self.draggable_area.set_origin(ctx, Point::ORIGIN);
         bc.constrain(self.draggable_area.layout(ctx, bc, data, env));
 
-        self.exit_button.set_origin(ctx, Point::new(bc.max().width - self.height, 0.0));
+        self.exit_button
+            .set_origin(ctx, Point::new(bc.max().width - self.height, 0.0));
         bc.constrain(self.exit_button.layout(ctx, bc, data, env));
-        self.minimize_button.set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
+        self.minimize_button
+            .set_origin(ctx, Point::new(bc.max().width - self.height * 2.0, 0.0));
         bc.constrain(self.minimize_button.layout(ctx, bc, data, env));
-        self.search_bar.set_origin(ctx, Point::new(bc.max().width / 2.0 - 160.0, 0.0));
-        bc.constrain(self.search_bar.layout(ctx,
-                                            &BoxConstraints::new(
-                                                Size::new(320.0, self.height),
-                                                Size::new(320.0, self.height))
-                                            , data, env));
+        self.search_bar
+            .set_origin(ctx, Point::new(bc.max().width / 2.0 - 160.0, 0.0));
+        bc.constrain(self.search_bar.layout(
+            ctx,
+            &BoxConstraints::new(Size::new(320.0, self.height), Size::new(320.0, self.height)),
+            data,
+            env,
+        ));
 
         Size::new(bc.max().width, self.height)
     }
 
     fn paint(&mut self, ctx: &mut PaintCtx, data: &T, env: &Env) {
-        let rect = Rect::from_origin_size(Point::ORIGIN, Size::new(ctx.window().get_size().width, self.height));
+        let rect = Rect::from_origin_size(
+            Point::ORIGIN,
+            Size::new(ctx.window().get_size().width, self.height),
+        );
         ctx.fill(rect, &env.get(theme::COLOR_PRIMARY_TITLE_BAR));
 
         self.draggable_area.paint(ctx, data, env);

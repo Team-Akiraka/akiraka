@@ -1,4 +1,3 @@
-
 pub mod sine {
     use std::f64::consts::PI;
 
@@ -14,7 +13,6 @@ pub mod sine {
         0.0
     }
 }
-
 
 pub mod circ {
     pub fn ease_in(x: f64) -> f64 {
@@ -33,7 +31,6 @@ pub mod circ {
         }
     }
 }
-
 
 pub mod elastic {
     use std::f64::consts::PI;
@@ -61,7 +58,6 @@ pub mod elastic {
     }
 }
 
-
 pub mod back {
     const C1: f64 = 1.74158;
     const C3: f64 = C1 + 1.0;
@@ -78,7 +74,6 @@ pub mod back {
         0.0
     }
 }
-
 
 pub mod expo {
     const C1: f64 = 1.74158;
